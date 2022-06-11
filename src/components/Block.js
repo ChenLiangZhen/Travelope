@@ -2,29 +2,36 @@ import {HStack, Text, VStack} from "native-base";
 import React from "react";
 
 
-const Block = ({children,h, mt, mb, pt, pb}) => {
+const Block = ({children, bdc, bgc, sc, jc, ai, fd, ...props}) => {
 
 	return(
+
 		<VStack
-			h={h}
-			p={2}
-			mx={4}
-			mt={mt | 0}
-			mb={mb | 6}
-			pt={pt}
-			pb={pb}
-			borderColor={"#9B9FC9"}
+
+			px={16}
+			mb={24}
+
 			borderWidth={2}
-			borderRadius={20}
-			bg={"#fff"}
-			shadowColor={"#5f5db1"}
+			borderRadius={18}
+
+			bg={ bgc? bgc : "#fff" }
+			borderColor={ bdc? bdc : "#9B9FC9" }
+			shadowColor={sc? sc : "#908dff"}
 			shadowRadius={0}
-			shadowOpacity={.25}
+			shadowOpacity={.4}
 			shadowOffset={{
 				height: 10,
 			}}
+
+			flexDirection={fd? fd: "column"}
+			justifyContent={jc? jc: "flex-start"}
+			alignItems={ai? ai: "flex-start"}
+
+			{...props}
 		>
+
 			{children}
+
 		</VStack>
 	)
 }

@@ -3,18 +3,22 @@ const mongoose = require("mongoose")
 const User = mongoose.model("user_account")
 const UserData = mongoose.model("user_data")
 
-module.exports= (req, res, next) => {
+module.exports = (req, res, next) => {
+
+	console.log("JWT Auth processing...")
 	const { authorization } = req.headers
 
+	console.log(authorization)
+
 	if(!authorization){
-		console.log("[userAuth]: Invalid JWT Token")
+		console.log("[userAuth]: Invalid JWT Token (NULL)")
 		return res.status(401).send({ error: "You must be logged in."})
 	}
 
 	const token = authorization.replace("Bearer ", "")
 	jwt.verify(token, "U0VDUkVUX0tFWV9PRl9NSURURVJNX1BST0pFQ1Q=", async(err, payload) => {
 		if(err){
-			console.log("[userAuth]: Invalid JWT Token")
+			console.log("[userAuth]: Invalid JWT Token (INVALID)")
 			return res.status(401).send({ error: "You must be logged in." })
 		}
 

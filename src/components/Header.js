@@ -1,8 +1,7 @@
-import {Box, HStack, Image, Pressable, Text} from "native-base";
+import {Box, HStack, Pressable, Text} from "native-base";
 import {useEffect, useState} from "react";
 import React from "react";
-import {View} from "react-native";
-import SVGImg from "../res/AppIcon.svg";
+import {View,  Image} from "react-native";
 import Feather from "react-native-vector-icons/Feather";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import LinearGradient from "react-native-linear-gradient";
@@ -20,8 +19,8 @@ const AppHeader = (props) => {
 			case 'CurrentTrip':
 				setTranslatedTitle("目前旅程")
 				break
-			case 'RecentTrip':
-				setTranslatedTitle("近期旅程")
+			case 'TripOverview':
+				setTranslatedTitle("旅程總覽")
 				break
 			case 'MemEnvelope':
 				setTranslatedTitle("回憶信封")
@@ -44,13 +43,7 @@ const AppHeader = (props) => {
 
 		<View
 			style={{
-				marginBottom: 8,
-				shadowColor: "#AAA7CC",
-				shadowOpacity: 1,
-				shadowRadius: 0,
-				shadowOffset: {
-					height: 9
-				}
+				marginBottom: 24,
 			}}
 		>
 			<View
@@ -58,21 +51,22 @@ const AppHeader = (props) => {
 					flexDirection: "row",
 					paddingHorizontal: 18,
 					marginTop: props.paddingTop,
-					height: 42,
+					height: 44,
 					backgroundColor: "#fff",
 					justifyContent: "space-between",
 					alignItems: "center",
 				}}
 			>
 				<Pressable
+					onPress={()=> {
+						props.navigation.navigate("Settings")
+					}}
 					style={{
 						zIndex: 100,
 						height: 32,
 						width: 32,
 					}}
-					onPress={() => {
-						props.navigation.openDrawer()
-					}}>
+					>
 					<MaskedView
 						style={{flex: 1, flexDirection: 'row', height: 32}}
 						maskElement={
@@ -105,7 +99,16 @@ const AppHeader = (props) => {
 					// 	style={{ height: 32 }}
 					// 	source={require("../res/AppIcon.svg")}
 					// />
-					<SVGImg width={150}/>
+					// <SVGImg width={200}/>
+
+					<Image
+						source={require("../res/branding_eng_larger.png")}
+						style={{
+							resizeMode: "contain",
+							// height: 20,
+							width: 190
+						}}
+					/>
 					:
 
 					<MaskedView
@@ -166,13 +169,17 @@ const AppHeader = (props) => {
 				</Pressable>
 			</View>
 
-			<View
-				style={{
-					height: 2,
-					width: "100%",
-					backgroundColor: "#6961C6"
-				}}
+			<LinearGradient
+
+				useAngle={true}
+				angle={90}
+				// angleCenter={{x: 0.5, y: 0.5}}
+				locations={[0, .9]}
+				colors={['#8480ff', "#c57fff"]}
+				style={{ height: 2, width: "100%"}}
+
 			/>
+
 		</View>
 	)
 }

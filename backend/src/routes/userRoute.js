@@ -4,9 +4,9 @@ const jwt = require("jsonwebtoken");
 const User = mongoose.model("user_account")
 const UserData = mongoose.model("user_data")
 
-const router = express.Router()
+const router_sign = express.Router()
 
-router.post("/api/signup", async (req, res) => {
+router_sign.post("/api/signup", async (req, res) => {
 
 	const { nickname ,email, password } = req.body
 	let linkId, userData
@@ -26,45 +26,13 @@ router.post("/api/signup", async (req, res) => {
 		//SECRET_KEY_OF_MIDTERM_PROJECT，Base64 Encoded.
 
 		linkId = user._id
-		userData = {
-			noteData: [
-				{
-					id: "0",
-					title: "心情好好～～",
-					content: "從來沒想過會遇到這麼雞掰的一天．．．",
-					createdAt: {
-						year: 2022,
-						month: 4,
-						day: 4
-					},
-					noteMood: 1
-				},
-				{
-					id: "1",
-					title: "今天超雞掰！！！",
-					content: "心情怎麼可以這麼好 wow",
-					createdAt: {
-						year: 2022,
-						month: 4,
-						day: 5
-					},
-					noteMood: 1
-				},
-			],
-			setting: {
-				userName: nickname,
-				userEmail: email,
-				displayBackground: false,
-				background: "bigcookie",
-				accessibility: false,
-				noteDisplayTwoColumn : false,
-				tabBarDisplayFloat: false,
-			}
-		}
+		userData = {}
 
 		const data = new UserData({
 			userLink :linkId ,
-			data: userData})
+			data: userData
+		})
+
 		await data.save()
 
 		const token = jwt.sign({userId: user._id}, "U0VDUkVUX0tFWV9PRl9NSURURVJNX1BST0pFQ1Q=")
@@ -78,7 +46,7 @@ router.post("/api/signup", async (req, res) => {
 
 })
 
-router.post('/api/signin', async(req, res) => {
+router_sign.post('/api/signin', async(req, res) => {
 	const {email, password } = req.body
 
 	if(!email || !password){
@@ -96,10 +64,10 @@ router.post('/api/signin', async(req, res) => {
 
 		const userData = await UserData.findOne({userLink: user._id})
 
-		res.send({ token, userData })
+		res.send({ token, user, userData })
 	}catch (e){
 		return res.status(422).send({ error: "invalid password of email"})
 	}
 })
 
-module.exports = router
+module.exports = router_sign
