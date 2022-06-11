@@ -15,7 +15,7 @@ const MainScreen = () => {
 
 				<Block h={20} mt={4}>
 					<Text>
-						dfbnlkfsjn
+
 					</Text>
 				</Block>
 
