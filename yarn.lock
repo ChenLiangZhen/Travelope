@@ -6837,6 +6837,11 @@ react-is@^16.13.0, react-is@^16.13.1, react-is@^16.7.0:
   resolved "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
+react-native-clean-project@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-clean-project/-/react-native-clean-project-4.0.1.tgz#c0e2b17eebf32a683aa67da45fe7932857166da7"
+  integrity sha512-B7rXdFC4bfA+Vv7lZ9bKS6cUDgqg04OR5D69sNnhheFBJQ1V04cIfJ1Fu0sbqRsIehqlOcySQRpp8tm7r7PvLQ==
+
 react-native-codegen@^0.0.17:
   version "0.0.17"
   resolved "https://registry.npmjs.org/react-native-codegen/-/react-native-codegen-0.0.17.tgz"
@@ -6925,6 +6930,11 @@ react-native-screens@^3.13.1:
   dependencies:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
+
+react-native-share@^7.6.2:
+  version "7.6.2"
+  resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-7.6.2.tgz#7a1edf2226109b0a0aeaeefef3f8f7b119508a96"
+  integrity sha512-8Dv0ZqqW3rSzQxi9MoxXreRU65xizGVhrS2xoXfKJrgx9cI0jCAUao7B6CSZdB1exr6ZLFpi56pJ7t1Fp++d1A==
 
 react-native-svg-transformer@^1.0.0:
   version "1.0.0"
