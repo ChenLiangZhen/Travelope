@@ -10,10 +10,15 @@ import BlockTitle from "../components/BlockTitle";
 import LayoutBase from "../components/LayoutBase";
 import GradientButton from "../components/GradientButton";
 import Share from "react-native-share"
+import ViewShot from "react-native-view-shot";
 
 const MainScreen = ({ navigation }) => {
 
+  const ref = useRef()
+
   useEffect(()=> {
+
+
     Share.open({ message: "dfgdg"})
       .then((res) => {
         console.log(res);
@@ -21,7 +26,19 @@ const MainScreen = ({ navigation }) => {
       .catch((err) => {
         err && console.log(err);
       });
+
+      // on mount
+      ref.current.capture()
+        .then(uri => {
+          console.log("do something with ", uri);
+        })
+        .catch((e) => {
+          console.log(e)
+        })
+
   },[])
+
+
 
   // useEffect(() => {
   //   // on mount
@@ -39,11 +56,12 @@ const MainScreen = ({ navigation }) => {
     <LayoutBase>
 
       <StatusBar barStyle={"dark-content"} />
+
       <ScrollView flex={1}>
 
-        {/*<ViewShot ref={ref} options={{ fileName: "Your-File-Name", format: "jpg", quality: 0.9 }}>*/}
-        {/*  <Text>...Something to rasterize...</Text>*/}
-        {/*</ViewShot>*/}
+        <ViewShot ref={ref} options={{ fileName: "Your-File-Name", format: "jpg", quality: 0.9 }}>
+          <Text>...Something to rasterize...</Text>
+        </ViewShot>
 
         <Block borderRadius={100} fd={"row"} h={64} sc={"#9e66ff"} bdc={"#af81ff"} ai={"center"} jc={"space-between"}>
 
