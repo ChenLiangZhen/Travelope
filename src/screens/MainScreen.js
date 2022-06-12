@@ -9,10 +9,19 @@ import Block from "../components/Block";
 import BlockTitle from "../components/BlockTitle";
 import LayoutBase from "../components/LayoutBase";
 import GradientButton from "../components/GradientButton";
+import Share from "react-native-share"
 
 const MainScreen = ({ navigation }) => {
 
-  const ref = useRef();
+  useEffect(()=> {
+    Share.open({ message: "dfgdg"})
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        err && console.log(err);
+      });
+  },[])
 
   // useEffect(() => {
   //   // on mount

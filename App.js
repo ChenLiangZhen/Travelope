@@ -16,6 +16,71 @@ import MemEnvelope from "./src/screens/envelope/MemEnvelope";
 import TripPostcard from "./src/screens/TripPostcard";
 import MyZone from "./src/screens/MyZone";
 import Settings from "./src/screens/Settings";
+import { useEffect, useRef } from "react";
+import Share from "react-native-share";
+
+// const App = () => {
+//
+//   useEffect(() => {
+//     Share.open({message: "vsdfb"})
+//       .then((res) => {
+//         console.log(res);
+//       })
+//       .catch((err) => {
+//         err && console.log(err);
+//       });
+//   }, []);
+//
+//   // const onShare = async () => {
+//   //   try {
+//   //     const result = await Share.share({
+//   //       message:
+//   //         'React Native | A framework for building native apps using React',
+//   //     });
+//   //     if (result.action === Share.sharedAction) {
+//   //       if (result.activityType) {
+//   //         // shared with activity type of result.activityType
+//   //       } else {
+//   //         // shared
+//   //       }
+//   //     } else if (result.action === Share.dismissedAction) {
+//   //       // dismissed
+//   //     }
+//   //   } catch (error) {
+//   //     alert(error.message);
+//   //   }
+//   return (
+//     <ExampleCaptureOnMountManually/>
+//     // <View/>
+//   );
+// }
+//
+// function ExampleCaptureOnMountManually() {
+//   const ref = useRef();
+//
+//   useEffect(() => {
+//     // on mount
+//     ref.current.capture()
+//       .then(uri => {
+//         console.log("do something with ", uri);
+//       })
+//       .catch(err => {
+//         console.log(err)
+//       })
+//   }, []);
+//
+//   return (
+//
+//     <View/>
+//     // <ViewShot ref={ref} options={{ fileName: "Your-File-Name", format: "jpg", quality: 0.9 }}>
+//     //   <Text>...Something to rasterize...</Text>
+//     // </ViewShot>
+//   );
+// }
+//
+//
+// export default App
+
 
 const defaultTheme = {
   ...DefaultTheme, colors: {

@@ -70,5 +70,13 @@
         <string>SimpleLineIcons.ttf</string>
         <string>Zocial.ttf</string>
     </array>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>$(PRODUCT_NAME) wants to save photos</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>whatsapp</string>
+		<string>line</string>
+		<string>facebook</string>
+	</array>
 </dict>
 </plist>
