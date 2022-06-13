@@ -6,6 +6,7 @@ import Feather from "react-native-vector-icons/Feather";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import LinearGradient from "react-native-linear-gradient";
 import MaskedView from "@react-native-masked-view/masked-view";
+import { IB_ArrowLeft, IB_User } from "./GradientIconButton";
 
 const AppHeader = (props) => {
 
@@ -57,42 +58,11 @@ const AppHeader = (props) => {
 					alignItems: "center",
 				}}
 			>
-				<Pressable
-					onPress={()=> {
-						props.navigation.navigate("Settings")
-					}}
-					style={{
-						zIndex: 100,
-						height: 32,
-						width: 32,
-					}}
-					>
-					<MaskedView
-						style={{flex: 1, flexDirection: 'row', height: 32}}
-						maskElement={
-							<View
-								style={{
-									flex: 1,
-									backgroundColor: 'transparent',
-									justifyContent: 'center',
-									alignItems: 'center',
-								}}>
-								<Feather
-									name={"user"}
-									size={24}
-								/>
-							</View>
-						}>
-						<LinearGradient
-							useAngle={true}
-							angle={170}
-							angleCenter={{x: 0.2, y: 0.7}}
-							locations={[0, 0.6]}
-							colors={['#3346ff', "#a138ff"]}
-							style={{flex: 1}}
-						/>
-					</MaskedView>
-				</Pressable>
+				{props.title === "MainScreen"?
+
+					<IB_User/> : <IB_ArrowLeft/>
+
+				}
 
 				{props.title === "MainScreen" ?
 					// <Image

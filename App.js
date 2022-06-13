@@ -18,6 +18,8 @@ import MyZone from "./src/screens/MyZone";
 import Settings from "./src/screens/Settings";
 import { useEffect, useRef } from "react";
 import Share from "react-native-share";
+import { store } from "./src/globalstate/store";
+import { Provider } from "react-redux";
 
 // const App = () => {
 //
@@ -159,13 +161,17 @@ export default function App() {
     },
   });
 
-  return (<SafeAreaProvider>
-      <NativeBaseProvider theme={theme}>
-        <NavigationContainer theme={defaultTheme}>
-          <DrawerNavigator />
-        </NavigationContainer>
-      </NativeBaseProvider>
-    </SafeAreaProvider>);
+  return (
+    <Provider store={store}>
+      <SafeAreaProvider>
+        <NativeBaseProvider theme={theme}>
+          <NavigationContainer theme={defaultTheme}>
+            <DrawerNavigator />
+          </NavigationContainer>
+        </NativeBaseProvider>
+      </SafeAreaProvider>
+    </Provider>
+  )
 }
 
 const NativeStack = createNativeStackNavigator();
@@ -174,13 +180,13 @@ const Drawer = createDrawerNavigator();
 const StackNavigator = () => {
 
   return (<NativeStack.Navigator
-      screenOptions={{
-        headerShown: false, initialRouteName: "DrawerNavigator",
-      }}
-    >
-      <NativeStack.Screen component={SplashScreen} name={"SplashScreen"} />
-      <NativeStack.Screen component={DrawerNavigator} name={"DrawerNavigator"} />
-    </NativeStack.Navigator>);
+    screenOptions={{
+      headerShown: false, initialRouteName: "DrawerNavigator",
+    }}
+  >
+    <NativeStack.Screen component={SplashScreen} name={"SplashScreen"} />
+    <NativeStack.Screen component={DrawerNavigator} name={"DrawerNavigator"} />
+  </NativeStack.Navigator>);
 };
 
 
@@ -188,7 +194,11 @@ const DrawerNavigator = () => {
 
   const insets = useSafeAreaInsets();
 
-  return (<Drawer.Navigator
+  return (
+
+    <Drawer.Navigator
+
+      backBehavior="history"
       drawerContent={({ state, navigation, descriptors }) => {
         return (
 
@@ -206,8 +216,8 @@ const DrawerNavigator = () => {
             />
 
             <Pressable onPress={() => {
-                navigation.navigate("MainScreen");
-              }} w={WIDTH / 2} flexDirection={"row"} justifyContent={"flex-end"}px={20} py={8}>
+              navigation.navigate("MainScreen");
+            }} w={WIDTH / 2} flexDirection={"row"} justifyContent={"flex-end"} px={20} py={8}>
               <Text fontWeight={state.index == 0 ? "bold" : "normal"}
                     fontSize={state.index == 0 ? 19 : 18}
                     color={"#616cea"}

@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import thunk from "redux-thunk";
 
 import accountReducer from "./accountSlice";
+import dataReducer from "./dataSlice";
 
 const persistConfig = {
     key: 'root',
@@ -14,10 +15,13 @@ export const store = configureStore({
 
     reducer: {
         account: persistReducer(persistConfig, accountReducer),
+        data: persistReducer(persistConfig, dataReducer)
     },
+
     devTools: process.env.NODE_ENV !== 'production',
     middleware: [thunk]
 
 });
 
-persistStore(store);
+export const dataControl = persistStore(store);
+// dataControl.purge()
