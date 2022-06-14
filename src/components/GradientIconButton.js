@@ -42,7 +42,7 @@ export const IB_ArrowLeft = () => {
             angle={170}
             angleCenter={{x: 0.2, y: 0.7}}
             locations={[0, 0.6]}
-            colors={['#3346ff', "#a138ff"]}
+            colors={['#6779ff', "#b467ff"]}
             style={{flex: 1}}
           />
         </MaskedView>
@@ -91,7 +91,7 @@ export const IB_User = () => {
             angle={170}
             angleCenter={{x: 0.2, y: 0.7}}
             locations={[0, 0.6]}
-            colors={['#3346ff', "#a138ff"]}
+            colors={['#6571ff', "#ae67ff"]}
             style={{flex: 1}}
           />
         </MaskedView>

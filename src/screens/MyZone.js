@@ -64,6 +64,7 @@ const MyZone = () => {
       <Actionsheet
 
         overflow={"visible"}
+
         _backdrop={{
           bg: "#4e3e7e",
           opacity: .5,

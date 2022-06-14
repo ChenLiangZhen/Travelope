@@ -51,13 +51,14 @@ export const GradientBorderButton = ({ h, w, color, bgc, title, fs, onPress }) =
 
 };
 
-export const GradientButton = ({ h, w, color, title, fs, flex, onPress }) => {
+export const GradientButton = ({ h, w, color, title, fs, flex, onPress , ...props}) => {
 
   return (
 
     <Pressable
       flex={flex}
-      onPress={()=> onPress}
+      onPress={onPress}
+      {...props}
     >
       <LinearGradient
         useAngle={true}

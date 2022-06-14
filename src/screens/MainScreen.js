@@ -1,23 +1,17 @@
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { Box, HStack, Pressable, ScrollView, StatusBar, Text, View } from "native-base";
-import AppHeader from "../components/Header";
-import SVGImg from "../res/AppIcon.svg";
-import LottieView from "lottie-react-native";
-import { WIDTH } from "../Util";
-import React, { useCallback, useEffect, useRef } from "react";
+import { ScrollView, StatusBar, Text } from "native-base";
+import React, { useEffect, useRef } from "react";
 import Block from "../components/Block";
 import BlockTitle from "../components/BlockTitle";
 import LayoutBase from "../components/LayoutBase";
 import { GradientButton } from "../components/GradientButton";
-import Share from "react-native-share"
-import ViewShot from "react-native-view-shot";
+
+import CameraRoll from "@react-native-community/cameraroll";
 
 const MainScreen = ({ navigation }) => {
 
   const ref = useRef()
 
   useEffect(()=> {
-
 
     // Share.open({ message: "dfgdg"})
     //   .then((res) => {
@@ -51,11 +45,13 @@ const MainScreen = ({ navigation }) => {
   //     })
   // }, []);
 
+  useEffect(()=> {
+    CameraRoll.getPhotos()
+  },[])
+
   return (
 
     <LayoutBase>
-
-      <StatusBar barStyle={"dark-content"} />
 
       <ScrollView flex={1}>
 

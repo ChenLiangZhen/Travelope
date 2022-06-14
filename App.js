@@ -1,4 +1,4 @@
-import { extendTheme, HStack, Image, NativeBaseProvider, Pressable, Text, VStack } from "native-base";
+import { extendTheme, HStack, Image, NativeBaseProvider, Pressable, StatusBar, Text, VStack } from "native-base";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import MainScreen from "./src/screens/MainScreen";
@@ -20,6 +20,8 @@ import { useEffect, useRef } from "react";
 import Share from "react-native-share";
 import { store } from "./src/globalstate/store";
 import { Provider } from "react-redux";
+import NewTrip from "./src/screens/trip/NewTrip";
+import { SSRProvider } from "react-aria";
 
 // const App = () => {
 //
@@ -159,18 +161,49 @@ export default function App() {
       80: 80,
       96: 96,
     },
-  });
+    colors: {
+      // Add new color
+      primary: {
+
+        bg: {
+          purple: '#f4f1ff',
+          pink: '#f5f1ff',
+        },
+
+        darker_bg: {
+          purple: "#ebe5ff",
+          pink: "#eee6ff",
+        },
+
+        placeholder: {
+          purple: '#afa5ff',
+          pink: '#c4a7ff'
+        },
+
+        text: {
+          purple: '#7667ff',
+          pink: '#9f67ff'
+        },
+      }
+  }});
 
   return (
-    <Provider store={store}>
-      <SafeAreaProvider>
-        <NativeBaseProvider theme={theme}>
-          <NavigationContainer theme={defaultTheme}>
-            <DrawerNavigator />
-          </NavigationContainer>
-        </NativeBaseProvider>
-      </SafeAreaProvider>
-    </Provider>
+    <SSRProvider>
+
+      <StatusBar barStyle={"dark-content"} />
+
+      <Provider store={store}>
+        <SafeAreaProvider>
+          <NativeBaseProvider theme={theme}>
+            <NavigationContainer theme={defaultTheme}>
+              <DrawerNavigator />
+            </NavigationContainer>
+          </NativeBaseProvider>
+        </SafeAreaProvider>
+      </Provider>
+
+    </SSRProvider>
+
   )
 }
 
@@ -198,6 +231,7 @@ const DrawerNavigator = () => {
 
     <Drawer.Navigator
 
+      initialRouteName={"Settings"}
       backBehavior="history"
       drawerContent={({ state, navigation, descriptors }) => {
         return (
@@ -322,6 +356,7 @@ const DrawerNavigator = () => {
     >
       <Drawer.Screen component={MainScreen} name={"MainScreen"} />
       <Drawer.Screen component={CurrentTrip} name={"CurrentTrip"} />
+      <Drawer.Screen component={NewTrip} name={"NewTrip"} />
       <Drawer.Screen component={TripOverview} name={"TripOverview"} />
       <Drawer.Screen component={MemEnvelope} name={"MemEnvelope"} />
       <Drawer.Screen component={TripPostcard} name={"TripPostcard"} />

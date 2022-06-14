@@ -19,6 +19,8 @@ target 'travelope' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  pod 'react-native-cameraroll', :path => '../node_modules/@react-native-community/cameraroll'
+
   target 'travelopeTests' do
     inherit! :complete
     # Pods for testing

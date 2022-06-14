@@ -1,29 +1,42 @@
 import React from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { Box } from "native-base";
+import { Box, Button, FormControl, Input, KeyboardAvoidingView, Modal, Text, VStack } from "native-base";
 import LinearGradient from "react-native-linear-gradient";
+import { Platform } from "react-native";
 
 const LayoutBase = ({children}) => {
+
+
   return(
 
     <SafeAreaProvider>
-      <SafeAreaView>
-        <Box px={20}>
 
-          <LinearGradient
+      <SafeAreaView style={{ flex: 1}}>
+        {/*<KeyboardAvoidingView*/}
+        {/*  keyboardVerticalOffset={500}*/}
+        {/*  flex={1}*/}
+        {/*  behavior={Platform.OS === "ios" ? "padding" : "height"}*/}
+        {/*>*/}
 
-            useAngle={true}
-            angle={180}
-            // angleCenter={{x: 0.5, y: 0.5}}
-            locations={[0, .9]}
-            colors={['#ffffff', "#ffffff"]}
-            style={{ height: "100%", width: "100%"}}
-          >
-            {children}
+          <Box flex={1} px={20}>
 
-          </LinearGradient>
+            <LinearGradient
 
-        </Box>
+              useAngle={true}
+              angle={180}
+              // angleCenter={{x: 0.5, y: 0.5}}
+              locations={[0, .9]}
+              colors={['#ffffff', "#ffffff"]}
+              style={{ height: "100%", width: "100%", flex: 1}}
+            >
+              {children}
+
+            </LinearGradient>
+
+          </Box>
+
+
+        {/*</KeyboardAvoidingView>*/}
       </SafeAreaView>
     </SafeAreaProvider>
 
