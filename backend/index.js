@@ -23,13 +23,13 @@ const URI = 'mongodb://client:testdatabase@localhost:30123/?authSource=admin'
 const testURI = 'mongodb://localhost:30123'
 
 mongoose.connect(testURI)
-   .then(() => { console.log("successfully connected modified!!") }, rej => {console.log("failed to connect: " + rej)})
+   .then(() => { console.log("successfully connected: " + testURI) }, rej => {console.log("failed to connect: " + rej)})
 
-app.get("/api", userAuth, (req, res)=>{
-  res.send(`your email is: ${req.user.email} and your data is: ${req.data}`)
-})
+// app.get("/api", userAuth, (req, res)=>{
+//   res.send(`your email is: ${req.user.email} and your data is: ${req.data}`)
+// })
 
-const PORT= 8080;
+const PORT= 3000;
 app.listen(PORT, ()=>{
   console.log(`App is running on port ${PORT}`)
 })

@@ -8,7 +8,7 @@ const userAuth = require("../middleware/userAuth")
 
 const router_data = express.Router()
 
-router_data.get("/api/get-data", userAuth, async (req, res) => {
+router_data.get("/api/travelope/get-data", userAuth, async (req, res) => {
 
 	try {
 		UserData.findOne({userLink: req.query.id}, (e, data) => {
@@ -26,7 +26,7 @@ router_data.get("/api/get-data", userAuth, async (req, res) => {
 
 })
 
-router_data.put(`/api/update-data`, userAuth, async (req, res) => {
+router_data.put(`/api/travelope/update-data`, userAuth, async (req, res) => {
 
 	const {data, userLink} = req.body
 

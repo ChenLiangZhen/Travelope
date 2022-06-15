@@ -14,7 +14,7 @@ const InputField = ({ ...props }) => {
         bg: "transparent",
       }}
 
-      autoCapitalize={false}
+      autoCapitalize={"none"}
       placeholderTextColor={theme.primary.placeholder.purple}
       selectionColor={"#9380ff"}
       borderColor={"#c5baff"}

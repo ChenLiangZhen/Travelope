@@ -6,7 +6,7 @@ const UserData = mongoose.model("user_data")
 
 const router_sign = express.Router()
 
-router_sign.post("/api/signup", async (req, res) => {
+router_sign.post("/api/travelope/signup", async (req, res) => {
 
 	const { nickname ,email, password } = req.body
 	let linkId, userData
@@ -46,7 +46,7 @@ router_sign.post("/api/signup", async (req, res) => {
 
 })
 
-router_sign.post('/api/signin', async(req, res) => {
+router_sign.post('/api/travelope/signin', async(req, res) => {
 	const {email, password } = req.body
 
 	if(!email || !password){
