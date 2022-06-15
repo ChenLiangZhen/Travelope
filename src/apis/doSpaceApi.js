@@ -1,4 +1,4 @@
-import { CreateBucketCommand, ListBucketsCommand } from "@aws-sdk/client-s3";
+import { CreateBucketCommand, ListBucketsCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { doClient } from "./doClient.js";
 
 export const runList = async () => {
@@ -13,7 +13,7 @@ export const runList = async () => {
 
 // Specifies a path within your Space and the file to upload.
 export const bucketParams = {
-  Bucket: "example-space-name",
+  Bucket: "horizones-space",
   Key: "example.txt",
   Body: "content"
 };
@@ -21,7 +21,7 @@ export const bucketParams = {
 // Uploads the specified file to the chosen path.
 export const run = async () => {
   try {
-    const data = await s3Client.send(new PutObjectCommand(bucketParams));
+    const data = await doClient.send(new PutObjectCommand(bucketParams));
     console.log(
       "Successfully uploaded object: " +
       bucketParams.Bucket +

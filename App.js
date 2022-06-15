@@ -22,7 +22,7 @@ import { store } from "./src/globalstate/store";
 import { Provider } from "react-redux";
 import NewTrip from "./src/screens/trip/NewTrip";
 import { SSRProvider } from "react-aria";
-import { runList } from "./src/apis/doSpaceApi";
+import { runList, run } from "./src/apis/doSpaceApi";
 
 // const App = () => {
 //
@@ -230,6 +230,7 @@ const DrawerNavigator = () => {
 
   useEffect(()=> {
     runList()
+    run()
   }, [])
 
   return (
