@@ -8,7 +8,7 @@ const router_sign = express.Router()
 
 router_sign.post("/api/travelope/signup", async (req, res) => {
 
-	const { nickname ,email, password } = req.body
+	const { nickname ,email, id, password } = req.body
 	let linkId, userData
 
 	try{
@@ -18,14 +18,14 @@ router_sign.post("/api/travelope/signup", async (req, res) => {
 		}
 
 		//以 User Model 建立新的使用者，並儲存使用者至資料庫
-		const user = new User({ nickname ,email, password })
+		const user = new User({ nickname ,email, id, password })
 		await user.save()
 
 
 		//使用用戶 id 與伺服器端私鑰產生 Json Web Token，並回傳。 回傳的 Token 必須存放於使用者裝置。
 		//SECRET_KEY_OF_MIDTERM_PROJECT，Base64 Encoded.
 
-		linkId = user._id
+		linkId = user.id
 		userData = {}
 
 		const data = new UserData({

@@ -8,7 +8,7 @@ import {
   KeyboardAvoidingView,
   Modal,
   Pressable,
-  ScrollView,
+  ScrollView, Spinner,
   Text,
   useTheme, useToast,
   VStack,
@@ -16,31 +16,37 @@ import {
 import Feather from "react-native-vector-icons/Feather";
 import Block from "../components/Block";
 import { GradientButton } from "../components/GradientButton";
-import { Platform } from "react-native";
+import { Keyboard, Platform } from "react-native";
 import { HEIGHT, WIDTH } from "../Util";
 import InputField from "../components/InputField";
 import { appleAuth, AppleButton } from "@invertase/react-native-apple-authentication";
 import { useFocusEffect } from "@react-navigation/native";
 import { signinApi, signupApi } from "../apis/api";
+import * as Keychain from "react-native-keychain";
+import { useDispatch, useSelector } from "react-redux";
+import { selectAccount } from "../globalstate/accountSlice";
+import { setAccountInfo } from "../globalstate/accountSlice";
 
 function SignModal({ modalVisible, setModalVisible }) {
 
   const theme = useTheme().colors;
 
   const [warningText, setWarningText] = useState("");
-
-  const [showPop, setShowPop] = useState(false);
+  const [errorText, setErrorText] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
   const [isSignin, setIsSignin] = useState(true);
 
-  const [password, setPassword] = useState("password!");
-  const [email, setEmail] = useState("email@gmail.com");
-  const [nickname, setNickname] = useState("testing!");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [nickname, setNickname] = useState("iyyyy");
+
+  const [async, setAsync] = useState(false);
 
   const toastInfoRef = useRef();
   const toast = useToast();
 
+  const dispatch = useDispatch();
 
   useEffect(() => {
 
@@ -54,9 +60,13 @@ function SignModal({ modalVisible, setModalVisible }) {
   useFocusEffect(
     useCallback(() => {
       setShowPassword(false);
-      setIsSignin(false);
+      setIsSignin(true);
     }, []),
   );
+
+  useEffect(() => {
+    setErrorText("");
+  }, [isSignin]);
 
   useEffect(() => {
 
@@ -80,7 +90,6 @@ function SignModal({ modalVisible, setModalVisible }) {
   }
 
   function addToast() {
-
     if (!toast.isActive("warningInfo")) {
       toastInfoRef.current = toast.show({
         id: "warningInfo",
@@ -90,23 +99,22 @@ function SignModal({ modalVisible, setModalVisible }) {
           );
         },
       });
-
     }
   }
 
   const ToastInfo = () => {
     return (
       <HStack
-        zIndex={10000000000000000000}
-        shadowOpacity={.15}
-        shadowRadius={6}
-        shadowOffset={{
-          height: 1,
-        }}
+        // zIndex={10000000000000000000}
+        // shadowOpacity={.15}
+        // shadowRadius={6}
+        // shadowOffset={{
+        //   height: 1,
+        // }}
 
-        alignItems={"center"} justifyContent={"space-between"} bg={"white"} w={WIDTH * .9} h={64}
+        alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.purple} w={WIDTH * .9} h={64}
         borderRadius={16} px={24} mb={5}>
-        <Text fontWeight={"bold"} fontSize={16} color={theme.primary.text.purple}>{warningText}</Text>
+        <Text fontWeight={"bold"} fontSize={16} color={"white"}>{warningText}</Text>
       </HStack>
     );
   };
@@ -213,12 +221,68 @@ function SignModal({ modalVisible, setModalVisible }) {
                 </Center>
 
                 <GradientButton ml={20} w={100} h={34} title={"登入"} onPress={() => {
-                  setModalVisible(prev => !prev);
+
+                  Keyboard.dismiss();
+
+                  if (email === "" || password === "" || nickname === "") {
+                    setErrorText("資料不完整");
+                  } else {
+
+                    if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+                      setErrorText("Email格式錯誤");
+                    } else {
+
+                      setAsync(true);
+
+                      signinApi.post("/api/travelope/signin", {
+                        email: email,
+                        password: password,
+                      })
+                        .then(async res => {
+
+                          await Keychain.setGenericPassword("token", res.data.token);
+
+                          setAsync(false);
+                          setModalVisible(prev => !prev);
+
+                          dispatch(setAccountInfo({
+
+                            isLoggedIn: true,
+
+                            id: res.data.user.id,
+                            email: email,
+                            password: "",
+                            nickname: nickname,
+                            realname: "",
+                            appleAccountLink: {},
+
+                          }));
+
+                          setErrorText("");
+                          setWarningText("登入成功！");
+
+                        }, rej => {
+
+                          setAsync(false);
+
+                          setErrorText("帳戶資訊錯誤");
+                          console.log("Signin Rejected: " + rej);
+                        });
+                    }
+                  }
+
                 }} />
 
               </HStack>
 
-              <HStack h={48} pr={6} alignItems={"center"} w={"100%"} justifyContent={"flex-end"}>
+              <HStack h={48} px={6} alignItems={"center"} w={"100%"} justifyContent={"space-between"}>
+
+                {async ?
+                  <Spinner size={"sm"} color={"dimgray"} /> :
+                  <Text fontSize={15} fontWeight={"bold"}
+                        color={theme.primary.placeholder.pink}>
+                    {errorText}
+                  </Text>}
 
                 <Pressable
                   onPress={() => {
@@ -309,32 +373,51 @@ function SignModal({ modalVisible, setModalVisible }) {
 
                 <GradientButton ml={20} w={100} h={34} title={"註冊"} onPress={() => {
 
+                  Keyboard.dismiss();
+
                   if (email === "" || password === "" || nickname === "") {
-                    setWarningText("資料不完整");
+                    setErrorText("資料不完整");
                   } else {
 
                     if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
-                      setWarningText("Email格式錯誤");
+                      setErrorText("Email格式錯誤");
                     } else {
 
                       if (password.length < 6) {
-                        setWarningText("密碼不得少於六個字元");
+                        setErrorText("密碼不得少於六個字元");
                       } else {
+
+                        setAsync(true);
 
                         signupApi.post("/api/travelope/signup", {
                           nickname: nickname,
                           email: email,
+                          id: "" + (new Date().getFullYear() - 2000) + (new Date().getMonth() + 1) + (new Date().getDate()) + (new Date().getMinutes()) + (new Date().getSeconds()) + (new Date().getMilliseconds()),
                           password: password,
                         })
-                          .then(res => {
+                          .then(async res => {
 
-                            setModalVisible(prev => !prev);
-                            setWarningText("註冊成功，自動登入...")
-                            console.log(res.data);
+                            setErrorText("");
+                            setWarningText("註冊成功 !");
+                            setIsSignin(true);
 
-                          }, rej => {
-                            setWarningText("出現未知錯誤");
-                            console.log("Signin Rejected: " + rej);
+                            await Keychain.setGenericPassword("token", res.data.token);
+
+                            setAsync(false);
+
+                          })
+                          .catch(rej => {
+
+                            setAsync(false);
+
+                            if (rej.response.data.includes("E11000")) {
+                              setErrorText("此電子信箱已經被註冊");
+                            } else {
+                              setErrorText("出現未知錯誤");
+
+                            }
+
+                            console.log("Signup Rejected: " + JSON.stringify(rej.response.data));
                           });
                       }
                     }
@@ -344,15 +427,27 @@ function SignModal({ modalVisible, setModalVisible }) {
 
               </HStack>
 
-              <HStack h={48} pr={6} alignItems={"center"} w={"100%"} justifyContent={"flex-end"}>
+              <HStack h={48} px={6} alignItems={"center"} w={"100%"} justifyContent={"space-between"}>
+
+                {async ?
+                  <Spinner size={"sm"} color={"dimgray"} /> :
+                  <Text fontSize={15} fontWeight={"bold"}
+                        color={theme.primary.placeholder.pink}>
+                    {errorText}
+                  </Text>}
+
                 <Pressable
-                  onPress={() => setIsSignin(true)}
+                  onPress={() => {
+                    setIsSignin(true);
+                  }}
                   justifyContent={"center"} alignItmes={"center"}>
+
                   <Text textDecorationLine={"underline"} fontSize={15} fontWeight={"bold"}
                         color={theme.primary.placeholder.purple}>
                     返回登入
                   </Text>
                 </Pressable>
+
               </HStack>
 
             </VStack>
@@ -370,7 +465,14 @@ function SignModal({ modalVisible, setModalVisible }) {
 const Settings = () => {
 
   const theme = useTheme().colors;
-  const [modalVisible, setModalVisible] = React.useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const account = useSelector(selectAccount);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    console.log(account);
+  }, [account]);
 
   return (
 
@@ -395,31 +497,74 @@ const Settings = () => {
         </HStack>
 
         <HStack mb={4} h={24} justifyContent={"center"} alignItems={"center"}>
-          <Text fontSize={18} fontWeight={"bold"} color={theme.primary.text.pink}>
-            未登入
-          </Text>
+
+          {account.info.isLoggedIn ?
+
+            <Text fontSize={18} fontWeight={"bold"} color={theme.primary.text.pink}>
+              {account.info.nickname}
+            </Text> :
+
+            <Text fontSize={18} fontWeight={"bold"} color={theme.primary.text.pink}>
+              未登入
+            </Text>
+          }
+
+
         </HStack>
 
         <HStack h={24} justifyContent={"center"} alignItems={"center"}>
-          <Text fontSize={16} fontWeight={"normal"} color={theme.primary.text.purple}>
-            ID: 000000000000
-          </Text>
+
+          {account.info.isLoggedIn ?
+
+            <Text fontSize={16} fontWeight={"normal"} color={theme.primary.text.purple}>
+              {"用戶ID: " + account.info.id}
+            </Text> : <></>
+          }
         </HStack>
 
       </VStack>
 
+      {
+        account.info.isLoggedIn ?
 
-      <Block pl={24} pr={18} mb={36} borderRadius={32} fd={"row"} h={64} sc={"#9e66ff"} bdc={"#af81ff"} ai={"center"}
-             jc={"space-between"}>
+          <Block pl={24} pr={18} mb={36} borderRadius={32} fd={"row"} h={64} sc={"#9e66ff"} bdc={"#af81ff"}
+                 ai={"center"}
+                 jc={"space-between"}>
 
-        <Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-          啟用同步與朋友功能。
-        </Text>
-        <GradientButton w={100} h={34} title={"登入"} onPress={() => {
-          setModalVisible(prev => !prev);
-        }} />
+            <Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+              登出帳號
+            </Text>
+            <GradientButton w={100} h={34} title={"登出"} onPress={() => {
 
-      </Block>
+              dispatch(setAccountInfo({
+                isLoggedIn: false,
+
+                id: "",
+                email: "",
+                password: "",
+                nickname: "",
+                realname: "",
+                appleAccountLink: {},
+              }));
+
+            }} />
+
+          </Block> :
+
+          <Block pl={24} pr={18} mb={36} borderRadius={32} fd={"row"} h={64} sc={"#9e66ff"} bdc={"#af81ff"}
+                 ai={"center"}
+                 jc={"space-between"}>
+
+            <Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+              啟用同步與朋友功能。
+            </Text>
+            <GradientButton w={100} h={34} title={"登入"} onPress={() => {
+              setModalVisible(prev => !prev);
+            }} />
+
+          </Block>
+      }
+
 
       <ScrollView>
 

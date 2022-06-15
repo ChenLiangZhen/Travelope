@@ -22,6 +22,7 @@ import { store } from "./src/globalstate/store";
 import { Provider } from "react-redux";
 import NewTrip from "./src/screens/trip/NewTrip";
 import { SSRProvider } from "react-aria";
+import { runList } from "./src/apis/doSpaceApi";
 
 // const App = () => {
 //
@@ -227,11 +228,16 @@ const DrawerNavigator = () => {
 
   const insets = useSafeAreaInsets();
 
+  useEffect(()=> {
+    runList()
+  }, [])
+
   return (
 
     <Drawer.Navigator
 
-      initialRouteName={"Settings"}
+      initialRouteName={"MyZone"}
+
       backBehavior="history"
       drawerContent={({ state, navigation, descriptors }) => {
         return (

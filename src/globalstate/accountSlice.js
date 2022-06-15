@@ -2,7 +2,11 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 
 export const initialState = {
 
-    accountData: {
+    info: {
+
+        isLoggedIn: false,
+
+        id: "",
         email: "",
         password: "",
         nickname: "",
@@ -21,52 +25,7 @@ export const initialState = {
                 id: 2,
                 name: "Mary",
                 tag: "Girlfriend"
-            },{
-                id: 1,
-                name: "JACOB",
-                tag: "Friend"
-            },
-            {
-                id: 2,
-                name: "Mary",
-                tag: "Girlfriend"
-            },{
-                id: 1,
-                name: "JACOB",
-                tag: "Friend"
-            },
-            {
-                id: 2,
-                name: "Mary",
-                tag: "Girlfriend"
-            },{
-                id: 1,
-                name: "JACOB",
-                tag: "Friend"
-            },
-            {
-                id: 2,
-                name: "Mary",
-                tag: "Girlfriend"
-            },{
-                id: 1,
-                name: "JACOB",
-                tag: "Friend"
-            },
-            {
-                id: 2,
-                name: "Mary",
-                tag: "Girlfriend"
-            },{
-                id: 1,
-                name: "JACOB",
-                tag: "Friend"
-            },
-            {
-                id: 2,
-                name: "Mary",
-                tag: "Girlfriend"
-            },
+            }
         ]
     },
 
