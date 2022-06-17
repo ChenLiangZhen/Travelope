@@ -16,7 +16,7 @@ import {
 import Feather from "react-native-vector-icons/Feather";
 import Block from "../components/Block";
 import { GradientButton } from "../components/GradientButton";
-import { Keyboard, Platform } from "react-native";
+import { Keyboard, Platform , Image} from "react-native";
 import { HEIGHT, WIDTH } from "../Util";
 import InputField from "../components/InputField";
 import { appleAuth, AppleButton } from "@invertase/react-native-apple-authentication";
@@ -26,6 +26,10 @@ import * as Keychain from "react-native-keychain";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAccount } from "../globalstate/accountSlice";
 import { setAccountInfo } from "../globalstate/accountSlice";
+import { launchImageLibrary } from "react-native-image-picker";
+import { findAndDownloadImage, uploadImage } from "../apis/imageNetworkManager";
+import ImagePicker from "react-native-image-crop-picker";
+import RNFS from "react-native-fs";
 
 function SignModal({ modalVisible, setModalVisible }) {
 
@@ -39,7 +43,7 @@ function SignModal({ modalVisible, setModalVisible }) {
 
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [nickname, setNickname] = useState("iyyyy");
+  const [nickname, setNickname] = useState("");
 
   const [async, setAsync] = useState(false);
 
@@ -105,12 +109,6 @@ function SignModal({ modalVisible, setModalVisible }) {
   const ToastInfo = () => {
     return (
       <HStack
-        // zIndex={10000000000000000000}
-        // shadowOpacity={.15}
-        // shadowRadius={6}
-        // shadowOffset={{
-        //   height: 1,
-        // }}
 
         alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.purple} w={WIDTH * .9} h={64}
         borderRadius={16} px={24} mb={5}>
@@ -224,7 +222,7 @@ function SignModal({ modalVisible, setModalVisible }) {
 
                   Keyboard.dismiss();
 
-                  if (email === "" || password === "" || nickname === "") {
+                  if (email === "" || password === "") {
                     setErrorText("資料不完整");
                   } else {
 
@@ -250,10 +248,9 @@ function SignModal({ modalVisible, setModalVisible }) {
                             isLoggedIn: true,
 
                             id: res.data.user.id,
-                            email: email,
+                            email: res.data.user.email,
                             password: "",
-                            nickname: nickname,
-                            realname: "",
+                            nickname: res.data.user.nickname,
                             appleAccountLink: {},
 
                           }));
@@ -469,10 +466,134 @@ const Settings = () => {
 
   const account = useSelector(selectAccount);
   const dispatch = useDispatch();
+  const [userImageURI, setUserImageURI] = useState("");
+  const [userImageBlob, setUserImageBlob] = useState("");
+
+  const toastInfoRef = useRef();
+  const toast = useToast();
 
   useEffect(() => {
-    console.log(account);
+    console.log(account)
   }, [account]);
+
+  useEffect(() => {
+    RNFS.exists(RNFS.DocumentDirectoryPath + "/travelope/" + account.info.id)
+      .then( profilePictureExists => {
+        if(profilePictureExists) {
+          console.log("FOUND PREVIOUS PROFILE IMAGE")
+          setUserImageURI(RNFS.DocumentDirectoryPath + "/travelope/" + account.info.id)
+        }
+      })
+  }, []);
+
+  useEffect(()=> {
+    findAndDownloadImage(account.info.id, account.info.id)
+      // .then(blob=> setUserImageBlob(blob))
+  }, [])
+
+  useEffect(() => {
+
+    console.log("Revoke testing");
+    // onCredentialRevoked returns a function that will remove the event listener. useEffect will call this function when the component unmounts
+    return appleAuth.onCredentialRevoked(async () => {
+      console.warn("User Credentials have been Revoked");
+    });
+  }, []);
+
+  function closeInfoToast() {
+    if (toastInfoRef.current) {
+      toast.close(toastInfoRef.current);
+    }
+  }
+
+  function addToast(warningText) {
+    if (!toast.isActive("warningInfo")) {
+      toastInfoRef.current = toast.show({
+        id: "warningInfo",
+        render: () => {
+          return (
+            <ToastInfo warningText={warningText}/>
+          );
+        },
+      });
+    }
+  }
+
+  const ToastInfo = ({ warningText }) => {
+    return (
+      <HStack
+
+        alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.purple} w={WIDTH * .9} h={64}
+        borderRadius={16} px={24} mb={5}>
+        <Text fontWeight={"bold"} fontSize={16} color={"white"}>{warningText}</Text>
+      </HStack>
+    );
+  };
+
+  async function setProfilePicture() {
+
+    // const result = await launchImageLibrary({ quality : 0.5 });
+    // console.log(result.assets[0].uri)
+    // uploadImage(result.assets[0].uri)
+    //
+    // setUserImageURI(result.assets[0].uri)
+
+    ImagePicker.openPicker({
+      width: 512,
+      height: 512,
+      mediaType: "photo",
+      cropping: true,
+      cropperCircleOverlay: true,
+    }).then(async image => {
+
+      console.log("Setting profile image...")
+
+      const name = account.info.id
+
+      RNFS.exists(RNFS.DocumentDirectoryPath + "/travelope")
+        .then(async result => {
+          if(!result) {
+            console.log("Travelope directory not found. Create one.")
+            await RNFS.mkdir(RNFS.DocumentDirectoryPath + "/travelope")
+
+          }
+
+          RNFS.exists(RNFS.DocumentDirectoryPath + "/travelope/" + name)
+            .then(async imageExist => {
+
+              if(imageExist){
+
+                await RNFS.unlink(RNFS.DocumentDirectoryPath + "/travelope/" + name)
+
+              }
+              RNFS.moveFile(image.path, RNFS.DocumentDirectoryPath + "/travelope/" + name,{
+                NSURLIsExcludedFromBackupKey: false
+              })
+                .then(async ()=> {
+                  uploadImage(RNFS.DocumentDirectoryPath + "/travelope/" + name, account.info.id, account.info.id);
+                  setUserImageURI(RNFS.DocumentDirectoryPath + "/travelope/" + name);
+
+                  // const notBase64Image = await RNFS.readFile(RNFS.DocumentDirectoryPath + "/travelope/" + name)
+                  // await RNFS.writeFile(RNFS.DocumentDirectoryPath + "/travelope/" + name + "base64", notBase64Image,"base64")
+
+                  const blob = await RNFS.readFile(RNFS.DocumentDirectoryPath + "/travelope/" + name + "base64X")
+                  setUserImageBlob("data:image/png;base64," + blob)
+                })
+            })
+        })
+
+      // RNFS.moveFile("file://" + image.path, RNFS.DocumentDirectoryPath + "travelope/" + name,{
+      //   NSURLIsExcludedFromBackupKey: false
+      // })
+      //   .then((res)=> {
+      //       uploadImage(RNFS.DocumentDirectoryPath + "travelope/" + name, account.info.id, account.info.id);
+      //   })
+      //
+      // setUserImageURI(image.sourceURL);
+    });
+
+
+  }
 
   return (
 
@@ -482,17 +603,40 @@ const Settings = () => {
 
       <VStack mb={36}>
 
-        <HStack h={96} justifyContent={"center"} alignItems={"center"}>
+        <HStack h={100} mb={12} justifyContent={"center"} alignItems={"center"}>
           <Pressable
-            h={72}
-            w={72}
+            onPress={async () => {
+              if(!account.info.isLoggedIn) {
+                addToast("必須登入才能設定頭像喔！");
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                closeInfoToast();
+                return
+              }
+              setProfilePicture();
+            }}
+            h={96}
+            w={96}
+            overflow={"hidden"}
             borderRadius={100}
             borderWidth={2}
             borderColor={theme.primary.text.pink}
             justifyContent={"center"}
             alignItems={"center"}
           >
-            <Feather name={"user"} color={theme.primary.text.pink} size={32} />
+            {
+              userImageURI !== "" ?
+                <Image
+                  style={{
+                    borderRadius: 100,
+                    height: 88,
+                    width: 88
+                  }}
+                  source={{uri: userImageBlob}}
+                  alt={"userImage"}
+                />
+                : <Feather name={"user"} color={theme.primary.text.pink} size={32} />
+            }
+
           </Pressable>
         </HStack>
 

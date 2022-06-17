@@ -10,7 +10,7 @@ import SplashScreen from "./src/screens/SplashScreen";
 import { HEIGHT, WIDTH } from "./src/Util";
 import CurrentTrip from "./src/screens/trip/CurrentTrip";
 import React from "react";
-import { View } from "react-native";
+import { LogBox, View } from "react-native";
 import TripOverview from "./src/screens/trip/TripOverview";
 import MemEnvelope from "./src/screens/envelope/MemEnvelope";
 import TripPostcard from "./src/screens/TripPostcard";
@@ -22,7 +22,10 @@ import { store } from "./src/globalstate/store";
 import { Provider } from "react-redux";
 import NewTrip from "./src/screens/trip/NewTrip";
 import { SSRProvider } from "react-aria";
-import { runList, run } from "./src/apis/doSpaceApi";
+import { runList, uploadImage } from "./src/apis/imageNetworkManager";
+import { launchImageLibrary } from "react-native-image-picker";
+
+LogBox.ignoreLogs(["Require cycle"]);
 
 // const App = () => {
 //
@@ -167,8 +170,8 @@ export default function App() {
       primary: {
 
         bg: {
-          purple: '#f4f1ff',
-          pink: '#f5f1ff',
+          purple: "#f4f1ff",
+          pink: "#f5f1ff",
         },
 
         darker_bg: {
@@ -177,16 +180,17 @@ export default function App() {
         },
 
         placeholder: {
-          purple: '#afa5ff',
-          pink: '#c4a7ff'
+          purple: "#afa5ff",
+          pink: "#c4a7ff",
         },
 
         text: {
-          purple: '#7667ff',
-          pink: '#9f67ff'
+          purple: "#7667ff",
+          pink: "#9f67ff",
         },
-      }
-  }});
+      },
+    },
+  });
 
   return (
     <SSRProvider>
@@ -205,7 +209,7 @@ export default function App() {
 
     </SSRProvider>
 
-  )
+  );
 }
 
 const NativeStack = createNativeStackNavigator();
@@ -228,16 +232,11 @@ const DrawerNavigator = () => {
 
   const insets = useSafeAreaInsets();
 
-  useEffect(()=> {
-    runList()
-    run()
-  }, [])
-
   return (
 
     <Drawer.Navigator
 
-      initialRouteName={"MyZone"}
+      initialRouteName={"Settings"}
 
       backBehavior="history"
       drawerContent={({ state, navigation, descriptors }) => {

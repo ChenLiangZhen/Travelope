@@ -10,7 +10,8 @@ export const initialState = {
         email: "",
         password: "",
         nickname: "",
-        realname: "",
+        profilePictureLocalPath: "",
+
         appleAccountLink: {}
     },
 

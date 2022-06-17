@@ -20,6 +20,9 @@ import { useSelector } from "react-redux";
 import { selectAccount } from "../globalstate/accountSlice";
 import { FlatList } from "react-native";
 import { WIDTH } from "../Util";
+import RNFS, { exists } from "react-native-fs";
+import { launchImageLibrary } from "react-native-image-picker";
+import { uploadImage } from "../apis/imageNetworkManager";
 
 const FriendItem = ({ item }) => {
 
@@ -55,7 +58,9 @@ const MyZone = () => {
   const renderItem = ({ item }) => <FriendItem item={item}/>
 
   useEffect(()=> {
+
     console.log(account.friendData)
+
   }, [account])
 
   return (
