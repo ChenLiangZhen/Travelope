@@ -17,9 +17,13 @@ module.exports = (async () => {
     },
     resolver: {
       extraNodeModules: {
+        extraNodeModules: require.resolve('node-libs-react-native'),
         stream: require.resolve('readable-stream'),
-        // crypto: require.resolve('react-native-crypto-js'),
+
       },
+      //   stream: require.resolve('readable-stream'),
+      //   // crypto: require.resolve('react-native-crypto-js'),
+      // },
       assetExts: assetExts.filter(ext => ext !== 'svg'),
       sourceExts: [...sourceExts, 'svg'],
 

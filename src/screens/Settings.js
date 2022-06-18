@@ -1,792 +1,798 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import LayoutBase from "../components/LayoutBase";
+import React, { useCallback, useEffect, useRef, useState } from "react"
+import LayoutBase from "../components/LayoutBase"
 import {
-  Button, Center,
-  FormControl,
-  HStack,
-  Input,
-  KeyboardAvoidingView,
-  Modal,
-  Pressable,
-  ScrollView, Spinner,
-  Text,
-  useTheme, useToast,
-  VStack,
-} from "native-base";
-import Feather from "react-native-vector-icons/Feather";
-import Block from "../components/Block";
-import { GradientButton } from "../components/GradientButton";
-import { Keyboard, Platform , Image} from "react-native";
-import { HEIGHT, WIDTH } from "../Util";
-import InputField from "../components/InputField";
-import { appleAuth, AppleButton } from "@invertase/react-native-apple-authentication";
-import { useFocusEffect } from "@react-navigation/native";
-import { signinApi, signupApi } from "../apis/api";
-import * as Keychain from "react-native-keychain";
-import { useDispatch, useSelector } from "react-redux";
-import { selectAccount } from "../globalstate/accountSlice";
-import { setAccountInfo } from "../globalstate/accountSlice";
-import { launchImageLibrary } from "react-native-image-picker";
-import { findAndDownloadImage, uploadImage } from "../apis/imageNetworkManager";
-import ImagePicker from "react-native-image-crop-picker";
-import RNFS from "react-native-fs";
+	Center,
+	HStack,
+	KeyboardAvoidingView,
+	Modal,
+	Pressable,
+	ScrollView,
+	Spinner,
+	Text,
+	useTheme,
+	useToast,
+	VStack,
+} from "native-base"
+import Feather from "react-native-vector-icons/Feather"
+import Block from "../components/Block"
+import { GradientButton } from "../components/GradientButton"
+import { Image, Keyboard, Platform } from "react-native"
+import { HEIGHT, WIDTH } from "../Util"
+import InputField from "../components/InputField"
+import { appleAuth, AppleButton } from "@invertase/react-native-apple-authentication"
+import { useFocusEffect } from "@react-navigation/native"
+import { apiRequest, signinApi, signupApi } from "../apis/api"
+import * as Keychain from "react-native-keychain"
+import { useDispatch, useSelector } from "react-redux"
+import { selectAccount, setAccountInfo, setProfilePicture } from "../globalstate/accountSlice"
+import ImagePicker from "react-native-image-crop-picker"
+import RNFS from "react-native-fs"
+import { profilePictureInit } from "../apis/fileManager"
 
 function SignModal({ modalVisible, setModalVisible }) {
 
-  const theme = useTheme().colors;
-
-  const [warningText, setWarningText] = useState("");
-  const [errorText, setErrorText] = useState("");
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [isSignin, setIsSignin] = useState(true);
-
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [nickname, setNickname] = useState("");
-
-  const [async, setAsync] = useState(false);
-
-  const toastInfoRef = useRef();
-  const toast = useToast();
-
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-
-    console.log("Revoke testing");
-    // onCredentialRevoked returns a function that will remove the event listener. useEffect will call this function when the component unmounts
-    return appleAuth.onCredentialRevoked(async () => {
-      console.warn("User Credentials have been Revoked");
-    });
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      setShowPassword(false);
-      setIsSignin(true);
-    }, []),
-  );
-
-  useEffect(() => {
-    setErrorText("");
-  }, [isSignin]);
-
-  useEffect(() => {
-
-    async function showInfo() {
-      addToast();
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      closeInfoToast();
-      setWarningText("");
-    }
-
-    if (warningText !== "") {
-      showInfo();
-    }
-
-  }, [warningText]);
-
-  function closeInfoToast() {
-    if (toastInfoRef.current) {
-      toast.close(toastInfoRef.current);
-    }
-  }
-
-  function addToast() {
-    if (!toast.isActive("warningInfo")) {
-      toastInfoRef.current = toast.show({
-        id: "warningInfo",
-        render: () => {
-          return (
-            <ToastInfo />
-          );
-        },
-      });
-    }
-  }
-
-  const ToastInfo = () => {
-    return (
-      <HStack
-
-        alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.purple} w={WIDTH * .9} h={64}
-        borderRadius={16} px={24} mb={5}>
-        <Text fontWeight={"bold"} fontSize={16} color={"white"}>{warningText}</Text>
-      </HStack>
-    );
-  };
-
-  async function onAppleButtonPress() {
-
-    // performs login request
-    const appleAuthRequestResponse = await appleAuth.performRequest({
-      requestedOperation: appleAuth.Operation.LOGIN,
-      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
-    });
-
-    // get current authentication state for user
-    // /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
-    const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
-
-    // use credentialState response to ensure the user is authenticated
-    if (credentialState === appleAuth.State.AUTHORIZED) {
-      // user is authenticated
-    }
-  }
-
-  return <>
-
-    {isSignin ?
-
-      <Modal isOpen={modalVisible} onClose={() => setModalVisible()} justifyContent="flex-end" bottom={HEIGHT * .35}
-             shadowOpacity={.2}
-             shadowRadius={24}
-             shadowOffset={{
-               height: 4,
-             }}
-             _backdrop={{ bg: "#000", opacity: .25 }}
-      >
-
-        <KeyboardAvoidingView
-          keyboardVerticalOffset={-200}
-          // flex={1}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
-          <Modal.Content borderRadius={24} w={WIDTH * .9} px={20} py={12}>
-
-            <HStack mt={4} h={30} mb={16} justifyContent={"space-between"} alignItems={"center"}>
-
-              <Text ml={8} fontSize={18} fontWeight={"bold"} color={theme.primary.text.purple}>
-                登入Travelope
-              </Text>
-
-              <Pressable onPress={() => setModalVisible()} justifyContent={"center"} alignItems={"center"} w={28}
-                         h={28}>
-                <Feather name={"x"} size={20} color={theme.primary.text.purple} />
-              </Pressable>
-
-            </HStack>
-
-            {/*<HStack h={4} bg={theme.primary.placeholder.purple}/>*/}
-
-            <VStack h={240} borderRadius={16} justifyContent={"flex-end"}>
-
-              <VStack mt={12} mb={20} p={8} h={108} borderColor={"gray.200"} borderWidth={1} borderRadius={16}
-                      bg={"gray.100"} justifyContent={"space-around"} sdvsd>
-                <InputField
-                  value={email}
-                  onChangeText={text => {
-                    setEmail(text);
-                  }}
-                  borderWidth={0} color={theme.primary.text.purple} placeholder={"電子郵件"} />
-                <HStack h={1} bg={"gray.300"} />
-                <InputField
-                  value={password}
-                  onChangeText={text => {
-                    setPassword(text);
-                  }}
-                  secureTextEntry={!showPassword}
-                  InputRightElement={<Pressable justifyContent={"center"} alignItems={"center"} size="xs" rounded="none"
-                                                w="1/6" h="full" onPress={() => setShowPassword(prev => !prev)}>
-                    {showPassword ? <Feather name={"eye"} size={18} color={theme.primary.text.purple} /> :
-                      <Feather name={"eye-off"} size={18} color={theme.primary.text.purple} />}
-                  </Pressable>}
-                  borderWidth={0} color={theme.primary.text.purple} placeholder={"密碼"} type={"password"} />
-              </VStack>
-
-
-              <HStack h={48} pr={4} alignItems={"center"} w={"100%"} justifyContent={"flex-end"}>
-
-                <Center h={32} w={148} bg={"black"} borderRadius={16} shadowColor={"purple"} shadowOpacity={.2}
-                        shadowOffset={{ height: 1 }}
-                        shadowRadius={8}>
-                  <AppleButton
-                    buttonStyle={AppleButton.Style.BLACK}
-                    buttonType={AppleButton.Type.SIGN_IN}
-                    style={{
-                      width: 128, // You must specify a width
-                      height: 32, // You must specify a height
-                    }}
-                    onPress={() =>
-                      onAppleButtonPress()
-                        .catch((e) => {
-                          console.log(e);
-                        })
-
-                    }
-                  />
-                </Center>
-
-                <GradientButton ml={20} w={100} h={34} title={"登入"} onPress={() => {
-
-                  Keyboard.dismiss();
-
-                  if (email === "" || password === "") {
-                    setErrorText("資料不完整");
-                  } else {
-
-                    if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
-                      setErrorText("Email格式錯誤");
-                    } else {
-
-                      setAsync(true);
-
-                      signinApi.post("/api/travelope/signin", {
-                        email: email,
-                        password: password,
-                      })
-                        .then(async res => {
+	const theme = useTheme().colors
+
+	const [warningText, setWarningText] = useState("")
+	const [errorText, setErrorText] = useState("")
+
+	const [showPassword, setShowPassword] = useState(false)
+	const [isSignin, setIsSignin] = useState(true)
+
+	const [password, setPassword] = useState("")
+	const [email, setEmail] = useState("")
+	const [nickname, setNickname] = useState("")
+
+	const [async, setAsync] = useState(false)
+
+	const toastInfoRef = useRef()
+	const toast = useToast()
+
+	const dispatch = useDispatch()
+	const account = useSelector(selectAccount)
+
+	useEffect(() => {
+
+		console.log("Revoke testing")
+		// onCredentialRevoked returns a function that will remove the event listener. useEffect will call this function when the component unmounts
+		return appleAuth.onCredentialRevoked(async () => {
+			console.warn("User Credentials have been Revoked")
+		})
+
+	}, [])
+
+	useFocusEffect(
+		useCallback(() => {
+			setShowPassword(false)
+			setIsSignin(true)
+
+		}, []),
+	)
+
+	useEffect(() => {
+		setErrorText("")
+	}, [isSignin])
+
+	useEffect(() => {
+
+		async function showInfo() {
+			addToast()
+			await new Promise(resolve => setTimeout(resolve, 1500))
+			closeInfoToast()
+			setWarningText("")
+		}
+
+		if (warningText !== "") {
+			showInfo()
+		}
+
+	}, [warningText])
+
+	function closeInfoToast() {
+		if (toastInfoRef.current) {
+			toast.close(toastInfoRef.current)
+		}
+	}
+
+	function addToast() {
+		if (!toast.isActive("warningInfo")) {
+			toastInfoRef.current = toast.show({
+				id: "warningInfo",
+				render: () => {
+					return (
+						<ToastInfo />
+					)
+				},
+			})
+		}
+	}
+
+	const ToastInfo = () => {
+		return (
+			<HStack
+
+				alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.purple} w={WIDTH * .9} h={64}
+				borderRadius={16} px={24} mb={5}>
+				<Text fontWeight={"bold"} fontSize={16} color={"white"}>{warningText}</Text>
+			</HStack>
+		)
+	}
+
+	async function onAppleButtonPress() {
+
+		// performs login request
+		const appleAuthRequestResponse = await appleAuth.performRequest({
+			requestedOperation: appleAuth.Operation.LOGIN,
+			requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+		})
+
+		// get current authentication state for user
+		// /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
+		const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user)
+
+		// use credentialState response to ensure the user is authenticated
+		if (credentialState === appleAuth.State.AUTHORIZED) {
+			// user is authenticated
+		}
+	}
+
+	return <>
+
+		{isSignin?
+
+			<Modal isOpen={modalVisible} onClose={() => setModalVisible()} justifyContent="flex-end" bottom={HEIGHT * .35}
+			       shadowOpacity={.2}
+			       shadowRadius={24}
+			       shadowOffset={{
+				       height: 4,
+			       }}
+			       _backdrop={{ bg: "#000", opacity: .25 }}
+			>
+
+				<KeyboardAvoidingView
+					keyboardVerticalOffset={-200}
+					// flex={1}
+					behavior={Platform.OS === "ios"? "padding" : "height"}
+				>
+					<Modal.Content borderRadius={24} w={WIDTH * .9} px={20} py={12}>
+
+						<HStack mt={4} h={30} mb={16} justifyContent={"space-between"} alignItems={"center"}>
+
+							<Text ml={8} fontSize={18} fontWeight={"bold"} color={theme.primary.text.purple}>
+								登入Travelope
+							</Text>
+
+							<Pressable onPress={() => setModalVisible()} justifyContent={"center"} alignItems={"center"} w={28}
+							           h={28}>
+								<Feather name={"x"} size={20} color={theme.primary.text.purple} />
+							</Pressable>
+
+						</HStack>
+
+						{/*<HStack h={4} bg={theme.primary.placeholder.purple}/>*/}
+
+						<VStack h={240} borderRadius={16} justifyContent={"flex-end"}>
+
+							<VStack mt={12} mb={20} p={8} h={108} borderColor={"gray.200"} borderWidth={1} borderRadius={16}
+							        bg={"gray.100"} justifyContent={"space-around"} sdvsd>
+								<InputField
+									value={email}
+									onChangeText={text => {
+										setEmail(text)
+									}}
+									borderWidth={0} color={theme.primary.text.purple} placeholder={"電子郵件"} />
+								<HStack h={1} bg={"gray.300"} />
+								<InputField
+									value={password}
+									onChangeText={text => {
+										setPassword(text)
+									}}
+									secureTextEntry={!showPassword}
+									InputRightElement={<Pressable justifyContent={"center"} alignItems={"center"} size="xs"
+									                              rounded="none"
+									                              w="1/6" h="full"
+									                              onPress={() => setShowPassword(prev => !prev)}>
+										{showPassword? <Feather name={"eye"} size={18} color={theme.primary.text.purple} /> :
+											<Feather name={"eye-off"} size={18} color={theme.primary.text.purple} />}
+									</Pressable>}
+									borderWidth={0} color={theme.primary.text.purple} placeholder={"密碼"} type={"password"} />
+							</VStack>
+
+
+							<HStack h={48} pr={4} alignItems={"center"} w={"100%"} justifyContent={"flex-end"}>
+
+								<Center h={32} w={148} bg={"black"} borderRadius={16} shadowColor={"purple"} shadowOpacity={.2}
+								        shadowOffset={{ height: 1 }}
+								        shadowRadius={8}>
+									<AppleButton
+										buttonStyle={AppleButton.Style.BLACK}
+										buttonType={AppleButton.Type.SIGN_IN}
+										style={{
+											width: 128, // You must specify a width
+											height: 32, // You must specify a height
+										}}
+										onPress={() =>
+											onAppleButtonPress()
+												.catch((e) => {
+													console.log(e)
+												})
+
+										}
+									/>
+								</Center>
+
+								<GradientButton ml={20} w={100} h={34} title={"登入"} onPress={() => {
+
+									Keyboard.dismiss()
+
+									if (email === "" || password === "") {
+										setErrorText("資料不完整")
+									} else {
+
+										if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+											setErrorText("Email格式錯誤")
+										} else {
+
+											setAsync(true)
+
+											signinApi.post("/api/travelope/signin", {
+												email: email,
+												password: password,
+											})
+											         .then(async res => {
+
+												         await Keychain.setGenericPassword("token", res.data.token)
+
+												         setAsync(false)
+												         setModalVisible(prev => !prev)
+
+												         dispatch(setAccountInfo({
+
+													         ...account.info,
+													         isLoggedIn: true,
+													         id: res.data.user.id,
+													         email: res.data.user.email,
+													         nickname: res.data.user.nickname,
+
+												         }))
+
+												         setErrorText("")
+												         setWarningText("登入成功！")
+
+											         }, rej => {
+
+												         setAsync(false)
+
+												         setErrorText("帳戶資訊錯誤")
+												         console.log("Signin Rejected: " + rej)
+											         })
+										}
+									}
+
+								}} />
+
+							</HStack>
+
+							<HStack h={48} px={6} alignItems={"center"} w={"100%"} justifyContent={"space-between"}>
+
+								{async?
+									<Spinner size={"sm"} color={"dimgray"} /> :
+									<Text fontSize={15} fontWeight={"bold"}
+									      color={theme.primary.placeholder.pink}>
+										{errorText}
+									</Text>}
+
+								<Pressable
+									onPress={() => {
+										setIsSignin(false)
+									}}
+									justifyContent={"center"} alignItmes={"center"}>
+
+									<Text textDecorationLine={"underline"} fontSize={15} fontWeight={"bold"}
+									      color={theme.primary.placeholder.purple}>
+										使用電子郵件註冊帳號
+									</Text>
+								</Pressable>
+
+							</HStack>
+
+						</VStack>
+
+					</Modal.Content>
+				</KeyboardAvoidingView>
+
+			</Modal>
+
+			:
+
+			<Modal isOpen={modalVisible} onClose={() => setModalVisible()} justifyContent="flex-end" bottom={HEIGHT * .35}
+			       shadowOpacity={.2}
+			       shadowRadius={24}
+			       shadowOffset={{
+				       height: 4,
+			       }}
+			       _backdrop={{ bg: "#000", opacity: .25 }}
+			>
 
-                          await Keychain.setGenericPassword("token", res.data.token);
-
-                          setAsync(false);
-                          setModalVisible(prev => !prev);
-
-                          dispatch(setAccountInfo({
+				<KeyboardAvoidingView
+					keyboardVerticalOffset={-200}
+					// flex={1}
+					behavior={Platform.OS === "ios"? "padding" : "height"}
+				>
+					<Modal.Content borderRadius={24} w={WIDTH * .9} px={20} py={12}>
 
-                            isLoggedIn: true,
+						<HStack mt={4} h={30} mb={16} justifyContent={"space-between"} alignItems={"center"}>
 
-                            id: res.data.user.id,
-                            email: res.data.user.email,
-                            password: "",
-                            nickname: res.data.user.nickname,
-                            appleAccountLink: {},
+							<Text ml={8} fontSize={18} fontWeight={"bold"} color={theme.primary.text.purple}>
+								註冊Travelope
+							</Text>
 
-                          }));
-
-                          setErrorText("");
-                          setWarningText("登入成功！");
-
-                        }, rej => {
-
-                          setAsync(false);
-
-                          setErrorText("帳戶資訊錯誤");
-                          console.log("Signin Rejected: " + rej);
-                        });
-                    }
-                  }
-
-                }} />
-
-              </HStack>
-
-              <HStack h={48} px={6} alignItems={"center"} w={"100%"} justifyContent={"space-between"}>
+							<Pressable onPress={() => setModalVisible()} justifyContent={"center"} alignItems={"center"} w={28}
+							           h={28}>
+								<Feather name={"x"} size={20} color={theme.primary.text.purple} />
+							</Pressable>
 
-                {async ?
-                  <Spinner size={"sm"} color={"dimgray"} /> :
-                  <Text fontSize={15} fontWeight={"bold"}
-                        color={theme.primary.placeholder.pink}>
-                    {errorText}
-                  </Text>}
+						</HStack>
 
-                <Pressable
-                  onPress={() => {
-                    setIsSignin(false);
-                  }}
-                  justifyContent={"center"} alignItmes={"center"}>
+						{/*<HStack h={4} bg={theme.primary.placeholder.purple}/>*/}
 
-                  <Text textDecorationLine={"underline"} fontSize={15} fontWeight={"bold"}
-                        color={theme.primary.placeholder.purple}>
-                    使用電子郵件註冊帳號
-                  </Text>
-                </Pressable>
-
-              </HStack>
-
-            </VStack>
-
-          </Modal.Content>
-        </KeyboardAvoidingView>
-
-      </Modal>
+						<VStack h={300} borderRadius={16} justifyContent={"flex-end"}>
 
-      :
+							<VStack mt={12} mb={20} p={8} h={162} borderColor={"gray.200"} borderWidth={1} borderRadius={16}
+							        bg={"gray.100"} justifyContent={"space-around"} sdvsd>
 
-      <Modal isOpen={modalVisible} onClose={() => setModalVisible()} justifyContent="flex-end" bottom={HEIGHT * .35}
-             shadowOpacity={.2}
-             shadowRadius={24}
-             shadowOffset={{
-               height: 4,
-             }}
-             _backdrop={{ bg: "#000", opacity: .25 }}
-      >
+								<InputField
+									onChangeText={text => setNickname(text)}
+									value={nickname} borderWidth={0} color={theme.primary.text.purple} placeholder={"用戶名稱"} />
+
+								<HStack h={1} bg={"gray.300"} />
 
-        <KeyboardAvoidingView
-          keyboardVerticalOffset={-200}
-          // flex={1}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
-          <Modal.Content borderRadius={24} w={WIDTH * .9} px={20} py={12}>
+								<InputField
+									onChangeText={text => setEmail(text)}
+									value={email} borderWidth={0} color={theme.primary.text.purple} placeholder={"電子郵件"} />
+								<HStack h={1} bg={"gray.300"} />
 
-            <HStack mt={4} h={30} mb={16} justifyContent={"space-between"} alignItems={"center"}>
+								<InputField
+									value={password}
+									onChangeText={text => {
+										setPassword(text)
+									}}
+									secureTextEntry={!showPassword}
+									InputRightElement={<Pressable justifyContent={"center"} alignItems={"center"} size="xs"
+									                              rounded="none"
+									                              w="1/6" h="full"
+									                              onPress={() => setShowPassword(prev => !prev)}>
+										{showPassword? <Feather name={"eye"} size={18} color={theme.primary.text.purple} /> :
+											<Feather name={"eye-off"} size={18} color={theme.primary.text.purple} />}
+									</Pressable>}
+									borderWidth={0} color={theme.primary.text.purple} placeholder={"密碼"} type={"password"} />
+							</VStack>
 
-              <Text ml={8} fontSize={18} fontWeight={"bold"} color={theme.primary.text.purple}>
-                註冊Travelope
-              </Text>
 
-              <Pressable onPress={() => setModalVisible()} justifyContent={"center"} alignItems={"center"} w={28}
-                         h={28}>
-                <Feather name={"x"} size={20} color={theme.primary.text.purple} />
-              </Pressable>
+							<HStack h={48} pr={4} alignItems={"center"} w={"100%"} justifyContent={"flex-end"}>
 
-            </HStack>
+								<GradientButton ml={20} w={100} h={34} title={"註冊"} onPress={() => {
 
-            {/*<HStack h={4} bg={theme.primary.placeholder.purple}/>*/}
+									Keyboard.dismiss()
 
-            <VStack h={300} borderRadius={16} justifyContent={"flex-end"}>
+									if (email === "" || password === "" || nickname === "") {
+										setErrorText("資料不完整")
+									} else {
 
-              <VStack mt={12} mb={20} p={8} h={162} borderColor={"gray.200"} borderWidth={1} borderRadius={16}
-                      bg={"gray.100"} justifyContent={"space-around"} sdvsd>
+										if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+											setErrorText("Email格式錯誤")
+										} else {
 
-                <InputField
-                  onChangeText={text => setNickname(text)}
-                  value={nickname} borderWidth={0} color={theme.primary.text.purple} placeholder={"用戶名稱"} />
+											if (password.length < 6) {
+												setErrorText("密碼不得少於六個字元")
+											} else {
 
-                <HStack h={1} bg={"gray.300"} />
+												setAsync(true)
 
-                <InputField
-                  onChangeText={text => setEmail(text)}
-                  value={email} borderWidth={0} color={theme.primary.text.purple} placeholder={"電子郵件"} />
-                <HStack h={1} bg={"gray.300"} />
+												signupApi.post("/api/travelope/signup", {
 
-                <InputField
-                  value={password}
-                  onChangeText={text => {
-                    setPassword(text);
-                  }}
-                  secureTextEntry={!showPassword}
-                  InputRightElement={<Pressable justifyContent={"center"} alignItems={"center"} size="xs" rounded="none"
-                                                w="1/6" h="full" onPress={() => setShowPassword(prev => !prev)}>
-                    {showPassword ? <Feather name={"eye"} size={18} color={theme.primary.text.purple} /> :
-                      <Feather name={"eye-off"} size={18} color={theme.primary.text.purple} />}
-                  </Pressable>}
-                  borderWidth={0} color={theme.primary.text.purple} placeholder={"密碼"} type={"password"} />
-              </VStack>
+													...account.info,
+													nickname: nickname,
+													email: email,
+													id: "" + (new Date().getFullYear() - 2000) + (new Date().getMonth() + 1) + (new Date().getDate()) + (new Date().getMinutes()) + (new Date().getSeconds()) + (new Date().getMilliseconds()),
+													password: password,
 
+												})
+												         .then(async res => {
 
-              <HStack h={48} pr={4} alignItems={"center"} w={"100%"} justifyContent={"flex-end"}>
+													         setErrorText("")
+													         setWarningText("註冊成功 !")
+													         setIsSignin(true)
 
-                <GradientButton ml={20} w={100} h={34} title={"註冊"} onPress={() => {
+													         await Keychain.setGenericPassword("token", res.data.token)
 
-                  Keyboard.dismiss();
+													         setAsync(false)
 
-                  if (email === "" || password === "" || nickname === "") {
-                    setErrorText("資料不完整");
-                  } else {
+												         })
+												         .catch(rej => {
 
-                    if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
-                      setErrorText("Email格式錯誤");
-                    } else {
+													         setAsync(false)
 
-                      if (password.length < 6) {
-                        setErrorText("密碼不得少於六個字元");
-                      } else {
+													         if (rej.response.data.includes("E11000")) {
+														         setErrorText("此電子信箱已經被註冊")
+													         } else {
+														         setErrorText("出現未知錯誤")
 
-                        setAsync(true);
+													         }
 
-                        signupApi.post("/api/travelope/signup", {
-                          nickname: nickname,
-                          email: email,
-                          id: "" + (new Date().getFullYear() - 2000) + (new Date().getMonth() + 1) + (new Date().getDate()) + (new Date().getMinutes()) + (new Date().getSeconds()) + (new Date().getMilliseconds()),
-                          password: password,
-                        })
-                          .then(async res => {
+													         console.log("Signup Rejected: " + JSON.stringify(rej.response.data))
+												         })
+											}
+										}
+									}
 
-                            setErrorText("");
-                            setWarningText("註冊成功 !");
-                            setIsSignin(true);
+								}} />
 
-                            await Keychain.setGenericPassword("token", res.data.token);
+							</HStack>
 
-                            setAsync(false);
+							<HStack h={48} px={6} alignItems={"center"} w={"100%"} justifyContent={"space-between"}>
 
-                          })
-                          .catch(rej => {
+								{async?
+									<Spinner size={"sm"} color={"dimgray"} /> :
+									<Text fontSize={15} fontWeight={"bold"}
+									      color={theme.primary.placeholder.pink}>
+										{errorText}
+									</Text>}
 
-                            setAsync(false);
+								<Pressable
+									onPress={() => {
+										setIsSignin(true)
+									}}
+									justifyContent={"center"} alignItmes={"center"}>
 
-                            if (rej.response.data.includes("E11000")) {
-                              setErrorText("此電子信箱已經被註冊");
-                            } else {
-                              setErrorText("出現未知錯誤");
+									<Text textDecorationLine={"underline"} fontSize={15} fontWeight={"bold"}
+									      color={theme.primary.placeholder.purple}>
+										返回登入
+									</Text>
+								</Pressable>
 
-                            }
+							</HStack>
 
-                            console.log("Signup Rejected: " + JSON.stringify(rej.response.data));
-                          });
-                      }
-                    }
-                  }
+						</VStack>
 
-                }} />
+					</Modal.Content>
+				</KeyboardAvoidingView>
 
-              </HStack>
+			</Modal>
 
-              <HStack h={48} px={6} alignItems={"center"} w={"100%"} justifyContent={"space-between"}>
+		}
 
-                {async ?
-                  <Spinner size={"sm"} color={"dimgray"} /> :
-                  <Text fontSize={15} fontWeight={"bold"}
-                        color={theme.primary.placeholder.pink}>
-                    {errorText}
-                  </Text>}
-
-                <Pressable
-                  onPress={() => {
-                    setIsSignin(true);
-                  }}
-                  justifyContent={"center"} alignItmes={"center"}>
-
-                  <Text textDecorationLine={"underline"} fontSize={15} fontWeight={"bold"}
-                        color={theme.primary.placeholder.purple}>
-                    返回登入
-                  </Text>
-                </Pressable>
-
-              </HStack>
-
-            </VStack>
-
-          </Modal.Content>
-        </KeyboardAvoidingView>
-
-      </Modal>
-
-    }
-
-  </>;
+	</>
 }
 
 const Settings = () => {
 
-  const theme = useTheme().colors;
-  const [modalVisible, setModalVisible] = useState(false);
-
-  const account = useSelector(selectAccount);
-  const dispatch = useDispatch();
-  const [userImageURI, setUserImageURI] = useState("");
-  const [userImageBlob, setUserImageBlob] = useState("");
-
-  const toastInfoRef = useRef();
-  const toast = useToast();
-
-  useEffect(() => {
-    console.log(account)
-  }, [account]);
-
-  useEffect(() => {
-    RNFS.exists(RNFS.DocumentDirectoryPath + "/travelope/" + account.info.id)
-      .then( profilePictureExists => {
-        if(profilePictureExists) {
-          console.log("FOUND PREVIOUS PROFILE IMAGE")
-          setUserImageURI(RNFS.DocumentDirectoryPath + "/travelope/" + account.info.id)
-        }
-      })
-  }, []);
-
-  useEffect(()=> {
-    findAndDownloadImage(account.info.id, account.info.id)
-      // .then(blob=> setUserImageBlob(blob))
-  }, [])
-
-  useEffect(() => {
-
-    console.log("Revoke testing");
-    // onCredentialRevoked returns a function that will remove the event listener. useEffect will call this function when the component unmounts
-    return appleAuth.onCredentialRevoked(async () => {
-      console.warn("User Credentials have been Revoked");
-    });
-  }, []);
-
-  function closeInfoToast() {
-    if (toastInfoRef.current) {
-      toast.close(toastInfoRef.current);
-    }
-  }
-
-  function addToast(warningText) {
-    if (!toast.isActive("warningInfo")) {
-      toastInfoRef.current = toast.show({
-        id: "warningInfo",
-        render: () => {
-          return (
-            <ToastInfo warningText={warningText}/>
-          );
-        },
-      });
-    }
-  }
-
-  const ToastInfo = ({ warningText }) => {
-    return (
-      <HStack
-
-        alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.purple} w={WIDTH * .9} h={64}
-        borderRadius={16} px={24} mb={5}>
-        <Text fontWeight={"bold"} fontSize={16} color={"white"}>{warningText}</Text>
-      </HStack>
-    );
-  };
-
-  async function setProfilePicture() {
-
-    // const result = await launchImageLibrary({ quality : 0.5 });
-    // console.log(result.assets[0].uri)
-    // uploadImage(result.assets[0].uri)
-    //
-    // setUserImageURI(result.assets[0].uri)
-
-    ImagePicker.openPicker({
-      width: 512,
-      height: 512,
-      mediaType: "photo",
-      cropping: true,
-      cropperCircleOverlay: true,
-    }).then(async image => {
-
-      console.log("Setting profile image...")
-
-      const name = account.info.id
-
-      RNFS.exists(RNFS.DocumentDirectoryPath + "/travelope")
-        .then(async result => {
-          if(!result) {
-            console.log("Travelope directory not found. Create one.")
-            await RNFS.mkdir(RNFS.DocumentDirectoryPath + "/travelope")
-
-          }
-
-          RNFS.exists(RNFS.DocumentDirectoryPath + "/travelope/" + name)
-            .then(async imageExist => {
-
-              if(imageExist){
-
-                await RNFS.unlink(RNFS.DocumentDirectoryPath + "/travelope/" + name)
-
-              }
-              RNFS.moveFile(image.path, RNFS.DocumentDirectoryPath + "/travelope/" + name,{
-                NSURLIsExcludedFromBackupKey: false
-              })
-                .then(async ()=> {
-                  uploadImage(RNFS.DocumentDirectoryPath + "/travelope/" + name, account.info.id, account.info.id);
-                  setUserImageURI(RNFS.DocumentDirectoryPath + "/travelope/" + name);
-
-                  // const notBase64Image = await RNFS.readFile(RNFS.DocumentDirectoryPath + "/travelope/" + name)
-                  // await RNFS.writeFile(RNFS.DocumentDirectoryPath + "/travelope/" + name + "base64", notBase64Image,"base64")
-
-                  const blob = await RNFS.readFile(RNFS.DocumentDirectoryPath + "/travelope/" + name + "base64X")
-                  setUserImageBlob("data:image/png;base64," + blob)
-                })
-            })
-        })
-
-      // RNFS.moveFile("file://" + image.path, RNFS.DocumentDirectoryPath + "travelope/" + name,{
-      //   NSURLIsExcludedFromBackupKey: false
-      // })
-      //   .then((res)=> {
-      //       uploadImage(RNFS.DocumentDirectoryPath + "travelope/" + name, account.info.id, account.info.id);
-      //   })
-      //
-      // setUserImageURI(image.sourceURL);
-    });
-
-
-  }
-
-  return (
-
-    <LayoutBase>
-
-      <SignModal modalVisible={modalVisible} setModalVisible={() => setModalVisible(prev => !prev)} />
-
-      <VStack mb={36}>
-
-        <HStack h={100} mb={12} justifyContent={"center"} alignItems={"center"}>
-          <Pressable
-            onPress={async () => {
-              if(!account.info.isLoggedIn) {
-                addToast("必須登入才能設定頭像喔！");
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                closeInfoToast();
-                return
-              }
-              setProfilePicture();
-            }}
-            h={96}
-            w={96}
-            overflow={"hidden"}
-            borderRadius={100}
-            borderWidth={2}
-            borderColor={theme.primary.text.pink}
-            justifyContent={"center"}
-            alignItems={"center"}
-          >
-            {
-              userImageURI !== "" ?
-                <Image
-                  style={{
-                    borderRadius: 100,
-                    height: 88,
-                    width: 88
-                  }}
-                  source={{uri: userImageBlob}}
-                  alt={"userImage"}
-                />
-                : <Feather name={"user"} color={theme.primary.text.pink} size={32} />
-            }
-
-          </Pressable>
-        </HStack>
-
-        <HStack mb={4} h={24} justifyContent={"center"} alignItems={"center"}>
-
-          {account.info.isLoggedIn ?
-
-            <Text fontSize={18} fontWeight={"bold"} color={theme.primary.text.pink}>
-              {account.info.nickname}
-            </Text> :
-
-            <Text fontSize={18} fontWeight={"bold"} color={theme.primary.text.pink}>
-              未登入
-            </Text>
-          }
-
-
-        </HStack>
-
-        <HStack h={24} justifyContent={"center"} alignItems={"center"}>
-
-          {account.info.isLoggedIn ?
-
-            <Text fontSize={16} fontWeight={"normal"} color={theme.primary.text.purple}>
-              {"用戶ID: " + account.info.id}
-            </Text> : <></>
-          }
-        </HStack>
-
-      </VStack>
-
-      {
-        account.info.isLoggedIn ?
-
-          <Block pl={24} pr={18} mb={36} borderRadius={32} fd={"row"} h={64} sc={"#9e66ff"} bdc={"#af81ff"}
-                 ai={"center"}
-                 jc={"space-between"}>
-
-            <Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-              登出帳號
-            </Text>
-            <GradientButton w={100} h={34} title={"登出"} onPress={() => {
-
-              dispatch(setAccountInfo({
-                isLoggedIn: false,
-
-                id: "",
-                email: "",
-                password: "",
-                nickname: "",
-                realname: "",
-                appleAccountLink: {},
-              }));
-
-            }} />
-
-          </Block> :
-
-          <Block pl={24} pr={18} mb={36} borderRadius={32} fd={"row"} h={64} sc={"#9e66ff"} bdc={"#af81ff"}
-                 ai={"center"}
-                 jc={"space-between"}>
-
-            <Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-              啟用同步與朋友功能。
-            </Text>
-            <GradientButton w={100} h={34} title={"登入"} onPress={() => {
-              setModalVisible(prev => !prev);
-            }} />
-
-          </Block>
-      }
-
-
-      <ScrollView>
-
-        <Block px={12} py={16} borderRadius={32} fd={"column"} h={112} sc={"#9e66ff"} bdc={"#af81ff"}
-               jc={"space-between"}>
-
-          <Pressable flexDirection={"row"} px={10} alignItems={"center"}>
-            <Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-              選項
-            </Text>
-            <Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
-          </Pressable>
-
-          <HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.pink} />
-
-          <Pressable flexDirection={"row"} px={10} alignItems={"center"}>
-            <Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-              選項
-            </Text>
-            <Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
-          </Pressable>
-
-        </Block>
-
-        <Block px={12} py={16} borderRadius={32} fd={"column"} h={112} sc={"#9e66ff"} bdc={"#af81ff"}
-               jc={"space-between"}>
-
-          <Pressable flexDirection={"row"} px={10} alignItems={"center"}>
-            <Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-              選項
-            </Text>
-            <Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
-          </Pressable>
-
-          <HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.pink} />
-
-          <Pressable flexDirection={"row"} px={10} alignItems={"center"}>
-            <Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-              選項
-            </Text>
-            <Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
-          </Pressable>
-
-        </Block>
-
-        <Block px={12} py={16} borderRadius={32} fd={"column"} h={164} sc={"#9e66ff"} bdc={"#af81ff"}
-               jc={"space-between"}>
-
-          <Pressable flexDirection={"row"} px={10} alignItems={"center"}>
-            <Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-              選項
-            </Text>
-            <Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
-          </Pressable>
-
-          <HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.pink} />
-
-          <Pressable flexDirection={"row"} px={10} alignItems={"center"}>
-            <Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-              選項
-            </Text>
-            <Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
-          </Pressable>
-
-          <HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.pink} />
-
-          <Pressable flexDirection={"row"} px={10} alignItems={"center"}>
-            <Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-              選項
-            </Text>
-            <Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
-          </Pressable>
-
-        </Block>
-
-      </ScrollView>
-
-    </LayoutBase>);
-};
-
-export default Settings;
+	const theme = useTheme().colors
+	const [modalVisible, setModalVisible] = useState(false)
+
+	const account = useSelector(selectAccount)
+	const dispatch = useDispatch()
+
+	const toastInfoRef = useRef()
+	const toast = useToast()
+
+	useFocusEffect(
+		useCallback(() => {
+
+			}, [account]),
+	)
+
+	useEffect(() => {
+
+		console.log(account.info.profilePictureLocalPath)
+
+		return appleAuth.onCredentialRevoked(async () => {
+			console.warn("User Credentials have been Revoked")
+
+		})
+
+	}, [])
+
+
+	function closeInfoToast() {
+		if (toastInfoRef.current) {
+			toast.close(toastInfoRef.current)
+		}
+	}
+
+	function addToast(warningText) {
+		if (!toast.isActive("warningInfo")) {
+			toastInfoRef.current = toast.show({
+				id: "warningInfo",
+				render: () => {
+					return (
+						<ToastInfo warningText={warningText} />
+					)
+				},
+			})
+		}
+	}
+
+	const ToastInfo = ({ warningText }) => {
+		return (
+			<HStack
+				alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.purple} w={WIDTH * .9} h={64}
+				borderRadius={16} px={24} mb={5}>
+				<Text fontWeight={"bold"} fontSize={16} color={"white"}>{warningText}</Text>
+			</HStack>
+		)
+	}
+
+	const uploadProfilePicture = (accountID, key, localPath) => {
+
+		apiRequest("get", `/api/travelope/get-upload-link/${accountID}/${key}`)
+			.then(res => { // 取得授權後的檔案上傳連結
+
+				uploadToURL(res.url, res.name)
+				console.log(res)
+
+			}, rej => console.log(rej))
+
+
+		const files = [ // 設定上傳檔案的本地資訊
+			{
+				name: "test1",
+				filename: accountID,
+				filepath: localPath,
+				filetype: "image/*",
+			},
+		]
+
+		const uploadToURL = async (url, name) => {
+
+			RNFS.uploadFiles({
+
+				binaryStreamOnly: true,
+				toUrl: url,
+				files: files,
+
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/octet-stream",
+				},
+
+			}).promise.then((response) => {
+
+				if (response.statusCode == 200) {
+					console.log("FILES UPLOADED!")
+
+				} else {
+
+					console.log("SERVER ERROR")
+				}
+			}).catch((err) => {
+				if (err.description === "cancelled") {
+					console.log("USER CANCELLED")
+				}
+				console.log(err)
+			})
+		}
+	}
+
+	const updateProfilePicture = async () => { // 避免ＣＡＣＨＥ問題，因此先初始化
+
+		ImagePicker.openPicker({
+			width: 512,
+			height: 512,
+			mediaType: "photo",
+			cropping: true,
+			cropperCircleOverlay: true,
+
+		}).then(async image => {
+
+			console.log("Setting profile image...")
+
+			const accountID = account.info.id
+			const prevImgPath = account.info.profilePictureLocalPath
+			const URI = await profilePictureInit(image, accountID, prevImgPath)
+
+			console.log("PIC: " + prevImgPath + " AFTER: " + URI)
+			dispatch(setProfilePicture(URI))
+
+			uploadProfilePicture(account.info.id, account.info.id, URI)
+		})
+	}
+
+	return (
+
+		<LayoutBase>
+
+			<SignModal modalVisible={modalVisible} setModalVisible={() => setModalVisible(prev => !prev)} />
+
+			<VStack mb={36}>
+
+				<HStack h={100} mb={12} justifyContent={"center"} alignItems={"center"}>
+					<Pressable
+						onPress={async () => {
+							if (!account.info.isLoggedIn) {
+								addToast("必須登入才能設定頭像喔！")
+								await new Promise(resolve => setTimeout(resolve, 1500))
+								closeInfoToast()
+								return
+							}
+							updateProfilePicture()
+						}}
+						h={96}
+						w={96}
+						overflow={"hidden"}
+						borderRadius={100}
+						borderWidth={2}
+						borderColor={theme.primary.text.pink}
+						justifyContent={"center"}
+						alignItems={"center"}
+					>
+						{
+							account.info.profilePictureLocalPath !== ""?
+
+								<Image
+									style={{
+										borderRadius: 100,
+										height: 88,
+										width: 88,
+									}}
+									source={{ uri: account.info.profilePictureLocalPath }}
+									alt={"userImage"}
+								/>
+								: <Feather name={"user"} color={theme.primary.text.pink} size={32} />
+						}
+
+					</Pressable>
+				</HStack>
+
+				<HStack mb={4} h={24} justifyContent={"center"} alignItems={"center"}>
+
+					{
+						account.info.isLoggedIn?
+
+							<Text fontSize={18} fontWeight={"bold"} color={theme.primary.text.pink}>
+								{account.info.nickname}
+							</Text> :
+
+							<Text fontSize={18} fontWeight={"bold"} color={theme.primary.text.pink}>
+								未登入
+							</Text>
+					}
+
+				</HStack>
+
+				<HStack h={24} justifyContent={"center"} alignItems={"center"}>
+
+					{
+						account.info.isLoggedIn?
+
+							<Text fontSize={16} fontWeight={"normal"} color={theme.primary.text.purple}>
+								{"用戶ID: " + account.info.id}
+							</Text> : <></>
+					}
+
+				</HStack>
+
+			</VStack>
+
+			{
+				account.info.isLoggedIn?
+
+					<Block pl={24} pr={18} mb={36} borderRadius={32} fd={"row"} h={64} sc={"#9e66ff"} bdc={"#af81ff"}
+					       ai={"center"}
+					       jc={"space-between"}>
+
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+							登出帳號
+						</Text>
+						<GradientButton w={100} h={34} title={"登出"} onPress={() => {
+
+							dispatch(setAccountInfo({
+								isLoggedIn: false,
+
+								id: "",
+								email: "",
+								password: "",
+								nickname: "",
+								realname: "",
+								appleAccountLink: {},
+							}))
+
+						}} />
+
+					</Block> :
+
+					<Block pl={24} pr={18} mb={36} borderRadius={32} fd={"row"} h={64} sc={"#9e66ff"} bdc={"#af81ff"}
+					       ai={"center"}
+					       jc={"space-between"}>
+
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+							啟用同步與朋友功能。
+						</Text>
+						<GradientButton w={100} h={34} title={"登入"} onPress={() => {
+							setModalVisible(prev => !prev)
+						}} />
+
+					</Block>
+			}
+
+
+			<ScrollView>
+
+				<Block px={12} py={16} borderRadius={32} fd={"column"} h={112} sc={"#9e66ff"} bdc={"#af81ff"}
+				       jc={"space-between"}>
+
+					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+							選項
+						</Text>
+						<Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
+					</Pressable>
+
+					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.pink} />
+
+					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+							選項
+						</Text>
+						<Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
+					</Pressable>
+
+				</Block>
+
+				<Block px={12} py={16} borderRadius={32} fd={"column"} h={112} sc={"#9e66ff"} bdc={"#af81ff"}
+				       jc={"space-between"}>
+
+					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+							選項
+						</Text>
+						<Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
+					</Pressable>
+
+					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.pink} />
+
+					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+							選項
+						</Text>
+						<Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
+					</Pressable>
+
+				</Block>
+
+				<Block px={12} py={16} borderRadius={32} fd={"column"} h={164} sc={"#9e66ff"} bdc={"#af81ff"}
+				       jc={"space-between"}>
+
+					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+							選項
+						</Text>
+						<Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
+					</Pressable>
+
+					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.pink} />
+
+					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+							選項
+						</Text>
+						<Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
+					</Pressable>
+
+					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.pink} />
+
+					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+							選項
+						</Text>
+						<Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
+					</Pressable>
+
+				</Block>
+
+			</ScrollView>
+
+		</LayoutBase>)
+}
+
+export default Settings

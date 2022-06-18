@@ -1,28 +1,12 @@
 import React, { useEffect, useState } from "react";
 import LayoutBase from "../components/LayoutBase";
 import Block from "../components/Block";
-import {
-  Actionsheet,
-  Box,
-  Center,
-  CheckIcon,
-  HStack,
-  Input,
-  Pressable,
-  Select,
-  Text,
-  useDisclose,
-  VStack,
-} from "native-base";
-import { GradientBorderButton } from "../components/GradientButton";
+import { Actionsheet, Box, Center, HStack, Input, Pressable, Select, Text, useDisclose, VStack } from "native-base";
 import Feather from "react-native-vector-icons/Feather";
 import { useSelector } from "react-redux";
 import { selectAccount } from "../globalstate/accountSlice";
 import { FlatList } from "react-native";
 import { WIDTH } from "../Util";
-import RNFS, { exists } from "react-native-fs";
-import { launchImageLibrary } from "react-native-image-picker";
-import { uploadImage } from "../apis/imageNetworkManager";
 
 const FriendItem = ({ item }) => {
 

@@ -1,13 +1,13 @@
-import { extendTheme, HStack, Image, NativeBaseProvider, Pressable, StatusBar, Text, VStack } from "native-base";
+import { extendTheme, HStack, Image, NativeBaseProvider, Pressable, StatusBar, Text } from "native-base";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 import MainScreen from "./src/screens/MainScreen";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { getHeaderTitle } from "@react-navigation/elements";
 import AppHeader from "./src/components/Header";
 import SplashScreen from "./src/screens/SplashScreen";
-import { HEIGHT, WIDTH } from "./src/Util";
+import { WIDTH } from "./src/Util";
 import CurrentTrip from "./src/screens/trip/CurrentTrip";
 import React from "react";
 import { LogBox, View } from "react-native";
@@ -16,14 +16,10 @@ import MemEnvelope from "./src/screens/envelope/MemEnvelope";
 import TripPostcard from "./src/screens/TripPostcard";
 import MyZone from "./src/screens/MyZone";
 import Settings from "./src/screens/Settings";
-import { useEffect, useRef } from "react";
-import Share from "react-native-share";
 import { store } from "./src/globalstate/store";
 import { Provider } from "react-redux";
 import NewTrip from "./src/screens/trip/NewTrip";
 import { SSRProvider } from "react-aria";
-import { runList, uploadImage } from "./src/apis/imageNetworkManager";
-import { launchImageLibrary } from "react-native-image-picker";
 
 LogBox.ignoreLogs(["Require cycle"]);
 
