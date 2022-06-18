@@ -9,7 +9,7 @@ import AppHeader from "./src/components/Header";
 import SplashScreen from "./src/screens/SplashScreen";
 import { WIDTH } from "./src/Util";
 import CurrentTrip from "./src/screens/trip/CurrentTrip";
-import React from "react";
+import React, { useEffect } from "react"
 import { LogBox, View } from "react-native";
 import TripOverview from "./src/screens/trip/TripOverview";
 import MemEnvelope from "./src/screens/envelope/MemEnvelope";
@@ -20,6 +20,7 @@ import { store } from "./src/globalstate/store";
 import { Provider } from "react-redux";
 import NewTrip from "./src/screens/trip/NewTrip";
 import { SSRProvider } from "react-aria";
+import RNFS from "react-native-fs"
 
 LogBox.ignoreLogs(["Require cycle"]);
 
@@ -227,6 +228,20 @@ const StackNavigator = () => {
 const DrawerNavigator = () => {
 
   const insets = useSafeAreaInsets();
+  useEffect(()=> { // ＡＰＰ整體初始設定
+
+    RNFS.exists(RNFS.DocumentDirectoryPath + "/travelope")
+        .then(async result => {
+
+          if (!result) {   // 若使用者手機沒有ＴＲＡＶＥＬＯＰＥ資料夾，建立一個
+
+            console.log("Travelope directory not found. Create one.")
+            await RNFS.mkdir(RNFS.DocumentDirectoryPath + "/travelope")
+          }
+        })
+
+
+  }, [])
 
   return (
 

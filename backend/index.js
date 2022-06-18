@@ -7,6 +7,7 @@ const cors = require("cors")
 const mongoose = require("mongoose");
 
 const userRoute = require("./src/routes/userRoute")
+const userUpdateRoute = require("./src/routes/userRoute")
 const userDataRoute = require("./src/routes/userDataRoute")
 const fileTransferRoute = require("./src/routes/fileTransferRoute")
 const userAuth = require("./src/middleware/userAuth")

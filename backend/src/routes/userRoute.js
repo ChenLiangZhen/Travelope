@@ -1,24 +1,24 @@
 const express = require("express")
 const mongoose = require("mongoose")
-const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken")
 const User = mongoose.model("user_account")
 const UserData = mongoose.model("user_data")
 
-const router_sign = express.Router()
+const router_user = express.Router()
 
-router_sign.post("/api/travelope/signup", async (req, res) => {
+router_user.post("/api/travelope/signup", async (req, res) => {
 
-	const { nickname ,email, id, password } = req.body
+	const { nickname, email, id, password } = req.body
 	let linkId, userData
 
-	try{
+	try {
 
-		if(!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+		if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
 			return res.status(400).send("Signup Failed: Email Invalid.")
 		}
 
 		//以 User Model 建立新的使用者，並儲存使用者至資料庫
-		const user = new User({ nickname ,email, id, password })
+		const user = new User({ nickname, email, id, password })
 		await user.save()
 
 
@@ -29,16 +29,16 @@ router_sign.post("/api/travelope/signup", async (req, res) => {
 		userData = {}
 
 		const data = new UserData({
-			userLink :linkId ,
-			data: userData
+			userLink: linkId,
+			data: userData,
 		})
 
 		await data.save()
 
-		const token = jwt.sign({userId: user._id}, "U0VDUkVUX0tFWV9PRl9NSURURVJNX1BST0pFQ1Q=")
+		const token = jwt.sign({ userId: user._id }, "U0VDUkVUX0tFWV9PRl9NSURURVJNX1BST0pFQ1Q=")
 		res.send({ token })
 
-	} catch(e){
+	} catch (e) {
 
 		res.status(422).send("Signup Failed: " + e)
 		console.log("[Sign Up]: " + e)
@@ -46,28 +46,80 @@ router_sign.post("/api/travelope/signup", async (req, res) => {
 
 })
 
-router_sign.post('/api/travelope/signin', async(req, res) => {
-	const {email, password } = req.body
+router_user.post("/api/travelope/signin", async (req, res) => {
+	const { email, password } = req.body
 
-	if(!email || !password){
-		return res.status(422).send({ error: "must provide email and password."})
+	if (!email || !password) {
+		return res.status(422).send({ error: "must provide email and password." })
 	}
 	//尋找該 email 的使用者是否存在。 若不在則回傳錯誤。
 	const user = await User.findOne({ email })
-	if(!user){
-		return res.status(422).send({ error: "invalid password of email"})
+	if (!user) {
+		return res.status(422).send({ error: "invalid password of email" })
 	}
 
-	try{
+	try {
 		await user.comparePassword(password)
 		const token = jwt.sign({ userId: user._id }, "U0VDUkVUX0tFWV9PRl9NSURURVJNX1BST0pFQ1Q=")
 
-		const userData = await UserData.findOne({userLink: user._id})
+		const userData = await UserData.findOne({ userLink: user._id })
 
 		res.send({ token, user, userData })
-	}catch (e){
-		return res.status(422).send({ error: "invalid password of email"})
+	} catch (e) {
+		return res.status(422).send({ error: "invalid password of email" })
 	}
 })
 
-module.exports = router_sign
+router_user.put("/api/travelope/update-user", async (req, res) => {
+
+	const { id, data } = req.body
+
+	try {
+		User.updateOne({ id: id },
+			{
+				email: data.email,
+				password: data.password,
+				nickname: data.nickname,
+				hasRemoteProfilePicture: data.hasRemoteProfilePicture,
+				appleAccountLink: data.appleAccountLink
+			},
+			{},
+			(e, res) => {
+				console.log("[MATCHED COUNT]: " + res.matchedCount)
+			})
+
+		res.sendStatus(200)
+
+	} catch (e) {
+
+		res.status(422).send("Update Data Failed: " + e)
+		console.log("[Update Data Failed]: " + e)
+	}
+
+})
+
+router_user.put("/api/travelope/update-user-has-picture", async (req, res) => {
+
+	const { id } = req.body
+
+	try {
+		User.updateOne({ id: id },
+			{
+				hasRemoteProfilePicture: true,
+			},
+			{},
+			(e, res) => {
+				console.log("[MATCHED COUNT]: " + res.matchedCount)
+			})
+
+		res.sendStatus(200)
+
+	} catch (e) {
+
+		res.status(422).send("Update Data Failed: " + e)
+		console.log("[Update Data Failed]: " + e)
+	}
+
+})
+
+module.exports = router_user

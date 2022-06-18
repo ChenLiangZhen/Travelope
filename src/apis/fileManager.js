@@ -8,36 +8,22 @@ export const profilePictureInit = async (image, accountID, prevImgPath) => {
 
 		const randomName = accountID + new Date().getTime()
 
-		RNFS.exists(RNFS.DocumentDirectoryPath + "/travelope")
+		if (prevImgPath != "") {
 
-		    .then(async result => {
+			console.log("Previous profile picture found. Delete.")
+			await RNFS.unlink(prevImgPath)
+		}
 
-			    console.log("fire function 1")
+		RNFS.moveFile(image.path, RNFS.DocumentDirectoryPath + "/travelope/" + randomName, {
+			NSURLIsExcludedFromBackupKey: false,
+		})
+		    .then(() => {
 
-			    if (!result) {   // 若使用者手機沒有ＴＲＡＶＥＬＯＰＥ資料夾，建立一個
+			    console.log("fire function 4")
 
-				    console.log("Travelope directory not found. Create one.")
-				    await RNFS.mkdir(RNFS.DocumentDirectoryPath + "/travelope")
+			    resolve(RNFS.DocumentDirectoryPath + "/travelope/" + randomName)
+		    })
 
-			    }
-
-					if(prevImgPath != ""){
-
-						console.log("Previous profile picture found. Delete.")
-						await RNFS.unlink(prevImgPath)
-					}
-
-			    RNFS.moveFile(image.path, RNFS.DocumentDirectoryPath + "/travelope/" + randomName, {
-				    NSURLIsExcludedFromBackupKey: false,
-			    })
-			        .then(() => {
-
-				        console.log("fire function 4")
-
-				        resolve(RNFS.DocumentDirectoryPath + "/travelope/" + randomName)
-			        })
-
-		    }, rej => reject(rej))
-	})
+	}, rej => reject(rej))
 }
 

@@ -24,10 +24,16 @@ import { useFocusEffect } from "@react-navigation/native"
 import { apiRequest, signinApi, signupApi } from "../apis/api"
 import * as Keychain from "react-native-keychain"
 import { useDispatch, useSelector } from "react-redux"
-import { selectAccount, setAccountInfo, setProfilePicture } from "../globalstate/accountSlice"
+import {
+	selectAccount,
+	setAccountInfo,
+	setHasRemoteProfilePicture,
+	setProfilePicture,
+} from "../globalstate/accountSlice"
 import ImagePicker from "react-native-image-crop-picker"
 import RNFS from "react-native-fs"
 import { profilePictureInit } from "../apis/fileManager"
+import { downloadProfilePicture, uploadProfilePicture } from "../apis/transferManager"
 
 function SignModal({ modalVisible, setModalVisible }) {
 
@@ -249,12 +255,18 @@ function SignModal({ modalVisible, setModalVisible }) {
 												         dispatch(setAccountInfo({
 
 													         ...account.info,
+
 													         isLoggedIn: true,
 													         id: res.data.user.id,
 													         email: res.data.user.email,
 													         nickname: res.data.user.nickname,
 
 												         }))
+
+												         if (res.data.user.hasRemoteProfilePicture) {
+													         await downloadProfilePicture(res.data.user.id, res.data.user.id, RNFS.DocumentDirectoryPath + "/travelope/" + res.data.user.id)
+													         dispatch(setProfilePicture(RNFS.DocumentDirectoryPath + "/travelope/" + res.data.user.id))
+												         }
 
 												         setErrorText("")
 												         setWarningText("登入成功！")
@@ -479,18 +491,19 @@ const Settings = () => {
 	useFocusEffect(
 		useCallback(() => {
 
-			}, [account]),
+			if (account.info.isLoggedIn === true &&
+				account.info.profilePictureLocalPath === "" &&
+				account.info.hasRemoteProfilePicture === true) {
+			}
+
+		}, [account]),
 	)
 
 	useEffect(() => {
 
-		console.log(account.info.profilePictureLocalPath)
-
 		return appleAuth.onCredentialRevoked(async () => {
 			console.warn("User Credentials have been Revoked")
-
 		})
-
 	}, [])
 
 
@@ -523,58 +536,8 @@ const Settings = () => {
 		)
 	}
 
-	const uploadProfilePicture = (accountID, key, localPath) => {
 
-		apiRequest("get", `/api/travelope/get-upload-link/${accountID}/${key}`)
-			.then(res => { // 取得授權後的檔案上傳連結
-
-				uploadToURL(res.url, res.name)
-				console.log(res)
-
-			}, rej => console.log(rej))
-
-
-		const files = [ // 設定上傳檔案的本地資訊
-			{
-				name: "test1",
-				filename: accountID,
-				filepath: localPath,
-				filetype: "image/*",
-			},
-		]
-
-		const uploadToURL = async (url, name) => {
-
-			RNFS.uploadFiles({
-
-				binaryStreamOnly: true,
-				toUrl: url,
-				files: files,
-
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/octet-stream",
-				},
-
-			}).promise.then((response) => {
-
-				if (response.statusCode == 200) {
-					console.log("FILES UPLOADED!")
-
-				} else {
-
-					console.log("SERVER ERROR")
-				}
-			}).catch((err) => {
-				if (err.description === "cancelled") {
-					console.log("USER CANCELLED")
-				}
-				console.log(err)
-			})
-		}
-	}
-
-	const updateProfilePicture = async () => { // 避免ＣＡＣＨＥ問題，因此先初始化
+	const updateProfilePicture = async () => {
 
 		ImagePicker.openPicker({
 			width: 512,
@@ -592,11 +555,17 @@ const Settings = () => {
 			const URI = await profilePictureInit(image, accountID, prevImgPath)
 
 			console.log("PIC: " + prevImgPath + " AFTER: " + URI)
+
 			dispatch(setProfilePicture(URI))
+			dispatch(setHasRemoteProfilePicture())
 
 			uploadProfilePicture(account.info.id, account.info.id, URI)
+			apiRequest("put", "/api/travelope/update-user-has-picture", {
+				id: accountID
+			})
 		})
 	}
+
 
 	return (
 
@@ -687,13 +656,15 @@ const Settings = () => {
 						<GradientButton w={100} h={34} title={"登出"} onPress={() => {
 
 							dispatch(setAccountInfo({
-								isLoggedIn: false,
 
+								isLoggedIn: false,
 								id: "",
 								email: "",
 								password: "",
 								nickname: "",
-								realname: "",
+								profilePictureLocalPath: "",
+								hasRemoteProfilePicture: false,
+
 								appleAccountLink: {},
 							}))
 

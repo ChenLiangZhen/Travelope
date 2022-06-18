@@ -17,8 +17,7 @@ const request = axios.create({
 
 const getPassword = async () => {
 
-	try {
-		// Retrieve the credentials
+	try { // Retrieve the credentials
 		const credentials = await Keychain.getGenericPassword();
 		if (credentials) {
 			console.log(

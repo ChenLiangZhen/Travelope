@@ -2,13 +2,14 @@ const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
 
 const UserSchema = new mongoose.Schema({
-	nickname: {
-		type: String,
-		required: true
-	},
+
 	id: {
 		type: String,
 		unique: true,
+		required: true
+	},
+	nickname: {
+		type: String,
 		required: true
 	},
 	email: {
@@ -20,6 +21,14 @@ const UserSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
+	appleAccountLink: {
+		type: Object,
+		required: false
+	},
+	hasRemoteProfilePicture: {
+		type: Boolean,
+		required: false
+	}
 }, {
 	collection: "user_account"
 });

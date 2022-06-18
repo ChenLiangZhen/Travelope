@@ -12,7 +12,7 @@ export const initialState = {
     nickname: "",
 
     profilePictureLocalPath: "",
-    profilePictureCloudPath: "",
+    hasRemoteProfilePicture: false,
 
     appleAccountLink: {},
   },
@@ -49,6 +49,10 @@ const accountSlice = createSlice({
     setProfilePicture(state, action) {
       state.info.profilePictureLocalPath = action.payload;
     },
+
+    setHasRemoteProfilePicture(state) {
+      state.info.hasRemoteProfilePicture = true
+    }
   },
 });
 
@@ -57,7 +61,8 @@ export const selectAccount = (state) => state.account;
 
 export const {
   setAccountInfo,
-  setProfilePicture
+  setProfilePicture,
+  setHasRemoteProfilePicture,
 } = accountSlice.actions;
 
 export default accountSlice.reducer;
