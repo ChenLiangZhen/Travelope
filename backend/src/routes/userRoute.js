@@ -1,10 +1,35 @@
 const express = require("express")
 const mongoose = require("mongoose")
 const jwt = require("jsonwebtoken")
+const userAuth = require("../middleware/userAuth")
 const User = mongoose.model("user_account")
 const UserData = mongoose.model("user_data")
 
 const router_user = express.Router()
+
+router_user.get("/api/travelope/find-user/:accountID",userAuth ,async (req, res) => {
+
+	const { accountID } = req.params
+
+	try {
+		console.log(accountID)
+		User.findOne({id: accountID}, (e, data) => {
+
+			if (e || !data) {
+				console.log("ERROR FINDING USER:" + e)
+				return res.status(404).send("ERROR")
+			}
+
+			res.send(data)
+		})
+
+	} catch (e) {
+
+		res.status(422).send("Update Data Failed: " + e)
+		console.log("[Update Data Failed]: " + e)
+	}
+
+})
 
 router_user.post("/api/travelope/signup", async (req, res) => {
 
@@ -113,6 +138,80 @@ router_user.put("/api/travelope/update-user-has-picture", async (req, res) => {
 			})
 
 		res.sendStatus(200)
+
+	} catch (e) {
+
+		res.status(422).send("Update Data Failed: " + e)
+		console.log("[Update Data Failed]: " + e)
+	}
+
+})
+
+router_user.post("/api/travelope/add-friend/:accountID", async (req, res) => {
+
+	const { key, name, tag } = req.body
+	const { accountID } = req.params
+
+	try {
+
+		User.findOne({id: accountID}, async (e, user)=> {
+
+			if (e || !user) {
+				console.log("ERROR FINDING USER:" + e)
+				return res.status(404).send("ERROR")
+			}
+
+			if(user.friends.find(item => item.key === key)){
+
+				return res.status(409).send("duplicate")
+			}
+
+			user.friends.push({
+				key : key,
+				name: name,
+				tag: tag
+			})
+
+			await user.save()
+
+			return res.status(200)
+
+		})
+
+	} catch (e) {
+
+		res.status(422).send("Update Data Failed: " + e)
+		console.log("[Update Data Failed]: " + e)
+	}
+
+})
+
+router_user.post("/api/travelope/del-friend/:accountID/:key", async (req, res) => {
+
+	const { key, accountID } = req.params
+
+	try {
+
+		User.findOne({id: accountID}, async (e, user)=> {
+
+			if (e || !user) {
+				console.log("ERROR FINDING USER:" + e)
+				return res.status(404).send("ERROR")
+			}
+
+			if(!user.friends.find(item => item.key === key)){
+
+				console.log("ERROR FINDING DEL FRIEND.")
+				return res.status(422).send("ERROR")
+			}
+
+			let delIndex = user.friends.findIndex(item => item.key === key)
+			user.friends.splice(delIndex,1)
+
+			await user.save()
+
+			return res.status(200)
+		})
 
 	} catch (e) {
 

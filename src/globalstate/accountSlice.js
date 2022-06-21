@@ -2,6 +2,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export const initialState = {
 
+  tmp: {
+
+    selectedFriend: []
+  },
+
   info: {
 
     isLoggedIn: false,
@@ -19,16 +24,7 @@ export const initialState = {
 
   friendData: {
     friends: [
-      {
-        id: 1,
-        name: "JACOB",
-        tag: "Friend",
-      },
-      {
-        id: 2,
-        name: "Mary",
-        tag: "Girlfriend",
-      },
+
     ],
   },
 
@@ -52,7 +48,19 @@ const accountSlice = createSlice({
 
     setHasRemoteProfilePicture(state) {
       state.info.hasRemoteProfilePicture = true
-    }
+    },
+
+    addFriend(state, action) {
+      state.friendData.friends.push(action.payload)
+    },
+
+    delFriend(state, action) {
+
+      let index = state.friendData.friends.findIndex(friend => friend.key === action.payload)
+
+      console.log(action.payload)
+      state.friendData.friends.splice(index, 1)
+    },
   },
 });
 
@@ -63,6 +71,8 @@ export const {
   setAccountInfo,
   setProfilePicture,
   setHasRemoteProfilePicture,
+  addFriend,
+  delFriend,
 } = accountSlice.actions;
 
 export default accountSlice.reducer;

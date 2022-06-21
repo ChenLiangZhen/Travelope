@@ -15,7 +15,7 @@ const InputField = ({ ...props }) => {
       }}
 
       autoCapitalize={"none"}
-      placeholderTextColor={theme.primary.placeholder.purple}
+      placeholderTextColor={theme.primary.placeholder.indigo}
       selectionColor={"#9380ff"}
       borderColor={"#c5baff"}
       bg={"transparent"}

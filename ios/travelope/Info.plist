@@ -42,7 +42,7 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>Travelope 必須獲得位置存取權限以執行對應功能</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>$(PRODUCT_NAME) 需要儲存相片的權限</string>
 	<key>NSPhotoLibraryUsageDescription</key>

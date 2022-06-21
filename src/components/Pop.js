@@ -68,7 +68,7 @@
 //   const ToastInfo = () => {
 //     return(
 //       <HStack alignItems={"center"} justifyContent={"space-between"} bg={"white"} w={WIDTH * .9} h={16} borderRadius={16} px={6} py="1"  mb={5}>
-//         <Text fontWeight={"bold"} fontSize={16} color={theme.primary.placeholder.purple}>{content}</Text>
+//         <Text fontWeight={"bold"} fontSize={16} color={theme.primary.placeholder.indigo}>{content}</Text>
 //       </HStack>
 //     )
 //   }

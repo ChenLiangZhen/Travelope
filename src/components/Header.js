@@ -39,6 +39,9 @@ const AppHeader = (props) => {
 			case 'Settings':
 				setTranslatedTitle("個人設定")
 				break
+			case 'NewNote':
+				setTranslatedTitle("新增遊記")
+				break
 			default:
 				setTranslatedTitle("尚未翻譯")
 		}

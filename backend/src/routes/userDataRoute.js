@@ -76,7 +76,6 @@ router_data.get(`/api/get-soup`, userAuth, async (req, res) => {
 			res.send(result)
 		});
 
-
 	} catch (e) {
 
 		res.status(422).send("Update Data Failed: " + e)

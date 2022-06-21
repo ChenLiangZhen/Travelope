@@ -117,7 +117,7 @@ function SignModal({ modalVisible, setModalVisible }) {
 		return (
 			<HStack
 
-				alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.purple} w={WIDTH * .9} h={64}
+				alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.indigo} w={WIDTH * .9} h={64}
 				borderRadius={16} px={24} mb={5}>
 				<Text fontWeight={"bold"} fontSize={16} color={"white"}>{warningText}</Text>
 			</HStack>
@@ -164,18 +164,18 @@ function SignModal({ modalVisible, setModalVisible }) {
 
 						<HStack mt={4} h={30} mb={16} justifyContent={"space-between"} alignItems={"center"}>
 
-							<Text ml={8} fontSize={18} fontWeight={"bold"} color={theme.primary.text.purple}>
+							<Text ml={8} fontSize={18} fontWeight={"bold"} color={theme.primary.text.indigo}>
 								登入Travelope
 							</Text>
 
 							<Pressable onPress={() => setModalVisible()} justifyContent={"center"} alignItems={"center"} w={28}
 							           h={28}>
-								<Feather name={"x"} size={20} color={theme.primary.text.purple} />
+								<Feather name={"x"} size={20} color={theme.primary.text.indigo} />
 							</Pressable>
 
 						</HStack>
 
-						{/*<HStack h={4} bg={theme.primary.placeholder.purple}/>*/}
+						{/*<HStack h={4} bg={theme.primary.placeholder.indigo}/>*/}
 
 						<VStack h={240} borderRadius={16} justifyContent={"flex-end"}>
 
@@ -186,7 +186,7 @@ function SignModal({ modalVisible, setModalVisible }) {
 									onChangeText={text => {
 										setEmail(text)
 									}}
-									borderWidth={0} color={theme.primary.text.purple} placeholder={"電子郵件"} />
+									borderWidth={0} color={theme.primary.text.indigo} placeholder={"電子郵件"} />
 								<HStack h={1} bg={"gray.300"} />
 								<InputField
 									value={password}
@@ -198,16 +198,16 @@ function SignModal({ modalVisible, setModalVisible }) {
 									                              rounded="none"
 									                              w="1/6" h="full"
 									                              onPress={() => setShowPassword(prev => !prev)}>
-										{showPassword? <Feather name={"eye"} size={18} color={theme.primary.text.purple} /> :
-											<Feather name={"eye-off"} size={18} color={theme.primary.text.purple} />}
+										{showPassword? <Feather name={"eye"} size={18} color={theme.primary.text.indigo} /> :
+											<Feather name={"eye-off"} size={18} color={theme.primary.text.indigo} />}
 									</Pressable>}
-									borderWidth={0} color={theme.primary.text.purple} placeholder={"密碼"} type={"password"} />
+									borderWidth={0} color={theme.primary.text.indigo} placeholder={"密碼"} type={"password"} />
 							</VStack>
 
 
 							<HStack h={48} pr={4} alignItems={"center"} w={"100%"} justifyContent={"flex-end"}>
 
-								<Center h={32} w={148} bg={"black"} borderRadius={16} shadowColor={"purple"} shadowOpacity={.2}
+								<Center h={32} w={148} bg={"black"} borderRadius={16} shadowColor={"indigo"} shadowOpacity={.2}
 								        shadowOffset={{ height: 1 }}
 								        shadowRadius={8}>
 									<AppleButton
@@ -290,7 +290,7 @@ function SignModal({ modalVisible, setModalVisible }) {
 								{async?
 									<Spinner size={"sm"} color={"dimgray"} /> :
 									<Text fontSize={15} fontWeight={"bold"}
-									      color={theme.primary.placeholder.pink}>
+									      color={theme.primary.placeholder.purple}>
 										{errorText}
 									</Text>}
 
@@ -301,7 +301,7 @@ function SignModal({ modalVisible, setModalVisible }) {
 									justifyContent={"center"} alignItmes={"center"}>
 
 									<Text textDecorationLine={"underline"} fontSize={15} fontWeight={"bold"}
-									      color={theme.primary.placeholder.purple}>
+									      color={theme.primary.placeholder.indigo}>
 										使用電子郵件註冊帳號
 									</Text>
 								</Pressable>
@@ -335,18 +335,18 @@ function SignModal({ modalVisible, setModalVisible }) {
 
 						<HStack mt={4} h={30} mb={16} justifyContent={"space-between"} alignItems={"center"}>
 
-							<Text ml={8} fontSize={18} fontWeight={"bold"} color={theme.primary.text.purple}>
+							<Text ml={8} fontSize={18} fontWeight={"bold"} color={theme.primary.text.indigo}>
 								註冊Travelope
 							</Text>
 
 							<Pressable onPress={() => setModalVisible()} justifyContent={"center"} alignItems={"center"} w={28}
 							           h={28}>
-								<Feather name={"x"} size={20} color={theme.primary.text.purple} />
+								<Feather name={"x"} size={20} color={theme.primary.text.indigo} />
 							</Pressable>
 
 						</HStack>
 
-						{/*<HStack h={4} bg={theme.primary.placeholder.purple}/>*/}
+						{/*<HStack h={4} bg={theme.primary.placeholder.indigo}/>*/}
 
 						<VStack h={300} borderRadius={16} justifyContent={"flex-end"}>
 
@@ -355,13 +355,13 @@ function SignModal({ modalVisible, setModalVisible }) {
 
 								<InputField
 									onChangeText={text => setNickname(text)}
-									value={nickname} borderWidth={0} color={theme.primary.text.purple} placeholder={"用戶名稱"} />
+									value={nickname} borderWidth={0} color={theme.primary.text.indigo} placeholder={"用戶名稱"} />
 
 								<HStack h={1} bg={"gray.300"} />
 
 								<InputField
 									onChangeText={text => setEmail(text)}
-									value={email} borderWidth={0} color={theme.primary.text.purple} placeholder={"電子郵件"} />
+									value={email} borderWidth={0} color={theme.primary.text.indigo} placeholder={"電子郵件"} />
 								<HStack h={1} bg={"gray.300"} />
 
 								<InputField
@@ -374,10 +374,10 @@ function SignModal({ modalVisible, setModalVisible }) {
 									                              rounded="none"
 									                              w="1/6" h="full"
 									                              onPress={() => setShowPassword(prev => !prev)}>
-										{showPassword? <Feather name={"eye"} size={18} color={theme.primary.text.purple} /> :
-											<Feather name={"eye-off"} size={18} color={theme.primary.text.purple} />}
+										{showPassword? <Feather name={"eye"} size={18} color={theme.primary.text.indigo} /> :
+											<Feather name={"eye-off"} size={18} color={theme.primary.text.indigo} />}
 									</Pressable>}
-									borderWidth={0} color={theme.primary.text.purple} placeholder={"密碼"} type={"password"} />
+									borderWidth={0} color={theme.primary.text.indigo} placeholder={"密碼"} type={"password"} />
 							</VStack>
 
 
@@ -447,7 +447,7 @@ function SignModal({ modalVisible, setModalVisible }) {
 								{async?
 									<Spinner size={"sm"} color={"dimgray"} /> :
 									<Text fontSize={15} fontWeight={"bold"}
-									      color={theme.primary.placeholder.pink}>
+									      color={theme.primary.placeholder.purple}>
 										{errorText}
 									</Text>}
 
@@ -458,7 +458,7 @@ function SignModal({ modalVisible, setModalVisible }) {
 									justifyContent={"center"} alignItmes={"center"}>
 
 									<Text textDecorationLine={"underline"} fontSize={15} fontWeight={"bold"}
-									      color={theme.primary.placeholder.purple}>
+									      color={theme.primary.placeholder.indigo}>
 										返回登入
 									</Text>
 								</Pressable>
@@ -529,7 +529,7 @@ const Settings = () => {
 	const ToastInfo = ({ warningText }) => {
 		return (
 			<HStack
-				alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.purple} w={WIDTH * .9} h={64}
+				alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.indigo} w={WIDTH * .9} h={64}
 				borderRadius={16} px={24} mb={5}>
 				<Text fontWeight={"bold"} fontSize={16} color={"white"}>{warningText}</Text>
 			</HStack>
@@ -591,7 +591,7 @@ const Settings = () => {
 						overflow={"hidden"}
 						borderRadius={100}
 						borderWidth={2}
-						borderColor={theme.primary.text.pink}
+						borderColor={theme.primary.text.purple}
 						justifyContent={"center"}
 						alignItems={"center"}
 					>
@@ -607,7 +607,7 @@ const Settings = () => {
 									source={{ uri: account.info.profilePictureLocalPath }}
 									alt={"userImage"}
 								/>
-								: <Feather name={"user"} color={theme.primary.text.pink} size={32} />
+								: <Feather name={"user"} color={theme.primary.text.purple} size={32} />
 						}
 
 					</Pressable>
@@ -618,11 +618,11 @@ const Settings = () => {
 					{
 						account.info.isLoggedIn?
 
-							<Text fontSize={18} fontWeight={"bold"} color={theme.primary.text.pink}>
+							<Text fontSize={18} fontWeight={"bold"} color={theme.primary.text.purple}>
 								{account.info.nickname}
 							</Text> :
 
-							<Text fontSize={18} fontWeight={"bold"} color={theme.primary.text.pink}>
+							<Text fontSize={18} fontWeight={"bold"} color={theme.primary.text.purple}>
 								未登入
 							</Text>
 					}
@@ -634,7 +634,7 @@ const Settings = () => {
 					{
 						account.info.isLoggedIn?
 
-							<Text fontSize={16} fontWeight={"normal"} color={theme.primary.text.purple}>
+							<Text fontSize={16} fontWeight={"normal"} color={theme.primary.text.indigo}>
 								{"用戶ID: " + account.info.id}
 							</Text> : <></>
 					}
@@ -644,6 +644,7 @@ const Settings = () => {
 			</VStack>
 
 			{
+
 				account.info.isLoggedIn?
 
 					<Block pl={24} pr={18} mb={36} borderRadius={32} fd={"row"} h={64} sc={"#9e66ff"} bdc={"#af81ff"}
@@ -653,6 +654,7 @@ const Settings = () => {
 						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
 							登出帳號
 						</Text>
+
 						<GradientButton w={100} h={34} title={"登出"} onPress={() => {
 
 							dispatch(setAccountInfo({
@@ -696,16 +698,16 @@ const Settings = () => {
 						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
 							選項
 						</Text>
-						<Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
+						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
 					</Pressable>
 
-					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.pink} />
+					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.purple} />
 
 					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
 						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
 							選項
 						</Text>
-						<Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
+						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
 					</Pressable>
 
 				</Block>
@@ -717,16 +719,16 @@ const Settings = () => {
 						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
 							選項
 						</Text>
-						<Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
+						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
 					</Pressable>
 
-					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.pink} />
+					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.purple} />
 
 					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
 						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
 							選項
 						</Text>
-						<Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
+						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
 					</Pressable>
 
 				</Block>
@@ -738,25 +740,25 @@ const Settings = () => {
 						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
 							選項
 						</Text>
-						<Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
+						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
 					</Pressable>
 
-					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.pink} />
+					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.purple} />
 
 					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
 						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
 							選項
 						</Text>
-						<Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
+						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
 					</Pressable>
 
-					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.pink} />
+					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.purple} />
 
 					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
 						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
 							選項
 						</Text>
-						<Feather name={"arrow-right"} size={22} color={theme.primary.text.purple} />
+						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
 					</Pressable>
 
 				</Block>

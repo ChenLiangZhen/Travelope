@@ -1,13 +1,16 @@
 import React from "react";
 import LinearGradient from "react-native-linear-gradient";
-import { Pressable, Text, View } from "native-base";
+import { Pressable, Text, useTheme, View } from "native-base"
+import Feather from "react-native-vector-icons/Feather"
 
-export const GradientBorderButton = ({ h, w, color, bgc, title, fs, onPress }) => {
+export const GradientBorderButton = ({ icon, iconSize, iconColor, h, w, color, bgc, title, fs, onPress }) => {
+
+  const theme = useTheme().colors
 
   return (
 
     <Pressable
-      onPress={()=> onPress}
+      onPress={onPress}
     >
 
       <LinearGradient
@@ -17,8 +20,8 @@ export const GradientBorderButton = ({ h, w, color, bgc, title, fs, onPress }) =
         locations={[0, 1]}
         colors={["#8b7fff", "#db7fff"]}
         style={{
-          height: h ? h : 32,
-          width: w ? w : 72,
+          height:h? h : 32,
+          width: w?  w : 72,
           borderRadius: 100,
           justifyContent: "center",
           alignItems: "center",
@@ -27,13 +30,18 @@ export const GradientBorderButton = ({ h, w, color, bgc, title, fs, onPress }) =
 
         <View bg={bgc? bgc : 'white'}
               borderRadius={100}
-              h={h ? h -4 : 28}
-              w={w ? w -4 : 72 -4}
+              flexDirection={"row"}
+              h={ h? h -4 : 28}
+              w={ w? w -4: 72 -4}
               justifyContent={"center"}
               alignItems={"center"}
         >
 
+          {icon? <Feather name={icon} size={iconSize} color={iconColor} /> : <></>}
+
           <Text
+            ml={icon? 6 : 0}
+            mr={icon? 2 : 0}
             fontSize={fs? fs: 15}
             fontWeight={"bold"}
             color={color? color: "white"}

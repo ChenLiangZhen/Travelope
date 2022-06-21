@@ -21,6 +21,8 @@ import { Provider } from "react-redux";
 import NewTrip from "./src/screens/trip/NewTrip";
 import { SSRProvider } from "react-aria";
 import RNFS from "react-native-fs"
+import NewNote from "./src/screens/trip/NewNote"
+import TripOnMap from "./src/screens/trip/TripOnMap"
 
 LogBox.ignoreLogs(["Require cycle"]);
 
@@ -167,23 +169,37 @@ export default function App() {
       primary: {
 
         bg: {
-          purple: "#f4f1ff",
-          pink: "#f5f1ff",
+          indigo: "#f4f2ff",
+          purple: "#f5f1ff",
+          pink: "#faf2ff",
+          smoke: "#f4f4f4",
+          lightgray: "#eee",
+          gray: "#888"
         },
 
         darker_bg: {
-          purple: "#ebe5ff",
-          pink: "#eee6ff",
+          indigo: "#e8e6ff",
+          purple: "#eee6ff",
+          pink: "#f5e6ff",
+          lightgray: "#eee",
+          gray: "#888"
         },
 
         placeholder: {
-          purple: "#afa5ff",
-          pink: "#c4a7ff",
+          indigo: "#b0a6ff",
+          purple: "#c4a7ff",
+          pink: "#dba6ff",
+          lightgray: "#eee",
+          gray: "#888"
         },
 
         text: {
-          purple: "#7667ff",
-          pink: "#9f67ff",
+          indigo: "#7667ff",
+          purple: "#9f67ff",
+          pink: "#c267ff",
+          lightgray: "#eee",
+          midgray: "#aaa",
+          gray: "#888"
         },
       },
     },
@@ -228,6 +244,7 @@ const StackNavigator = () => {
 const DrawerNavigator = () => {
 
   const insets = useSafeAreaInsets();
+
   useEffect(()=> { // ＡＰＰ整體初始設定
 
     RNFS.exists(RNFS.DocumentDirectoryPath + "/travelope")
@@ -247,7 +264,7 @@ const DrawerNavigator = () => {
 
     <Drawer.Navigator
 
-      initialRouteName={"Settings"}
+      initialRouteName={"TripOnMap"}
 
       backBehavior="history"
       drawerContent={({ state, navigation, descriptors }) => {
@@ -291,18 +308,6 @@ const DrawerNavigator = () => {
 
               >
                 目前旅程
-              </Text>
-            </Pressable>
-
-            <Pressable onPress={() => {
-              navigation.navigate("TripOverview");
-            }} w={WIDTH / 2} flexDirection={"row"} justifyContent={"flex-end"} px={20} py={8}>
-              <Text fontWeight={state.index == 2 ? "bold" : "normal"}
-                    fontSize={state.index == 2 ? 18 : 17}
-                    color={"#6661ea"}
-
-              >
-                旅程總覽
               </Text>
             </Pressable>
 
@@ -374,7 +379,9 @@ const DrawerNavigator = () => {
       <Drawer.Screen component={MainScreen} name={"MainScreen"} />
       <Drawer.Screen component={CurrentTrip} name={"CurrentTrip"} />
       <Drawer.Screen component={NewTrip} name={"NewTrip"} />
+      <Drawer.Screen component={NewNote} name={"NewNote"} />
       <Drawer.Screen component={TripOverview} name={"TripOverview"} />
+      <Drawer.Screen component={TripOnMap} name={"TripOnMap"} />
       <Drawer.Screen component={MemEnvelope} name={"MemEnvelope"} />
       <Drawer.Screen component={TripPostcard} name={"TripPostcard"} />
       <Drawer.Screen component={MyZone} name={"MyZone"} />

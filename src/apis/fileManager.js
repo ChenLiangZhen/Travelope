@@ -23,7 +23,6 @@ export const profilePictureInit = async (image, accountID, prevImgPath) => {
 
 			    resolve(RNFS.DocumentDirectoryPath + "/travelope/" + randomName)
 		    })
-
-	}, rej => reject(rej))
+	})
 }
 

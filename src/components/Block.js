@@ -1,8 +1,10 @@
-import {HStack, Text, VStack} from "native-base";
+import { HStack, Text, useTheme, VStack } from "native-base"
 import React from "react";
 
 
 const Block = ({children, bdc, bgc, sc, jc, ai, fd, ...props}) => {
+
+	const theme = useTheme().colors
 
 	return(
 
@@ -15,7 +17,7 @@ const Block = ({children, bdc, bgc, sc, jc, ai, fd, ...props}) => {
 			borderRadius={18}
 
 			bg={ bgc? bgc : "#fff" }
-			borderColor={ bdc? bdc : "#9B9FC9" }
+			borderColor={ bdc? bdc : theme.primary.text.purple }
 			shadowColor={sc? sc : "#908dff"}
 			shadowRadius={0}
 			shadowOpacity={.4}

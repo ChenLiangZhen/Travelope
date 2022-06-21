@@ -21,7 +21,7 @@ const getPassword = async () => {
 		const credentials = await Keychain.getGenericPassword();
 		if (credentials) {
 			console.log(
-				"Credentials successfully loaded for user " + JSON.stringify(credentials),
+				"Credentials successfully loaded"
 			);
 			return credentials
 		} else {
@@ -37,14 +37,17 @@ export async function apiRequest(method, route, req){
 	const token = await getPassword()
 	const pureToken = token.password.replace(/['"]+/g, '')
 
-	console.log("token: " + pureToken)
+	// console.log("token: " + pureToken)
 
 	return new Promise( async (resolve, reject)=>{
 		switch(method){
 
 			case "get":
 				request.get(route, Object.assign({
-					headers: { Authorization: `Bearer ` + pureToken},
+					headers: { Authorization: `Bearer ` + pureToken,
+						'Cache-Control': 'no-cache',
+						'Pragma': 'no-cache',
+						'Expires': '0',},
 				}, req))
 					.then(res => {
 						resolve(res.data)
@@ -54,7 +57,11 @@ export async function apiRequest(method, route, req){
 				break
 
 			case "post":
-				request.post(route, req, {headers: { Authorization: `Bearer ` + pureToken}})
+				request.post(route, req, {headers: { Authorization: `Bearer ` + pureToken,
+						'Cache-Control': 'no-cache',
+						'Pragma': 'no-cache',
+						'Expires': '0',
+					}})
 					.then(res => {
 						resolve(res.data)
 					}, rej=> {
@@ -63,7 +70,10 @@ export async function apiRequest(method, route, req){
 				break
 
 			case "put":
-				request.put(route,req, {headers: { Authorization: `Bearer ` + pureToken}})
+				request.put(route,req, {headers: { Authorization: `Bearer ` + pureToken,
+						'Cache-Control': 'no-cache',
+						'Pragma': 'no-cache',
+						'Expires': '0',}})
 					.then(res => {
 						resolve(res.data)
 					}, rej=> {
