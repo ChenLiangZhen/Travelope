@@ -6,10 +6,14 @@ import LayoutBase from "../components/LayoutBase";
 import { GradientButton } from "../components/GradientButton";
 
 import CameraRoll from "@react-native-community/cameraroll";
+import { FlatList } from "react-native"
+import { selectData } from "../globalstate/dataSlice"
+import { useSelector } from "react-redux"
 
 const MainScreen = ({ navigation }) => {
 
   const ref = useRef()
+  const accountData = useSelector(selectData)
 
   useEffect(()=> {
 
@@ -68,29 +72,34 @@ const MainScreen = ({ navigation }) => {
 
         </Block>
 
-        <BlockTitle onPress={() => {
-          navigation.navigate("TripOverview");
-        }} text={"旅程總覽"} color={"#5959ff"} icon={"send"} />
 
-        <Block h={80} bdc={"#8080ff"}>
+        {/*<FlatList*/}
 
-        </Block>
+        {/*/>*/}
 
-        <BlockTitle onPress={() => {
-          navigation.navigate("MemEnvelope");
-        }} text={"回憶信封"} color={"#7859ff"} icon={"mail"} />
+        {/*<BlockTitle onPress={() => {*/}
+        {/*  navigation.navigate("TripOverview");*/}
+        {/*}} text={"旅程總覽"} color={"#5959ff"} icon={"send"} />*/}
 
-        <Block h={80} bdc={"#9780ff"}>
+        {/*<Block h={80} bdc={"#8080ff"}>*/}
 
-        </Block>
+        {/*</Block>*/}
 
-        <BlockTitle onPress={() => {
-          navigation.navigate("TripPostcard");
-        }} text={"旅程紀念卡"} color={"#9959ff"} icon={"image"} />
+        {/*<BlockTitle onPress={() => {*/}
+        {/*  navigation.navigate("MemEnvelope");*/}
+        {/*}} text={"回憶信封"} color={"#7859ff"} icon={"mail"} />*/}
 
-        <Block h={80} bdc={"#ae7dff"}>
+        {/*<Block h={80} bdc={"#9780ff"}>*/}
 
-        </Block>
+        {/*</Block>*/}
+
+        {/*<BlockTitle onPress={() => {*/}
+        {/*  navigation.navigate("TripPostcard");*/}
+        {/*}} text={"旅程紀念卡"} color={"#9959ff"} icon={"image"} />*/}
+
+        {/*<Block h={80} bdc={"#ae7dff"}>*/}
+
+        {/*</Block>*/}
       </ScrollView>
 
     </LayoutBase>

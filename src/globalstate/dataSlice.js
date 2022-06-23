@@ -1,33 +1,132 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 export const initialState = {
 
-  tripData: {
+	currentTrip: {
 
-    currentTrip: {},
-    legacyTrips: []
+		isActive: true,
+		tripName: "",
+		startTime: {},
+		endTime: {},
+		fellowList: [],
 
-  },
+		// fellow: {
+		//   name: "",
+		//   key: ""
+		// },
+
+		tripNotes: [],
+
+		// tripNote: {
+		//
+		//   recordTime: {},
+		//
+		//   title: "",
+		//   description: "",
+		//   mood: "",
+		//   imageKey: "",
+		//
+		//   longitude: "",
+		//   latitude: "",
+		//
+		//   adjPhrases: [],
+		//   weather: "",
+		// }
+
+	},
+
+
+	trips: [
+
+		{
+			isActive: false,
+			tripName: "",
+			tripID: "",
+			startTime: {},
+			endTime: {},
+			fellowList: [],
+
+			fellow: {
+				name: "",
+				key: "",
+			},
+
+			tripNotes: [{
+
+				recordTime: {
+					y: 2022,
+					m: 6,
+					d: 24,
+
+				},
+
+				title: "",
+				description: "",
+				mood: "",
+				imageKey: "",
+
+				longitude: "",
+				latitude: "",
+
+				adjPhrases: [],
+				weather: "",
+
+			}, {
+
+				recordTime: {},
+
+				title: "",
+				description: "",
+				mood: "",
+				imageKey: "",
+
+				longitude: "",
+				latitude: "",
+
+				adjPhrases: [],
+				weather: "",
+
+			}],
+
+		},
+	],
+
+
 }
 
 const dataSlice = createSlice({
 
-  name: 'data',
-  initialState,
+	name: "data",
+	initialState,
 
-  reducers: {
-    // increment(state) {
-    //     state = action.payload
-    // },
-    // decrement(state) {
-    //     state.value--
-    // },
-    setAccountInfo(state, action) {
-      state.info = action.payload
-    },
-  },
+	reducers: {
+
+		purgeAccountData(state) {
+			state.currentTrip = initialState.currentTrip
+			state.trips = initialState.trips
+		},
+
+		setTrips(state, action) {
+			state.trips = action.payload
+		},
+
+		pushTrip(state, action) {
+			state.trips.push(action.payload)
+		},
+
+		setCurrentTrip(state, action) {
+			state.currentTrip = action.payload
+		},
+
+	},
 })
 
 export const selectData = (state) => state.data
-export const { setAccountInfo, setInterestedCategory } = dataSlice.actions
+export const {
+
+	purgeAccountData,
+	setTrips,
+	pushTrip,
+	setCurrentTrip,
+} = dataSlice.actions
 export default dataSlice.reducer

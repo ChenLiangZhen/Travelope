@@ -25,8 +25,9 @@ import { apiRequest, signinApi, signupApi } from "../apis/api"
 import * as Keychain from "react-native-keychain"
 import { useDispatch, useSelector } from "react-redux"
 import {
+	purgeAccount,
 	selectAccount,
-	setAccountInfo,
+	setAccountInfo, setFriends,
 	setHasRemoteProfilePicture,
 	setProfilePicture,
 } from "../globalstate/accountSlice"
@@ -34,6 +35,8 @@ import ImagePicker from "react-native-image-crop-picker"
 import RNFS from "react-native-fs"
 import { profilePictureInit } from "../apis/fileManager"
 import { downloadProfilePicture, uploadProfilePicture } from "../apis/transferManager"
+import { dataControl } from "../globalstate/store"
+import { purgeAccountData } from "../globalstate/dataSlice"
 
 function SignModal({ modalVisible, setModalVisible }) {
 
@@ -262,6 +265,8 @@ function SignModal({ modalVisible, setModalVisible }) {
 													         nickname: res.data.user.nickname,
 
 												         }))
+
+												         dispatch(setFriends(res.data.user.friends))
 
 												         if (res.data.user.hasRemoteProfilePicture) {
 													         await downloadProfilePicture(res.data.user.id, res.data.user.id, RNFS.DocumentDirectoryPath + "/travelope/" + res.data.user.id)
@@ -560,6 +565,7 @@ const Settings = () => {
 			dispatch(setHasRemoteProfilePicture())
 
 			uploadProfilePicture(account.info.id, account.info.id, URI)
+
 			apiRequest("put", "/api/travelope/update-user-has-picture", {
 				id: accountID
 			})
@@ -657,18 +663,23 @@ const Settings = () => {
 
 						<GradientButton w={100} h={34} title={"登出"} onPress={() => {
 
-							dispatch(setAccountInfo({
+							dispatch(purgeAccount())
+							dispatch(purgeAccountData())
 
-								isLoggedIn: false,
-								id: "",
-								email: "",
-								password: "",
-								nickname: "",
-								profilePictureLocalPath: "",
-								hasRemoteProfilePicture: false,
+							console.log("putreAccount")
 
-								appleAccountLink: {},
-							}))
+							// dispatch(setAccountInfo({
+							//
+							// 	isLoggedIn: false,
+							// 	id: "",
+							// 	email: "",
+							// 	password: "",
+							// 	nickname: "",
+							// 	profilePictureLocalPath: "",
+							// 	hasRemoteProfilePicture: false,
+							//
+							// 	appleAccountLink: {},
+							// }))
 
 						}} />
 
@@ -696,7 +707,7 @@ const Settings = () => {
 
 					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
 						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-							選項
+							我的圈子
 						</Text>
 						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
 					</Pressable>
@@ -705,40 +716,21 @@ const Settings = () => {
 
 					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
 						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-							選項
+							分享Travelope
 						</Text>
 						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
 					</Pressable>
 
 				</Block>
 
-				<Block px={12} py={16} borderRadius={32} fd={"column"} h={112} sc={"#9e66ff"} bdc={"#af81ff"}
-				       jc={"space-between"}>
 
-					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
-						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-							選項
-						</Text>
-						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
-					</Pressable>
-
-					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.purple} />
-
-					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
-						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-							選項
-						</Text>
-						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
-					</Pressable>
-
-				</Block>
 
 				<Block px={12} py={16} borderRadius={32} fd={"column"} h={164} sc={"#9e66ff"} bdc={"#af81ff"}
 				       jc={"space-between"}>
 
 					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
 						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-							選項
+							評分
 						</Text>
 						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
 					</Pressable>
@@ -747,7 +739,7 @@ const Settings = () => {
 
 					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
 						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-							選項
+							意見回饋
 						</Text>
 						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
 					</Pressable>
@@ -756,7 +748,7 @@ const Settings = () => {
 
 					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
 						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-							選項
+							隱私政策
 						</Text>
 						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
 					</Pressable>

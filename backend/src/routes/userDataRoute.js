@@ -8,14 +8,41 @@ const userAuth = require("../middleware/userAuth")
 
 const router_data = express.Router()
 
-router_data.get("/api/travelope/get-data", userAuth, async (req, res) => {
+router_data.get("/api/travelope/get-trips/:accountID", userAuth, async (req, res) => {
+
+	const { accountID } = req.params
 
 	try {
 		UserData.findOne({userLink: req.query.id}, (e, data) => {
 			if (e || !data) {
 				return res.status(404).send("ERROR")
 			}
-			res.send(data)
+
+			res.send(data.trips)
+		})
+
+	} catch (e) {
+
+		res.status(422).send("Update Data Failed: " + e)
+		console.log("[Update Data Failed]: " + e)
+	}
+
+})
+
+router_data.post("/api/travelope/new-trip/:accountID", async (req, res) => {
+
+	const { accountID } = req.params
+	const tripData = req.body
+
+	try {
+		UserData.findOne({userLink: accountID}, (e, userData) => {
+			if (e || !userData) {
+				return res.status(404).send("ERROR")
+			}
+
+			userData.trips.push(tripData)
+			userData.save()
+			res.status(200)
 		})
 
 	} catch (e) {
@@ -36,46 +63,6 @@ router_data.put(`/api/travelope/update-data`, userAuth, async (req, res) => {
 		})
 
 		res.sendStatus(200)
-	} catch (e) {
-
-		res.status(422).send("Update Data Failed: " + e)
-		console.log("[Update Data Failed]: " + e)
-	}
-
-})
-
-router_data.post(`/api/add-soup`, userAuth, async (req, res) => {
-
-	const {soupId, soupType, data} = req.body
-
-	try {
-
-		const soup = new SoupData({soupId, soupType , data})
-		await soup.save()
-
-		res.sendStatus(200)
-
-	} catch (e) {
-
-		res.status(422).send("Update Data Failed: " + e)
-		console.log("[Update Data Failed]: " + e)
-	}
-})
-
-router_data.get(`/api/get-soup`, userAuth, async (req, res) => {
-
-	try {
-
-		console.log(req.query.soupType)
-
-		SoupData.aggregate([
-			{ $match: { soupType: req.query.soupType }},
-			{ $sample: {size: 1}}
-		], {}, (err, result) => {
-			console.log(result)
-			res.send(result)
-		});
-
 	} catch (e) {
 
 		res.status(422).send("Update Data Failed: " + e)

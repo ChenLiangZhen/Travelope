@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import LayoutBase from "../../components/LayoutBase"
 import FlatBlock from "../../components/FlatBlock"
-import { HStack, Input, Modal, Pressable, Text, useTheme, useToast, View, VStack } from "native-base"
+import { HStack, Input, Modal, Pressable, Text, TextArea, useTheme, useToast, View, VStack } from "native-base"
 import Block from "../../components/Block"
 import DatePicker from "react-native-date-picker"
 import Feather from "react-native-vector-icons/Feather"
@@ -11,24 +11,52 @@ import { FlatList } from "react-native"
 import { HEIGHT, WIDTH } from "../../Util"
 import { useDispatch, useSelector } from "react-redux"
 import { appleAuth } from "@invertase/react-native-apple-authentication"
+import { pushTrip, selectData, setCurrentTrip } from "../../globalstate/dataSlice"
+import { apiRequest } from "../../apis/api"
 
-const NewTrip = () => {
+const NewTrip = ({navigation}) => {
 
 	const theme = useTheme().colors
 	const [hasFellow, setHasFellow] = useState(false)
 	const [tripName, setTripName] = useState("")
 	const [tripDescription, setTripDescription] = useState("")
 	const [modalVisible, setModalVisible] = useState(false)
+
 	const [date, setDate] = useState(new Date())
+	const [time, setTime] = useState(new Date())
 	const [open, setOpen] = useState(false)
+	const [openTime, setOpenTime] = useState(false)
 
 	const [selectedFriendsArray, setSelectedFriendsArray] = useState([])
 
+	const [tripObject, setTripObject] = useState({
+
+	})
+
 	const account = useSelector(selectAccount)
+	const accountData = useSelector(selectData)
 	const dispatch = useDispatch()
 
 	const toastInfoRef = useRef()
 	const toast = useToast()
+
+	useEffect(()=> {
+
+		setTripObject({
+
+			isActive: true,
+
+			tripID: "" + new Date().getTime(),
+			tripName: tripName,
+			tripDescription: tripDescription,
+			startTime: date,
+			endTime: {},
+			fellowList: selectedFriendsArray,
+
+			tripNotes: [],
+		})
+
+	},[tripName, date, selectedFriendsArray])
 
 	function closeInfoToast() {
 		if (toastInfoRef.current) {
@@ -49,13 +77,13 @@ const NewTrip = () => {
 		}
 	}
 
-	const ToastInfo = () => {
+	const ToastInfo = (info) => {
 		return (
 			<HStack
 
 				alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.indigo} w={WIDTH * .9} h={64}
 				borderRadius={16} px={24} mb={5}>
-				<Text fontWeight={"bold"} fontSize={16} color={"white"}>{warningText}</Text>
+				<Text fontWeight={"bold"} fontSize={16} color={"white"}>{info}</Text>
 			</HStack>
 		)
 	}
@@ -64,33 +92,44 @@ const NewTrip = () => {
 
 		// const [selected, setSelected] = useState(false)
 
+		useEffect(() => {
+
+			console.log(accountData.currentTrip)
+
+		}, [accountData])
+
 		return (
 
 			<Pressable
 
 				onPress={() => {
 
-					let result = selectedFriendsArray.find( selected => selected.id === item.id)
+					let result = selectedFriendsArray.find(selected => selected.key === item.key)
 
-					if(!result){
-						setSelectedFriendsArray(prev => [...prev, { id: item.id, name: item.name } ])
+					if (!result) {
+						setSelectedFriendsArray(prev => [...prev, { key: item.key, name: item.name }])
 
 					} else {
 						console.log("found duplicate")
-						setSelectedFriendsArray( prev => prev.filter( selected => selected.id !== item.id ))
+						setSelectedFriendsArray(prev => prev.filter(selected => selected.key !== item.key))
 					}
 				}}
 
-				borderRadius={18} borderWidth={2} w={"100%"} px={20} flexDirection={"row"} mb={12} h={48} backgroundColor={"gray.100"} alignItems={"center"}
-				borderColor={ selectedFriendsArray.find( selected => selected.id === item.id) ? theme.primary.placeholder.indigo : "transparent" }
+				borderRadius={18} borderWidth={2} w={"100%"} px={20} flexDirection={"row"} mb={12} h={48}
+				backgroundColor={"gray.100"} alignItems={"center"}
+				borderColor={selectedFriendsArray.find(selected => selected.key === item.key)? theme.primary.placeholder.indigo : "transparent"}
 				justifyContent={"space-between"}>
 
-				<Text numberOfLines={1} color={selectedFriendsArray.find( selected => selected.id === item.id) ? theme.primary.text.indigo : theme.primary.text.midgray } fontWeight={"bold"} fontSize={15}>
+				<Text numberOfLines={1}
+				      color={selectedFriendsArray.find(selected => selected.key === item.key)? theme.primary.text.indigo : theme.primary.text.midgray}
+				      fontWeight={"bold"} fontSize={15}>
 					{item.name}
 				</Text>
 
 
-				<Text numberOfLines={1} color={selectedFriendsArray.find( selected => selected.id === item.id) ? theme.primary.placeholder.indigo : theme.primary.text.midgray } fontSize={15}>
+				<Text numberOfLines={1}
+				      color={selectedFriendsArray.find(selected => selected.key === item.key)? theme.primary.placeholder.indigo : theme.primary.text.midgray}
+				      fontSize={15}>
 					{item.tag}
 				</Text>
 
@@ -163,7 +202,7 @@ const NewTrip = () => {
 							{"已選擇：" + selectedFriendsArray.length}
 						</Text>
 
-						<GradientButton title={"確認"} onPress={() => setModalVisible()}/>
+						<GradientButton title={"確認"} onPress={() => setModalVisible()} />
 
 					</HStack>
 
@@ -173,8 +212,8 @@ const NewTrip = () => {
 
 			<DatePicker
 				modal
-				mode={"date"}
-				title={"選擇旅遊的日期"}
+				mode={"datetime"}
+				title={"旅遊開始的時間"}
 				open={open}
 				date={date}
 				onConfirm={(date) => {
@@ -183,6 +222,21 @@ const NewTrip = () => {
 				}}
 				onCancel={() => {
 					setOpen(false)
+				}}
+			/>
+
+			<DatePicker
+				modal
+				mode={"time"}
+				title={"選擇旅遊的日期"}
+				open={openTime}
+				date={date}
+				onConfirm={(date) => {
+					setOpenTime(false)
+					setDate(date)
+				}}
+				onCancel={() => {
+					setOpenTime(false)
 				}}
 			/>
 
@@ -229,6 +283,49 @@ const NewTrip = () => {
 			</FlatBlock>
 
 			<FlatBlock
+				h={104}
+				mb={16}
+				borderWidth={1}
+				flexDirection={"row"}
+				bg={"white"}
+				shadowColor={theme.primary.bg.litgray}
+				borderColor={theme.primary.text.purple}
+				ai={"center"}
+			>
+				<Text
+					color={theme.primary.text.purple}
+					fontSize={16}
+					fontWeight={"bold"}
+					mr={20}
+				>描述</Text>
+
+				<TextArea
+					_focus={{
+						borderColor: theme.primary.text.purple,
+						color: theme.primary.text.purple,
+						bg: theme.primary.bg.purple,
+					}}
+
+					value={tripDescription}
+					onChangeText={desc => setTripDescription(desc)}
+					selectionColor={theme.primary.text.indigo}
+					borderColor={"transparent"}
+					color={theme.primary.text.purple}
+					bg={theme.primary.bg.smoke}
+					borderWidth={1}
+					borderRadius={16}
+					fontWeight={"bold"}
+					h={72}
+					flex={8}
+					px={20}
+					py={10}
+					fontSize={16}
+					textAlign={"left"}
+				/>
+
+			</FlatBlock>
+
+			<FlatBlock
 				h={64}
 				mb={16}
 				borderWidth={1}
@@ -251,7 +348,7 @@ const NewTrip = () => {
 						color: theme.primary.text.purple,
 						bg: theme.primary.bg.purple,
 					}}
-					value={date.getFullYear() + " - " + (date.getMonth() + 1) + " - " + date.getDate()}
+					value={date.getFullYear() + " - " + (date.getMonth() + 1) + " - " + date.getDate() + "   " + date.getHours() + " : " + date.getMinutes()}
 					selectionColor={theme.primary.text.purple}
 					borderColor={"transparent"}
 					color={theme.primary.text.purple}
@@ -273,12 +370,58 @@ const NewTrip = () => {
 
 			</FlatBlock>
 
+			{/*<FlatBlock*/}
+			{/*	h={64}*/}
+			{/*	mb={16}*/}
+			{/*	borderWidth={1}*/}
+			{/*	flexDirection={"row"}*/}
+			{/*	bg={"white"}*/}
+			{/*	shadowColor={theme.primary.bg.litgray}*/}
+			{/*	borderColor={theme.primary.text.purple}*/}
+			{/*	ai={"center"}*/}
+			{/*>*/}
+			{/*	<Text*/}
+			{/*		color={theme.primary.text.purple}*/}
+			{/*		fontSize={16}*/}
+			{/*		fontWeight={"bold"}*/}
+			{/*		mr={20}*/}
+			{/*	>啟程</Text>*/}
+
+			{/*	<Input*/}
+			{/*		_focus={{*/}
+			{/*			borderColor: theme.primary.text.purple,*/}
+			{/*			color: theme.primary.text.purple,*/}
+			{/*			bg: theme.primary.bg.purple,*/}
+			{/*		}}*/}
+
+			{/*		value={date.getFullYear() + " - " + (date.getMonth() + 1) + " - " + date.getDate()}*/}
+			{/*		selectionColor={theme.primary.text.purple}*/}
+			{/*		borderColor={"transparent"}*/}
+			{/*		color={theme.primary.text.purple}*/}
+			{/*		bg={theme.primary.bg.smoke}*/}
+			{/*		borderWidth={1}*/}
+			{/*		borderRadius={16}*/}
+			{/*		fontWeight={"bold"}*/}
+			{/*		mr={16}*/}
+			{/*		h={36}*/}
+			{/*		flex={8}*/}
+			{/*		px={20}*/}
+			{/*		fontSize={16}*/}
+			{/*		textAlign={"left"}*/}
+			{/*	/>*/}
+
+			{/*	<Pressable h={32} justifyContent={"center"} onPress={() => setOpenTime(true)}>*/}
+			{/*		<Feather name={"clock"} color={theme.primary.text.indigo} size={20} />*/}
+			{/*	</Pressable>*/}
+
+			{/*</FlatBlock>*/}
+
 			{
 
 				hasFellow?  //新增同行友人
 
 					<FlatBlock
-						h={selectedFriendsArray.length === 0 ? 64 : 64 + 40 * (selectedFriendsArray.length - 1)}
+						h={selectedFriendsArray.length === 0? 64 : 64 + 48 * (selectedFriendsArray.length - 1)}
 						mb={16}
 						borderWidth={1}
 						flexDirection={"row"}
@@ -299,26 +442,24 @@ const NewTrip = () => {
 								mr={14}
 							>同行</Text>
 
-							<View h={32 + (selectedFriendsArray.length - 1) * 32} w={4} borderRadius={10}
+							<View h={36 + (selectedFriendsArray.length - 1) * 40} w={4} borderRadius={10}
 							      bg={theme.primary.placeholder.purple} />
 
-							<VStack mx={18} justifyConten={"center"} flex={1} h={96} justifyContent={"center"} alignItems={"center"}
+							<VStack mx={18} justifyConten={"center"} flex={1} h={32 + (selectedFriendsArray.length - 1) * 40 } justifyContent={"center"} alignItems={"center"}
 							        borderRadius={18}>
 
 								<FlatList
 									style={{
 
-										paddingTop: 8,
 										width: "100%",
 										// marginLeft: 24,
 									}}
 
 									contentContainerStyle={{
-										justifyContent: "center",
-										height: 88,
 
 									}}
 
+									showsVerticalScrollIndicator={false}
 									data={selectedFriendsArray}
 									renderItem={renderItemTagFriend}
 								/>
@@ -351,7 +492,16 @@ const NewTrip = () => {
 					開始紀錄旅程！
 				</Text>
 
-				<GradientButton w={100} h={34} title={"建立旅程"} onPress={() => {}} />
+				<GradientButton w={100} h={34} title={"建立旅程"} onPress={() => {
+
+					dispatch(setCurrentTrip(tripObject))
+					dispatch(pushTrip(tripObject))
+
+					apiRequest("post", `/api/travelope/new-trip/${account.info.id}`, tripObject)
+
+					navigation.navigate("CurrentTrip")
+
+				}} />
 
 			</Block>
 

@@ -7,8 +7,8 @@ const UserDataSchema = new mongoose.Schema({
 		unique: true,
 		required: true
 	},
-	data: {
-		type: Object,
+	trips: {
+		type: [],
 		required: true
 	},
 }, {

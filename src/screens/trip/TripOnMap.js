@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react"
 import MapView, { Marker } from "react-native-maps"
 import axios from "axios"
-import { Actionsheet, Box, Center, Text, useDisclose, View } from "native-base"
+import { Actionsheet, Box, Center, HStack, Text, useDisclose, View } from "native-base"
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
 import LayoutBase from "../../components/LayoutBase"
 import { WIDTH } from "../../Util"
+import { SafeAreaView } from "react-native-safe-area-context"
+import Feather from "react-native-vector-icons/Feather"
 
 const getUbike = async () => {
 	return await axios.get("https://data.ntpc.gov.tw/api/datasets/71CD1490-A2DF-4198-BEF1-318479775E8A/json?page=0&size=200")
@@ -125,7 +127,22 @@ const TripOnMap = () => {
 
 	return (
 
-		<LayoutBase>
+		<SafeAreaView style={{ flex: 1}}>
+
+			<HStack bg={"transparent"} px={"5%"} justifyContent={"center"} h={48} w={"100%"} zIndex={100} position={"absolute"} top={60}>
+				<HStack bg={"white"} alignItems={"center"} w={"100%"} borderRadius={18} opacity={.75}>
+
+					<Pressable>
+
+					</Pressable>
+
+					<Feather name={"arrow-left-circle"} size={24}/>
+
+					<Text>
+						this is amazing!
+					</Text>
+				</HStack>
+			</HStack>
 
 				<Actionsheet
 					isOpen={isOpen} onClose={onClose}
@@ -264,7 +281,7 @@ const TripOnMap = () => {
 						onRegionChangeComplete={onRegionChangeComplete}
 						initialRegion={region}
 						style={{ flex: 1 }}
-						provider="google"
+						// provider="apple"
 						// customMapStyle={mapStyle}
 					>
 
@@ -308,7 +325,7 @@ const TripOnMap = () => {
 
 				</Box>
 
-		</LayoutBase>
+		</SafeAreaView>
 	);
 
 }

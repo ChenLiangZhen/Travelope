@@ -11,6 +11,7 @@ import { FlatList } from "react-native"
 import SwipeableItem, { useSwipeableItemParams } from "react-native-swipeable-item"
 import { StyleSheet, TouchableOpacity } from "react-native"
 import Animated, { useAnimatedStyle } from "react-native-reanimated"
+import { selectData } from "../../globalstate/dataSlice"
 
 const styles = StyleSheet.create({
 	container: {
@@ -100,8 +101,9 @@ const CurrentTrip = ({navigation}) => {
 
 	const theme = useTheme().colors
 	const account = useSelector(selectAccount)
+	const accountData = useSelector(selectData)
 
-	const [data, setData] = useState(account.friendData.friends)
+	const [data, setData] = useState(accountData.currentTrip.tripNotes)
 	const itemRefs = useRef(new Map())
 
 	const renderItem = useCallback((params) => {
@@ -112,14 +114,14 @@ const CurrentTrip = ({navigation}) => {
 
 		<LayoutBase>
 
-			<Block h={120} w={"100%"} flexDirection={"column"} justifyContent={"space-between"}>
+			<Block h={108} w={"100%"} flexDirection={"column"} justifyContent={"space-between"}>
 
 				<HStack h={52} w={"100%"} alignItems={"center"} justifyContent={"space-between"}>
 
 					<HStack flex={1} mr={24} alignItems={"center"}>
 						<Feather name={"send"} size={20} color={theme.primary.text.purple} />
 						<Text numberOfLines={1} fontWeight={"bold"} ml={8} fontSize={17}
-						      color={theme.primary.text.purple}>高中同學三天兩頭說我</Text>
+						      color={theme.primary.text.purple}>{accountData.currentTrip.tripName}</Text>
 					</HStack>
 
 					<GradientBorderButton icon={"x-circle"} iconSize={18} iconColor={theme.primary.text.purple} w={80}
@@ -127,17 +129,17 @@ const CurrentTrip = ({navigation}) => {
 
 				</HStack>
 
-				<View w={"90%"} h={1} bg={theme.primary.placeholder.indigo} />
+				<View w={"100%"} h={1} bg={theme.primary.placeholder.indigo} />
 
 				<HStack h={52} w={"100%"} alignItems={"center"}>
-					<Text numberOfLines={1} ml={8} color={theme.primary.text.indigo} fontSize={16}>高中同學三天兩頭說我rrr</Text>
+					<Text numberOfLines={1} ml={8} color={theme.primary.text.indigo} fontSize={16}>{accountData.currentTrip.tripDescription}</Text>
 				</HStack>
 
 			</Block>
 
 			<HStack px={4} mb={16}>
 
-				<GradientButton w={100} title={"開啟地圖"} onPress={()=> navigation.navigate()}/>
+				<GradientButton w={100} title={"開啟地圖"} onPress={()=> navigation.navigate("TripOnMap")}/>
 
 			</HStack>
 
