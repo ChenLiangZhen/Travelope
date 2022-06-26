@@ -29,10 +29,19 @@ export const weatherApi = axios.create({
 export const weatherRequest = (lon, lat) => {
 
 	return new Promise(async (resolve, reject) => {
-		weatherApi.get(`/data/2.5/weather?lat=25.0315&lon=121.4645&lang=zh_TW&units=metric&appid=82967bb4dc2077d0480f07bd6391016f`)
+		weatherApi.get(`/data/2.5/weather?lat=${lat}&lon=${lon}&lang=zh_TW&units=metric&appid=82967bb4dc2077d0480f07bd6391016f`)
 		          .then(res=> resolve(res), rej=> {reject(rej)})
 	})
 }
+
+export const weatherForecastRequest = (lon, lat) => {
+
+	return new Promise(async (resolve, reject) => {
+		weatherApi.get(`/data/3.0/onecall?lat=${lat}&lon=${lon}&lang=zh_TW&units=metric&exclude=current,minutely,hourly,alerts&appid=82967bb4dc2077d0480f07bd6391016f`)
+		          .then(res=> resolve(res), rej=> {reject(rej)})
+	})
+}
+
 
 export const geocodingRequest = (lon, lat) => {
 

@@ -23,7 +23,6 @@ target 'travelope' do
   pod 'react-native-cameraroll', :path => '../node_modules/@react-native-community/cameraroll'
   pod 'RNFS', :path => '../node_modules/react-native-fs'
 
-
   target 'travelopeTests' do
     inherit! :complete
     # Pods for testing

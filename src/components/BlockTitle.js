@@ -5,7 +5,7 @@ import LinearGradient from "react-native-linear-gradient";
 import MaskedView from "@react-native-masked-view/masked-view";
 import { useNavigation } from "@react-navigation/native";
 
-const BlockTitle = ({text, color, icon, onPress}) => {
+const BlockTitle = ({text, color, icon, onPress, rightElement}) => {
 
 	const navigation = useNavigation()
 
@@ -48,11 +48,17 @@ const BlockTitle = ({text, color, icon, onPress}) => {
 				</Text>
 			</HStack>
 
-			<Pressable
-				onPress={onPress}
-			>
-				<Feather name={"arrow-right-circle"} size={24} color={color}/>
-			</Pressable>
+			{rightElement?
+
+				<Pressable
+					onPress={onPress}
+				>
+					<Feather name={"arrow-right-circle"} size={24} color={color}/>
+				</Pressable>
+
+				: <></>}
+
+
 		</HStack>
 	)
 }

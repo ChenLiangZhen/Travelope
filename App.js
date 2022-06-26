@@ -269,7 +269,7 @@ const DrawerNavigator = () => {
 
 		<Drawer.Navigator
 
-			initialRouteName={"NewTrip"}
+			initialRouteName={"MainScreen"}
 
 			backBehavior="history"
 			drawerContent={({ state, navigation, descriptors }) => {

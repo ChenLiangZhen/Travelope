@@ -62,43 +62,46 @@ const AppHeader = (props) => {
 		>
 			<View
 				style={{
+
 					flexDirection: "row",
-					paddingHorizontal: 18,
+					paddingRight: 20,
 					paddingBottom: 4,
 					marginTop: props.paddingTop,
-					height: 40,
+					height: 48,
 					backgroundColor: "#fff",
 					justifyContent: "space-between",
 					alignItems: "center",
 				}}
 			>
-				{props.title === "MainScreen"?
+				{/*{*/}
+				{/*	props.title === "MainScreen"?*/}
+				{/*		*/}
+				{/*	account.info.profilePictureLocalPath !== ""?*/}
 
-					account.info.profilePictureLocalPath !== ""?
+				{/*		<Pressable*/}
+				{/*			onPress={() => navigation.navigate("Settings")}>*/}
+				{/*			<Image*/}
+				{/*				style={{*/}
+				{/*					borderRadius: 100,*/}
+				{/*					height: 26,*/}
+				{/*					width: 26,*/}
+				{/*				}}*/}
+				{/*				source={{ uri: account.info.profilePictureLocalPath }}*/}
+				{/*				alt={"userImage"}*/}
+				{/*			/></Pressable>*/}
 
-						<Pressable
-							onPress={() => navigation.navigate("Settings")}>
-							<Image
-								style={{
-									borderRadius: 100,
-									height: 26,
-									width: 26,
-								}}
-								source={{ uri: account.info.profilePictureLocalPath }}
-								alt={"userImage"}
-							/></Pressable>
+				{/*		: <Pressable*/}
+				{/*			onPress={() => navigation.navigate("Settings")}*/}
 
-						: <Pressable
-							onPress={() => navigation.navigate("Settings")}
-
-						><Feather name={"user"} color={theme.primary.text.purple} size={32} /></Pressable>
+				{/*		><Feather name={"user"} color={theme.primary.text.purple} size={32} /></Pressable>*/}
 
 
-					: <IB_ArrowLeft />
+				{/*	: <IB_ArrowLeft />*/}
 
-				}
+				{/*}*/}
 
-				{props.title === "MainScreen"?
+				{
+					props.title === "MainScreen"?
 
 					// <Image
 					// 	style={{ height: 32 }}
@@ -106,26 +109,35 @@ const AppHeader = (props) => {
 					// />
 					// <SVGImg width={200}/>
 
-					<Image
-						source={require("../res/branding_eng_larger.png")}
-						style={{
-							resizeMode: "contain",
-							// height: 20,
-							width: 180,
-						}}
-					/>
+						// <HStack ml={4}>
+
+							<Image
+								source={require("../res/branding_eng_larger.png")}
+								style={{
+
+									resizeMode: "contain",
+									// height: 20,
+									width: 190,
+									marginLeft: 8,
+
+								}}
+							/>
+
+						// </HStack>
+
 
 					:
 
 					<MaskedView
-						style={{ width: 200, justifyContent: "center", alignItems: "center" }}
+						style={{ width: 200, justifyContent: "center", alignItems: "flex-start" }}
 						maskElement={
-							<HStack flex={1} justifyContent={"center"} alignItems={"center"}>
-								<Text letterSpacing={1} fontWeight={"bold"} fontSize={18}>
+							<HStack flex={1} ml={28}justifyContent={"flex-start"} alignItems={"center"}>
+								<Text letterSpacing={1} fontWeight={"bold"} fontSize={20}>
 									{translatedTitle}
 								</Text>
 							</HStack>
 						}>
+
 						<LinearGradient
 							useAngle={true}
 							angle={170}
@@ -139,6 +151,7 @@ const AppHeader = (props) => {
 				}
 
 				<Pressable
+
 					style={{
 						zIndex: 100,
 						height: 32,
@@ -147,8 +160,10 @@ const AppHeader = (props) => {
 					onPress={() => {
 						props.navigation.openDrawer()
 					}}>
+
 					<MaskedView
-						style={{ flex: 1, flexDirection: "row", height: 32 }}
+
+						style={{ flex: 1, flexDirection: "row", height: 32}}
 						maskElement={
 							<View
 								style={{
@@ -175,16 +190,16 @@ const AppHeader = (props) => {
 				</Pressable>
 			</View>
 
-			<LinearGradient
+			{/*<LinearGradient*/}
 
-				useAngle={true}
-				angle={90}
-				// angleCenter={{x: 0.5, y: 0.5}}
-				locations={[0, .9]}
-				colors={["#a79aff", "#ce99ff"]}
-				style={{ height: 1, width: "100%" }}
+			{/*	useAngle={true}*/}
+			{/*	angle={90}*/}
+			{/*	// angleCenter={{x: 0.5, y: 0.5}}*/}
+			{/*	locations={[0, .9]}*/}
+			{/*	colors={["#a79aff", "#ce99ff"]}*/}
+			{/*	style={{ height: 1, width: "100%" }}*/}
 
-			/>
+			{/*/>*/}
 
 		</View>
 	)

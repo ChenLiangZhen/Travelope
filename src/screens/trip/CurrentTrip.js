@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import LayoutBase from "../../components/LayoutBase"
 import FlatBlock from "../../components/FlatBlock"
 import { HStack, Pressable, Text, useTheme, View } from "native-base"
@@ -103,8 +103,15 @@ const CurrentTrip = ({navigation}) => {
 	const account = useSelector(selectAccount)
 	const accountData = useSelector(selectData)
 
+	const [activeTrip, setActiveTrip] = useState({})
+
 	const [data, setData] = useState(accountData.currentTrip.tripNotes)
 	const itemRefs = useRef(new Map())
+
+	useEffect(()=> {
+		let trip = accountData.trips.find(item => item.isActive === true)
+		setActiveTrip(trip)
+	},[])
 
 	const renderItem = useCallback((params) => {
 		return <RowItem {...params} itemRefs={itemRefs} />
@@ -114,25 +121,31 @@ const CurrentTrip = ({navigation}) => {
 
 		<LayoutBase>
 
-			<Block h={108} w={"100%"} flexDirection={"column"} justifyContent={"space-between"}>
+			<Block h={"auto"} w={"100%"} pb={14} flexDirection={"column"} justifyContent={"space-between"}>
 
 				<HStack h={52} w={"100%"} alignItems={"center"} justifyContent={"space-between"}>
 
 					<HStack flex={1} mr={24} alignItems={"center"}>
 						<Feather name={"send"} size={20} color={theme.primary.text.purple} />
 						<Text numberOfLines={1} fontWeight={"bold"} ml={8} fontSize={17}
-						      color={theme.primary.text.purple}>{accountData.currentTrip.tripName}</Text>
+						      color={theme.primary.text.purple}>{activeTrip.tripName}</Text>
 					</HStack>
 
-					<GradientBorderButton icon={"x-circle"} iconSize={18} iconColor={theme.primary.text.purple} w={80}
+					<GradientBorderButton //結束旅程並設定此旅程為inactive。
+						onPress={()=> {
+
+
+
+						}}
+						icon={"x-circle"} iconSize={18} iconColor={theme.primary.text.purple} w={80}
 					                      color={theme.primary.text.purple} title={"結束"} />
 
 				</HStack>
 
-				<View w={"100%"} h={1} bg={theme.primary.placeholder.indigo} />
+				{/*<View w={"100%"} h={1} bg={theme.primary.placeholder.indigo} />*/}
 
-				<HStack h={52} w={"100%"} alignItems={"center"}>
-					<Text numberOfLines={1} ml={8} color={theme.primary.text.indigo} fontSize={16}>{accountData.currentTrip.tripDescription}</Text>
+				<HStack h={48} px={8} w={"100%"} borderRadius={12} alignItems={"center"} borderWidth={2} borderColor={theme.primary.placeholder.purple} borderStyle={"dotted"} bg={theme.primary.bg.indigo}>
+					<Text numberOfLines={1} ml={8} color={theme.primary.text.purple} fontSize={16}>{activeTrip.tripDescription}</Text>
 				</HStack>
 
 			</Block>
