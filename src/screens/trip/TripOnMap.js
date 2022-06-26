@@ -1,12 +1,17 @@
 import React, { useEffect, useRef, useState } from "react"
-import MapView, { Marker } from "react-native-maps"
+import MapView, { Callout, LatLng, Marker, PROVIDER_GOOGLE } from "react-native-maps"
 import axios from "axios"
-import { Actionsheet, Box, Center, HStack, Text, useDisclose, View } from "native-base"
+import { Actionsheet, Box, Center, HStack, Pressable, Text, useDisclose, useTheme, View } from "native-base"
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
 import LayoutBase from "../../components/LayoutBase"
 import { WIDTH } from "../../Util"
 import { SafeAreaView } from "react-native-safe-area-context"
 import Feather from "react-native-vector-icons/Feather"
+import { useDispatch, useSelector } from "react-redux"
+import { selectData } from "../../globalstate/dataSlice"
+import { selectAccount } from "../../globalstate/accountSlice"
+import Geolocation from 'react-native-geolocation-service'
+import Block from "../../components/Block"
 
 const getUbike = async () => {
 	return await axios.get("https://data.ntpc.gov.tw/api/datasets/71CD1490-A2DF-4198-BEF1-318479775E8A/json?page=0&size=200")
@@ -33,13 +38,19 @@ const TripOnMap = () => {
 
 	const [msg, setMsg] = useState("Waiting...");
 	const [onCurrentLocation, setOnCurrentLocation] = useState(false);
+
+	const theme = useTheme().colors
+
+	const accountData = useSelector(selectData)
+	const account = useSelector(selectAccount)
+	const dispatch = useDispatch()
+
 	const [stationBike, setStationBike] = useState({
 			total: 24,
 			bikes: 17
 		}
 	);
 	const [zoomRatio, setZoomRatio] = useState(1);
-
 
 	const [station, setStation] = useState({
 		type: "",
@@ -49,10 +60,14 @@ const TripOnMap = () => {
 		lon: "",
 	})
 
-
 	const [region, setRegion] = useState({
-		longitude: 121.544637,
-		latitude: 25.024624,
+
+		// longitude: 121.544637,
+		// latitude: 25.024624,
+
+		// longitude: 121.46505263178251,
+		// latitude: 25.031829833984375,
+
 		longitudeDelta: 0.02,
 		latitudeDelta: 0.04,
 	})
@@ -76,11 +91,13 @@ const TripOnMap = () => {
 	}
 
 	const setRegionAndMarker = (location) => {
+
 		setRegion({
 			...region,
 			longitude: location.coords.longitude,
 			latitude: location.coords.latitude,
 		});
+
 		setMarker({
 			...marker,
 			coord: {
@@ -90,34 +107,49 @@ const TripOnMap = () => {
 		});
 	};
 
-	const getUbikeData = async () => {
-		const bikeData = await getUbike();
-		setUbikeData(bikeData);
-	};
+	// const getUbikeData = async () => {
+	// 	const bikeData = await getUbike();
+	// 	setUbikeData(bikeData);
+	// };
 
 
 	const getLocation = async () => {
-		let { status } = await Location.requestForegroundPermissionsAsync();
+
+		console.log("exec")
+
+		let status = await Geolocation.requestAuthorization("whenInUse");
+
 		if (status !== 'granted') {
 			setMsg('Permission to access location was denied');
 			return;
 		}
-		let location = await Location.getCurrentPositionAsync({});
-		setRegionAndMarker(location);
+
+		Geolocation.getCurrentPosition((res)=> {
+			setRegionAndMarker(res);
+			console.log("located! " + JSON.stringify(res))
+		}, rej => console.log(rej));
+
 		setOnCurrentLocation(true);
 	}
+
+	useEffect(()=> {
+
+		mapRef.current.animateCamera({
+
+			center: region,
+			altitude: 2500
+		})
+
+	}, [region])
+
 
 	useEffect(() => {
 
 		getLocation();
-		getUbikeData()
-	}, []);
 
-	useEffect(() => {
-		console.log("render")
-		console.log(station)
-		console.log(stationBike)
-	})
+		// await new Promise(resolve => setTimeout(resolve, 5000))
+
+	},[]);
 
 	const {
 		isOpen,
@@ -130,18 +162,30 @@ const TripOnMap = () => {
 		<SafeAreaView style={{ flex: 1}}>
 
 			<HStack bg={"transparent"} px={"5%"} justifyContent={"center"} h={48} w={"100%"} zIndex={100} position={"absolute"} top={60}>
-				<HStack bg={"white"} alignItems={"center"} w={"100%"} borderRadius={18} opacity={.75}>
+				<Block opacity={.8} flexDirection={"row"} justifyContent={"space-between"} px={14} alignItems={"center"} h={48} w={"100%"} borderRadius={18}>
 
-					<Pressable>
+					<HStack flex={1} alignItems={"center"}>
 
+						<Pressable mr={4} h={24} w={24} alignItems={"center"} justifyContent={"center"}>
+							<Feather name={"send"} color={theme.primary.text.purple} size={18}/>
+						</Pressable>
+
+						<Text noOfLines={1} letterSpacing={1} w={"60%"} fontSize={18} fontWeight={"bold"} color={theme.primary.text.purple}>
+							{/*{accountData.currentTrip.tripName}*/}
+							跟同學去宜蘭玩三天
+						</Text>
+
+					</HStack>
+
+					<Pressable h={24} w={24} alignItems={"center"} justifyContent={"center"}>
+						<Feather name={"arrow-left-circle"} color={theme.primary.text.purple} size={22}/>
 					</Pressable>
 
-					<Feather name={"arrow-left-circle"} size={24}/>
+					{/*<Pressable  h={24} w={24}>*/}
+					{/*	/!*<Feather name={"arrow-left-circle"} size={24}/>*!/*/}
+					{/*</Pressable>*/}
 
-					<Text>
-						this is amazing!
-					</Text>
-				</HStack>
+				</Block>
 			</HStack>
 
 				<Actionsheet
@@ -279,13 +323,64 @@ const TripOnMap = () => {
 				<Box flex={1}>
 					<MapView
 						onRegionChangeComplete={onRegionChangeComplete}
-						initialRegion={region}
+						customMapStyle={require("../../res/mapStyle.json")}
+						// provider={PROVIDER_GOOGLE}
+						// initialCamera={{ center: region, altitude: 2500 }}
+						// camera={{
+						// 	// center: region,
+						// 	altitude: 2500
+						// }}
+					// 	center: LatLng;
+					// heading: number;
+					// pitch: number;
+					// zoom: number;
+					// altitude: number;
+						userInterfaceStyle={"light"}
+						mapType={"mutedStandard"}
+						ref={mapRef}
 						style={{ flex: 1 }}
 						// provider="apple"
 						// customMapStyle={mapStyle}
 					>
 
+						{/*<Callout*/}
+						{/*	tooltip={}*/}
+						{/*>*/}
+						{/*	<View>*/}
+						{/*		<Block bg={"white"} h={48} w={48} borderRadius={60} opacity={.8}*/}
+						{/*		       borderWidth={2} px={0} py={0} justifyContent={"center"} alignItems={"center"}>*/}
+						{/*			<Feather name={"map-pin"} size={24} color={theme.primary.text.purple} />*/}
+						{/*		</Block>*/}
+						{/*	</View>*/}
+
+
+						{/*</Callout>*/}
+
+						<Marker
+							tracksViewChanges={false}
+							coordinate={{ latitude: 25.031845092773438, longitude: 121.46505476503532 }}
+							key={"edwf"}
+							title={"yay"}
+							description={"yay"}
+							onPress={() => {
+
+								setRegion({
+									...region,
+									latitude: 25.031845092773438,
+									longitude: 121.46505476503532
+								})
+							}}
+						>
+								<Callout tooltip>
+									<View>
+										<Text>This is ridiculous</Text>
+									</View>
+								</Callout>
+						</Marker>
+
 						{(zoomRatio > 0.25) && ubikeData? ubikeData.data.map((site) => (
+
+
 							<Marker
 								tracksViewChanges={false}
 								coordinate={{ latitude: site.lat, longitude: site.lng }}

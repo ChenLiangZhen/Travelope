@@ -4,41 +4,76 @@ import { Box, Button, FormControl, Input, KeyboardAvoidingView, Modal, Text, VSt
 import LinearGradient from "react-native-linear-gradient";
 import { Platform } from "react-native";
 
-const LayoutBase = ({children}) => {
+const LayoutBase = ({children, avoidKeyboard}) => {
 
 
   return(
 
-    <SafeAreaProvider>
 
-      <SafeAreaView style={{ flex: 1}}>
-        {/*<KeyboardAvoidingView*/}
-        {/*  keyboardVerticalOffset={500}*/}
-        {/*  flex={1}*/}
-        {/*  behavior={Platform.OS === "ios" ? "padding" : "height"}*/}
-        {/*>*/}
+      avoidKeyboard?
 
-          <Box flex={1} px={20}>
+        <SafeAreaProvider>
 
-            <LinearGradient
+          <SafeAreaView style={{ flex: 1}}>
 
-              useAngle={true}
-              angle={180}
-              // angleCenter={{x: 0.5, y: 0.5}}
-              locations={[0, .9]}
-              colors={['#ffffff', "#ffffff"]}
-              style={{ height: "100%", width: "100%", flex: 1}}
+            <KeyboardAvoidingView
+              keyboardVerticalOffset={1000}
+              flex={1}
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
             >
-              {children}
 
-            </LinearGradient>
+            <Box flex={1} px={20}>
 
-          </Box>
+              <LinearGradient
+
+                useAngle={true}
+                angle={180}
+                // angleCenter={{x: 0.5, y: 0.5}}
+                locations={[0, .9]}
+                colors={['#ffffff', "#ffffff"]}
+                style={{ height: "100%", width: "100%", flex: 1}}
+              >
+                {children}
+
+              </LinearGradient>
+
+            </Box>
 
 
-        {/*</KeyboardAvoidingView>*/}
-      </SafeAreaView>
-    </SafeAreaProvider>
+            </KeyboardAvoidingView>
+          </SafeAreaView>
+        </SafeAreaProvider> :
+
+        <SafeAreaProvider>
+
+          <SafeAreaView style={{ flex: 1}}>
+            {/*<KeyboardAvoidingView*/}
+            {/*  keyboardVerticalOffset={500}*/}
+            {/*  flex={1}*/}
+            {/*  behavior={Platform.OS === "ios" ? "padding" : "height"}*/}
+            {/*>*/}
+
+            <Box flex={1} px={20}>
+
+              <LinearGradient
+
+                useAngle={true}
+                angle={180}
+                // angleCenter={{x: 0.5, y: 0.5}}
+                locations={[0, .9]}
+                colors={['#ffffff', "#ffffff"]}
+                style={{ height: "100%", width: "100%", flex: 1}}
+              >
+                {children}
+
+              </LinearGradient>
+
+            </Box>
+
+
+            {/*</KeyboardAvoidingView>*/}
+          </SafeAreaView>
+        </SafeAreaProvider>
 
   )
 }

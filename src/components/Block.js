@@ -22,7 +22,7 @@ const Block = ({children, bdc, bgc, sc, jc, ai, fd, ...props}) => {
 			shadowRadius={0}
 			shadowOpacity={.4}
 			shadowOffset={{
-				height: 10,
+				height: 8,
 			}}
 
 			flexDirection={fd? fd: "column"}

@@ -38,59 +38,51 @@ export const initialState = {
 
 	trips: [
 
-		{
-			isActive: false,
-			tripName: "",
-			tripID: "",
-			startTime: {},
-			endTime: {},
-			fellowList: [],
-
-			fellow: {
-				name: "",
-				key: "",
-			},
-
-			tripNotes: [{
-
-				recordTime: {
-					y: 2022,
-					m: 6,
-					d: 24,
-
-				},
-
-				title: "",
-				description: "",
-				mood: "",
-				imageKey: "",
-
-				longitude: "",
-				latitude: "",
-
-				adjPhrases: [],
-				weather: "",
-
-			}, {
-
-				recordTime: {},
-
-				title: "",
-				description: "",
-				mood: "",
-				imageKey: "",
-
-				longitude: "",
-				latitude: "",
-
-				adjPhrases: [],
-				weather: "",
-
-			}],
-
-		},
+		// {
+		// 	isActive: false,
+		// 	tripName: "",
+		// 	tripID: "",
+		// 	startTime: {},
+		// 	endTime: {},
+		// 	fellowList: [],
+		//
+		// 	fellow: {
+		// 		name: "",
+		// 		key: "",
+		// 	},
+		//
+		// 	tripNotes: [{
+		//
+		// 		title: "",
+		// 		description: "",
+		// 		mood: "",
+		// 		imageKey: "",
+		//
+		// 		longitude: "",
+		// 		latitude: "",
+		//
+		// 		adjPhrases: [],
+		// 		weather: "",
+		//
+		// 	}, {
+		//
+		// 		recordTime: {},
+		//
+		// 		title: "",
+		// 		description: "",
+		// 		mood: "",
+		// 		imageKey: "",
+		//
+		// 		longitude: "",
+		// 		latitude: "",
+		//
+		// 		adjPhrases: [],
+		// 		weather: "",
+		//
+		// 	}],
+		//
+		// },
 	],
-
 
 }
 
@@ -101,23 +93,30 @@ const dataSlice = createSlice({
 
 	reducers: {
 
-		purgeAccountData(state) {
-			state.currentTrip = initialState.currentTrip
-			state.trips = initialState.trips
+		purgeAccountData(state) { //用於登出用。
+
+			state.trips = []
 		},
 
-		setTrips(state, action) {
+		setTrips(state, action) { //用於第一次載入，從後端擷取資料用。
 			state.trips = action.payload
 		},
 
-		pushTrip(state, action) {
+		setCurrentTrip(state, action) { //用於更新目前的旅程用。 最新的旅程為旅程陣列的最後一個元素。
+			state.trips[state.trips.length - 1] = action.payload
+		},
+
+		pushTrip(state, action) { //建立一個新的旅程，一個新的旅程只會執行一次這個函式。
 			state.trips.push(action.payload)
 		},
 
-		setCurrentTrip(state, action) {
-			state.currentTrip = action.payload
+		pushTripNote(state, action) { //在當前旅程新增遊記。
+			state.trips[state.trips.length - 1].tripNotes.push(action.payload)
 		},
 
+		// setInactive(state) {
+		// 	state.currentTrip.
+		// }
 	},
 })
 
@@ -127,6 +126,7 @@ export const {
 	purgeAccountData,
 	setTrips,
 	pushTrip,
+	pushTripNote,
 	setCurrentTrip,
 } = dataSlice.actions
 export default dataSlice.reducer

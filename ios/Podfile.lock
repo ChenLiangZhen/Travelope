@@ -292,6 +292,8 @@ PODS:
     - React-Core
   - react-native-date-picker (4.2.2):
     - React-Core
+  - react-native-geolocation-service (5.3.0):
+    - React
   - react-native-get-random-values (1.8.0):
     - React-Core
   - react-native-image-picker (4.8.4):
@@ -486,6 +488,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - "react-native-cameraroll (from `../node_modules/@react-native-community/cameraroll`)"
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
+  - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-maps (from `../node_modules/react-native-maps`)
@@ -585,6 +588,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/cameraroll"
   react-native-date-picker:
     :path: "../node_modules/react-native-date-picker"
+  react-native-geolocation-service:
+    :path: "../node_modules/react-native-geolocation-service"
   react-native-get-random-values:
     :path: "../node_modules/react-native-get-random-values"
   react-native-image-picker:
@@ -687,6 +692,7 @@ SPEC CHECKSUMS:
   React-logger: a0833912d93b36b791b7a521672d8ee89107aff1
   react-native-cameraroll: 2957f2bce63ae896a848fbe0d5352c1bd4d20866
   react-native-date-picker: 9088350e06918f7d842a34c171acadc66583cb94
+  react-native-geolocation-service: f32ef48fa665bd710207a3ac39bc127cac9cb993
   react-native-get-random-values: a6ea6a8a65dc93e96e24a11105b1a9c8cfe1d72a
   react-native-image-picker: cffb727cf2f59bd5c0408e30b3dbe0b935f88835
   react-native-maps: 8b8bfada2c86205a7f5a07dd1f92f29b33ea83aa
@@ -723,6 +729,6 @@ SPEC CHECKSUMS:
   Yoga: 99652481fcd320aefa4a7ef90095b95acd181952
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 2d049aa329a0d9ca4c45fcb4a08e0ab08592e942
+PODFILE CHECKSUM: ac2a80ccb3e1b951e3f6ead3710edd29a0a35122
 
 COCOAPODS: 1.11.3

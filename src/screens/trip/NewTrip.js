@@ -56,7 +56,7 @@ const NewTrip = ({navigation}) => {
 			tripNotes: [],
 		})
 
-	},[tripName, date, selectedFriendsArray])
+	},[tripName, tripDescription, date, selectedFriendsArray])
 
 	function closeInfoToast() {
 		if (toastInfoRef.current) {
@@ -64,20 +64,20 @@ const NewTrip = ({navigation}) => {
 		}
 	}
 
-	function addToast() {
+	function addToast(info) {
 		if (!toast.isActive("warningInfo")) {
 			toastInfoRef.current = toast.show({
 				id: "warningInfo",
 				render: () => {
 					return (
-						<ToastInfo />
+						<ToastInfo info={info}/>
 					)
 				},
 			})
 		}
 	}
 
-	const ToastInfo = (info) => {
+	const ToastInfo = ({ info }) => {
 		return (
 			<HStack
 
@@ -162,6 +162,7 @@ const NewTrip = ({navigation}) => {
 
 	const renderItemSelectFriend = ({ item }) => <FriendSelect item={item} />
 	const renderItemTagFriend = ({ item }) => <FriendTag item={item} />
+
 
 	return (
 
@@ -493,6 +494,11 @@ const NewTrip = ({navigation}) => {
 				</Text>
 
 				<GradientButton w={100} h={34} title={"建立旅程"} onPress={() => {
+
+					if(tripName === "" || tripDescription === ""){
+						addToast("資料不完整。" )
+						return
+					}
 
 					dispatch(setCurrentTrip(tripObject))
 					dispatch(pushTrip(tripObject))

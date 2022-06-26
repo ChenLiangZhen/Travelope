@@ -85,7 +85,9 @@ function SignModal({ modalVisible, setModalVisible }) {
 	useEffect(() => {
 
 		async function showInfo() {
+
 			addToast()
+
 			await new Promise(resolve => setTimeout(resolve, 1500))
 			closeInfoToast()
 			setWarningText("")
