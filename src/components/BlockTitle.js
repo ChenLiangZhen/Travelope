@@ -12,7 +12,8 @@ const BlockTitle = ({text, color, icon, onPress, rightElement}) => {
 	return(
 
 		<HStack w={"100%"}
-		        h={40}
+		        h={42}
+		        mb={6}
 		        px={4}
 		        justifyContent={"space-between"}
 		        alignItems={"center"}

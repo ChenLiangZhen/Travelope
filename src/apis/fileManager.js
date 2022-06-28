@@ -26,3 +26,21 @@ export const profilePictureInit = async (image, accountID, prevImgPath) => {
 	})
 }
 
+export const uploadImageInit = async (image, accountID) => {
+
+	console.log("uploadImage")
+
+	return new Promise(async (resolve, reject) => {
+
+		const randomName = accountID + new Date().getTime()
+
+		RNFS.moveFile(image.path, RNFS.DocumentDirectoryPath + "/travelope/" + randomName, {
+			NSURLIsExcludedFromBackupKey: false,
+		})
+		    .then(res => {
+
+			    resolve(RNFS.DocumentDirectoryPath + "/travelope/" + randomName)
+		    })
+	})
+}
+

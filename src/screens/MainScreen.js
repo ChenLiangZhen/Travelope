@@ -14,13 +14,14 @@ import FlatBlock from "../components/FlatBlock"
 import Geolocation from "react-native-geolocation-service"
 import { weatherForecastRequest, weatherRequest } from "../apis/api"
 import Feather from "react-native-vector-icons/Feather"
+import { useFocusEffect } from "@react-navigation/native"
 
 const TripsItem = ({ item }) => {
 
 	const theme = useTheme().colors
 
 	return (
-		<Block h={96} pl={10} flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"}>
+		<Block h={84} pl={10} flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"}>
 
 			<HStack alignItems={"center"}>
 				<Feather name={"navigation-2"} color={theme.primary.placeholder.purple} size={36} />
@@ -33,7 +34,7 @@ const TripsItem = ({ item }) => {
 				</VStack>
 			</HStack>
 
-			<VStack borderRadius={12} w={72} bg={theme.primary.placeholder.indigo} h={68} alignItems={"center"}
+			<VStack borderRadius={12} w={68} bg={theme.primary.placeholder.indigo} h={60} alignItems={"center"}
 			        justifyContent={"center"}>
 				<Text fontSize={18} color={"white"} fontWeight={"bold"}> {new Date(item.startTime).getMonth() + 1 + "月"} </Text>
 				<Text fontSize={26} lineHeight={28} letterSpacing={2} color={"white"}
@@ -99,13 +100,17 @@ const MainScreen = ({ navigation }) => {
 
 	}
 
-	useEffect(() => {
 
-		setActiveTrip(accountData.trips.find(item => item.isActive))
+	useFocusEffect(
 
-		getLocation()
-		console.log("所有旅遊" + accountData.trips)
-	}, [])
+		React.useCallback(() => {
+
+			let trip = accountData.trips.find(item => item.isActive)
+			trip? setActiveTrip(trip) : setActiveTrip(null)
+			getLocation()
+
+		}, [accountData]),
+	);
 
 	useEffect(() => {
 
@@ -274,7 +279,7 @@ const MainScreen = ({ navigation }) => {
 						navigation.navigate("CurrentTrip")
 					}}>
 
-						<Block h={96} pl={10} flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"}>
+						<Block h={84} pl={10} flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"}>
 
 							<HStack alignItems={"center"}>
 								<Feather name={"navigation-2"} color={theme.primary.placeholder.purple} size={36} />
@@ -287,8 +292,9 @@ const MainScreen = ({ navigation }) => {
 								</VStack>
 							</HStack>
 
-							<VStack borderRadius={12} w={72} bg={theme.primary.placeholder.indigo} h={68} alignItems={"center"}
-							        justifyContent={"center"}>
+						<VStack borderRadius={12} w={68} bg={theme.primary.placeholder.indigo} h={60} alignItems={"center"}
+
+						        justifyContent={"center"}>
 								<Text fontSize={18} color={"white"} fontWeight={"bold"}> {new Date(activeTrip.startTime).getMonth() + 1 + "月"} </Text>
 								<Text fontSize={26} lineHeight={28} letterSpacing={2} color={"white"}
 								      fontWeight={"bold"}> {new Date(activeTrip.startTime).getDate()} </Text>
@@ -305,7 +311,7 @@ const MainScreen = ({ navigation }) => {
 
 						onPress={() => navigation.navigate("NewTrip")}
 
-						h={64}
+						h={78}
 						w={"100%"}
 						mb={32}
 						flexDirection={"row"}

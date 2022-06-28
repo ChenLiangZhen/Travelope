@@ -1,20 +1,33 @@
 import React, { useEffect, useRef, useState } from "react"
 import LayoutBase from "../../components/LayoutBase"
 import FlatBlock from "../../components/FlatBlock"
-import { HStack, Input, Modal, Pressable, Text, TextArea, useTheme, useToast, View, VStack } from "native-base"
+import {
+	HStack,
+	Input,
+	KeyboardAvoidingView,
+	Modal,
+	Pressable,
+	Text,
+	TextArea,
+	useTheme,
+	useToast,
+	View,
+	VStack,
+} from "native-base"
 import Block from "../../components/Block"
 import DatePicker from "react-native-date-picker"
 import Feather from "react-native-vector-icons/Feather"
 import { GradientBorderButton, GradientButton } from "../../components/GradientButton"
 import { selectAccount } from "../../globalstate/accountSlice"
-import { FlatList } from "react-native"
+import { FlatList, Keyboard } from "react-native"
 import { HEIGHT, WIDTH } from "../../Util"
 import { useDispatch, useSelector } from "react-redux"
 import { appleAuth } from "@invertase/react-native-apple-authentication"
 import { pushTrip, selectData, setCurrentTrip } from "../../globalstate/dataSlice"
 import { apiRequest } from "../../apis/api"
+import { useFocusEffect } from "@react-navigation/native"
 
-const NewTrip = ({navigation}) => {
+const NewTrip = ({ navigation }) => {
 
 	const theme = useTheme().colors
 	const [hasFellow, setHasFellow] = useState(false)
@@ -29,9 +42,7 @@ const NewTrip = ({navigation}) => {
 
 	const [selectedFriendsArray, setSelectedFriendsArray] = useState([])
 
-	const [tripObject, setTripObject] = useState({
-
-	})
+	const [tripObject, setTripObject] = useState({})
 
 	const account = useSelector(selectAccount)
 	const accountData = useSelector(selectData)
@@ -40,7 +51,17 @@ const NewTrip = ({navigation}) => {
 	const toastInfoRef = useRef()
 	const toast = useToast()
 
-	useEffect(()=> {
+	useFocusEffect(
+		React.useCallback(() => {
+
+			setTripName("")
+			setTripDescription("")
+			setSelectedFriendsArray([])
+
+		}, []),
+	)
+
+	useEffect(() => {
 
 		setTripObject({
 
@@ -56,7 +77,7 @@ const NewTrip = ({navigation}) => {
 			tripNotes: [],
 		})
 
-	},[tripName, tripDescription, date, selectedFriendsArray])
+	}, [tripName, tripDescription, date, selectedFriendsArray])
 
 	function closeInfoToast() {
 		if (toastInfoRef.current) {
@@ -70,7 +91,7 @@ const NewTrip = ({navigation}) => {
 				id: "warningInfo",
 				render: () => {
 					return (
-						<ToastInfo info={info}/>
+						<ToastInfo info={info} />
 					)
 				},
 			})
@@ -154,7 +175,6 @@ const NewTrip = ({navigation}) => {
 				<Text numberOfLines={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={15}>
 					{item.name}
 				</Text>
-
 			</Pressable>
 
 		)
@@ -162,7 +182,6 @@ const NewTrip = ({navigation}) => {
 
 	const renderItemSelectFriend = ({ item }) => <FriendSelect item={item} />
 	const renderItemTagFriend = ({ item }) => <FriendTag item={item} />
-
 
 	return (
 
@@ -241,277 +260,234 @@ const NewTrip = ({navigation}) => {
 				}}
 			/>
 
-			<FlatBlock
-				h={64}
-				mb={16}
-				borderWidth={1}
-				flexDirection={"row"}
-				bg={"white"}
-				shadowColor={theme.primary.bg.litgray}
-				borderColor={theme.primary.text.purple}
-				ai={"center"}
-			>
-				<Text
-					color={theme.primary.text.purple}
-					fontSize={16}
-					fontWeight={"bold"}
-					mr={20}
-				>名稱</Text>
-
-				<Input
-					_focus={{
-						borderColor: theme.primary.text.purple,
-						color: theme.primary.text.purple,
-						bg: theme.primary.bg.purple,
-					}}
-
-					value={tripName}
-					onChangeText={name => setTripName(name)}
-					selectionColor={theme.primary.text.indigo}
-					borderColor={"transparent"}
-					color={theme.primary.text.purple}
-					bg={theme.primary.bg.smoke}
-					borderWidth={1}
-					borderRadius={16}
-					fontWeight={"bold"}
-					h={36}
-					flex={8}
-					px={20}
-					fontSize={16}
-					textAlign={"left"}
-				/>
-
-			</FlatBlock>
-
-			<FlatBlock
-				h={104}
-				mb={16}
-				borderWidth={1}
-				flexDirection={"row"}
-				bg={"white"}
-				shadowColor={theme.primary.bg.litgray}
-				borderColor={theme.primary.text.purple}
-				ai={"center"}
-			>
-				<Text
-					color={theme.primary.text.purple}
-					fontSize={16}
-					fontWeight={"bold"}
-					mr={20}
-				>描述</Text>
-
-				<TextArea
-					_focus={{
-						borderColor: theme.primary.text.purple,
-						color: theme.primary.text.purple,
-						bg: theme.primary.bg.purple,
-					}}
-
-					value={tripDescription}
-					onChangeText={desc => setTripDescription(desc)}
-					selectionColor={theme.primary.text.indigo}
-					borderColor={"transparent"}
-					color={theme.primary.text.purple}
-					bg={theme.primary.bg.smoke}
-					borderWidth={1}
-					borderRadius={16}
-					fontWeight={"bold"}
-					h={72}
-					flex={8}
-					px={20}
-					py={10}
-					fontSize={16}
-					textAlign={"left"}
-				/>
-
-			</FlatBlock>
-
-			<FlatBlock
-				h={64}
-				mb={16}
-				borderWidth={1}
-				flexDirection={"row"}
-				bg={"white"}
-				shadowColor={theme.primary.bg.litgray}
-				borderColor={theme.primary.text.purple}
-				ai={"center"}
-			>
-				<Text
-					color={theme.primary.text.purple}
-					fontSize={16}
-					fontWeight={"bold"}
-					mr={20}
-				>日期</Text>
-
-				<Input
-					_focus={{
-						borderColor: theme.primary.text.purple,
-						color: theme.primary.text.purple,
-						bg: theme.primary.bg.purple,
-					}}
-					value={date.getFullYear() + " - " + (date.getMonth() + 1) + " - " + date.getDate() + "   " + date.getHours() + " : " + date.getMinutes()}
-					selectionColor={theme.primary.text.purple}
-					borderColor={"transparent"}
-					color={theme.primary.text.purple}
-					bg={theme.primary.bg.smoke}
-					borderWidth={1}
-					borderRadius={16}
-					fontWeight={"bold"}
-					mr={16}
-					h={36}
-					flex={8}
-					px={20}
-					fontSize={16}
-					textAlign={"left"}
-				/>
-
-				<Pressable h={32} justifyContent={"center"} onPress={() => setOpen(true)}>
-					<Feather name={"calendar"} color={theme.primary.text.indigo} size={20} />
-				</Pressable>
-
-			</FlatBlock>
-
-			{/*<FlatBlock*/}
-			{/*	h={64}*/}
-			{/*	mb={16}*/}
-			{/*	borderWidth={1}*/}
-			{/*	flexDirection={"row"}*/}
-			{/*	bg={"white"}*/}
-			{/*	shadowColor={theme.primary.bg.litgray}*/}
-			{/*	borderColor={theme.primary.text.purple}*/}
-			{/*	ai={"center"}*/}
-			{/*>*/}
-			{/*	<Text*/}
-			{/*		color={theme.primary.text.purple}*/}
-			{/*		fontSize={16}*/}
-			{/*		fontWeight={"bold"}*/}
-			{/*		mr={20}*/}
-			{/*	>啟程</Text>*/}
-
-			{/*	<Input*/}
-			{/*		_focus={{*/}
-			{/*			borderColor: theme.primary.text.purple,*/}
-			{/*			color: theme.primary.text.purple,*/}
-			{/*			bg: theme.primary.bg.purple,*/}
-			{/*		}}*/}
-
-			{/*		value={date.getFullYear() + " - " + (date.getMonth() + 1) + " - " + date.getDate()}*/}
-			{/*		selectionColor={theme.primary.text.purple}*/}
-			{/*		borderColor={"transparent"}*/}
-			{/*		color={theme.primary.text.purple}*/}
-			{/*		bg={theme.primary.bg.smoke}*/}
-			{/*		borderWidth={1}*/}
-			{/*		borderRadius={16}*/}
-			{/*		fontWeight={"bold"}*/}
-			{/*		mr={16}*/}
-			{/*		h={36}*/}
-			{/*		flex={8}*/}
-			{/*		px={20}*/}
-			{/*		fontSize={16}*/}
-			{/*		textAlign={"left"}*/}
-			{/*	/>*/}
-
-			{/*	<Pressable h={32} justifyContent={"center"} onPress={() => setOpenTime(true)}>*/}
-			{/*		<Feather name={"clock"} color={theme.primary.text.indigo} size={20} />*/}
-			{/*	</Pressable>*/}
-
-			{/*</FlatBlock>*/}
-
-			{
-
-				hasFellow?  //新增同行友人
+				<Pressable onPress={() => Keyboard.dismiss()}>
 
 					<FlatBlock
-						h={selectedFriendsArray.length === 0? 64 : 64 + 48 * (selectedFriendsArray.length - 1)}
+
+						h={64}
 						mb={16}
 						borderWidth={1}
 						flexDirection={"row"}
-						justifyContent={"space-between"}
 						bg={"white"}
 						shadowColor={theme.primary.bg.litgray}
 						borderColor={theme.primary.text.purple}
 						ai={"center"}
 					>
+						<Text
+							color={theme.primary.text.purple}
+							fontSize={16}
+							fontWeight={"bold"}
+							mr={20}
+						>名稱</Text>
+
+						<Input
+							_focus={{
+								borderColor: theme.primary.text.purple,
+								color: theme.primary.text.purple,
+								bg: theme.primary.bg.purple,
+							}}
+
+							value={tripName}
+							onChangeText={name => setTripName(name)}
+							selectionColor={theme.primary.text.indigo}
+							borderColor={"transparent"}
+							color={theme.primary.text.purple}
+							bg={theme.primary.bg.smoke}
+							borderWidth={1}
+							borderRadius={16}
+							fontWeight={"bold"}
+							h={36}
+							flex={8}
+							px={20}
+							fontSize={16}
+							textAlign={"left"}
+						/>
+
+					</FlatBlock>
+
+					<FlatBlock
+
+						h={104}
+						mb={16}
+						borderWidth={1}
+						flexDirection={"row"}
+						bg={"white"}
+						shadowColor={theme.primary.bg.litgray}
+						borderColor={theme.primary.text.purple}
+						ai={"center"}
+					>
+						<Text
+							color={theme.primary.text.purple}
+							fontSize={16}
+							fontWeight={"bold"}
+							mr={20}
+						>描述</Text>
+
+						<TextArea
+							_focus={{
+								borderColor: theme.primary.text.purple,
+								color: theme.primary.text.purple,
+								bg: theme.primary.bg.purple,
+							}}
+
+							value={tripDescription}
+							onChangeText={desc => setTripDescription(desc)}
+							selectionColor={theme.primary.text.indigo}
+							borderColor={"transparent"}
+							color={theme.primary.text.purple}
+							bg={theme.primary.bg.smoke}
+							borderWidth={1}
+							borderRadius={16}
+							fontWeight={"bold"}
+							h={72}
+							flex={8}
+							px={20}
+							py={10}
+							fontSize={16}
+							textAlign={"left"}
+						/>
+
+					</FlatBlock>
+
+					<FlatBlock
+						h={64}
+						mb={16}
+						borderWidth={1}
+						flexDirection={"row"}
+						bg={"white"}
+						shadowColor={theme.primary.bg.litgray}
+						borderColor={theme.primary.text.purple}
+						ai={"center"}
+					>
+						<Text
+							color={theme.primary.text.purple}
+							fontSize={16}
+							fontWeight={"bold"}
+							mr={20}
+						>日期</Text>
+
+						<Input
+							_focus={{
+								borderColor: theme.primary.text.purple,
+								color: theme.primary.text.purple,
+								bg: theme.primary.bg.purple,
+							}}
+							value={date.getFullYear() + " - " + (date.getMonth() + 1) + " - " + date.getDate() + "   " + date.getHours() + " : " + date.getMinutes()}
+							selectionColor={theme.primary.text.purple}
+							borderColor={"transparent"}
+							color={theme.primary.text.purple}
+							bg={theme.primary.bg.smoke}
+							borderWidth={1}
+							borderRadius={16}
+							fontWeight={"bold"}
+							mr={16}
+							h={36}
+							flex={8}
+							px={20}
+							fontSize={16}
+							textAlign={"left"}
+						/>
+
+						<Pressable h={32} justifyContent={"center"} onPress={() => setOpen(true)}>
+							<Feather name={"calendar"} color={theme.primary.text.indigo} size={20} />
+						</Pressable>
+
+					</FlatBlock>
+
+					{
+
+						hasFellow?  //新增同行友人
+
+							<FlatBlock
+								h={selectedFriendsArray.length === 0? 64 : 64 + 48 * (selectedFriendsArray.length - 1)}
+								mb={16}
+								borderWidth={1}
+								flexDirection={"row"}
+								justifyContent={"space-between"}
+								bg={"white"}
+								shadowColor={theme.primary.bg.litgray}
+								borderColor={theme.primary.text.purple}
+								ai={"center"}
+							>
 
 
-						<HStack alignItems={"center"}>
+								<HStack alignItems={"center"}>
 
-							<Text
-								color={theme.primary.text.purple}
-								fontSize={16}
-								fontWeight={"bold"}
-								mr={14}
-							>同行</Text>
+									<Text
+										color={theme.primary.text.purple}
+										fontSize={16}
+										fontWeight={"bold"}
+										mr={14}
+									>同行</Text>
 
-							<View h={36 + (selectedFriendsArray.length - 1) * 40} w={4} borderRadius={10}
-							      bg={theme.primary.placeholder.purple} />
+									<View h={36 + (selectedFriendsArray.length - 1) * 40} w={4} borderRadius={10}
+									      bg={theme.primary.placeholder.purple} />
 
-							<VStack mx={18} justifyConten={"center"} flex={1} h={32 + (selectedFriendsArray.length - 1) * 40 } justifyContent={"center"} alignItems={"center"}
-							        borderRadius={18}>
+									<VStack mx={18} justifyConten={"center"} flex={1} h={32 + (selectedFriendsArray.length - 1) * 40}
+									        justifyContent={"center"} alignItems={"center"}
+									        borderRadius={18}>
 
-								<FlatList
-									style={{
+										<FlatList
+											style={{
 
-										width: "100%",
-										// marginLeft: 24,
-									}}
+												width: "100%",
+												// marginLeft: 24,
+											}}
 
-									contentContainerStyle={{
+											contentContainerStyle={{}}
 
-									}}
+											showsVerticalScrollIndicator={false}
+											data={selectedFriendsArray}
+											renderItem={renderItemTagFriend}
+										/>
 
-									showsVerticalScrollIndicator={false}
-									data={selectedFriendsArray}
-									renderItem={renderItemTagFriend}
-								/>
+									</VStack>
 
-							</VStack>
+									<Pressable h={32} justifyContent={"center"} onPress={() => setModalVisible(true)}>
+										<Feather name={"plus-circle"} color={theme.primary.text.indigo} size={20} />
+									</Pressable>
 
-							<Pressable h={32} justifyContent={"center"} onPress={() => setModalVisible(true)}>
-								<Feather name={"plus-circle"} color={theme.primary.text.indigo} size={20} />
-							</Pressable>
-
-						</HStack>
-
-
-					</FlatBlock> : <></>
-
-			}
-
-			<HStack mb={12} w={"100%"} justifyContent={"flex-end"}>
-				<GradientBorderButton w={96} color={theme.primary.text.purple} title={hasFellow? "移除同行" : "新增同行"}
-				                      onPress={() => setHasFellow(prev => !prev)} />
-			</HStack>
+								</HStack>
 
 
-			<Block mt={36} pl={24} pr={18} mb={36} borderRadius={18} fd={"row"} h={64} sc={"#9e66ff"}
-			       bdc={theme.primary.text.purple}
-			       ai={"center"}
-			       jc={"space-between"}>
+							</FlatBlock> : <></>
 
-				<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-					開始紀錄旅程！
-				</Text>
-
-				<GradientButton w={100} h={34} title={"建立旅程"} onPress={() => {
-
-					if(tripName === "" || tripDescription === ""){
-						addToast("資料不完整。" )
-						return
 					}
 
-					dispatch(setCurrentTrip(tripObject))
-					dispatch(pushTrip(tripObject))
-
-					apiRequest("post", `/api/travelope/new-trip/${account.info.id}`, tripObject)
-
-					navigation.navigate("CurrentTrip")
-
-				}} />
-
-			</Block>
+					<HStack mb={12} w={"100%"} justifyContent={"flex-end"}>
+						<GradientBorderButton w={96} color={theme.primary.text.purple} title={hasFellow? "移除同行" : "新增同行"}
+						                      onPress={() => setHasFellow(prev => !prev)} />
+					</HStack>
 
 
+					<Block mt={36} pl={24} pr={18} mb={36} borderRadius={18} fd={"row"} h={64} sc={"#9e66ff"}
+					       bdc={theme.primary.text.purple}
+					       ai={"center"}
+					       jc={"space-between"}>
+
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+							開始紀錄旅程！
+						</Text>
+
+						<GradientButton w={100} h={34} title={"建立旅程"} onPress={() => {
+
+							if (tripName === "" || tripDescription === "") {
+								addToast("資料不完整。")
+								return
+							}
+
+							dispatch(pushTrip(tripObject))
+
+							apiRequest("post", `/api/travelope/new-trip/${account.info.id}`, tripObject)
+
+							navigation.navigate("CurrentTrip")
+
+						}} />
+
+					</Block>
+
+
+				</Pressable>
 		</LayoutBase>
 	)
 }

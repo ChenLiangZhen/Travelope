@@ -9,7 +9,7 @@ import AppHeader from "./src/components/Header"
 import SplashScreen from "./src/screens/SplashScreen"
 import { WIDTH } from "./src/Util"
 import CurrentTrip from "./src/screens/trip/CurrentTrip"
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { LogBox, View } from "react-native"
 import TripOverview from "./src/screens/trip/TripOverview"
 import MemEnvelope from "./src/screens/envelope/MemEnvelope"
@@ -17,12 +17,13 @@ import TripPostcard from "./src/screens/TripPostcard"
 import MyZone from "./src/screens/MyZone"
 import Settings from "./src/screens/Settings"
 import { store } from "./src/globalstate/store"
-import { Provider } from "react-redux"
+import { Provider, useSelector } from "react-redux"
 import NewTrip from "./src/screens/trip/NewTrip"
 import { SSRProvider } from "react-aria"
 import RNFS from "react-native-fs"
 import NewNote from "./src/screens/trip/NewNote"
 import TripOnMap from "./src/screens/trip/TripOnMap"
+import { selectData } from "./src/globalstate/dataSlice"
 
 LogBox.ignoreLogs(["Require cycle"])
 
@@ -248,6 +249,14 @@ const StackNavigator = () => {
 const DrawerNavigator = () => {
 
 	const insets = useSafeAreaInsets()
+	const accountData = useSelector(selectData)
+	const [activeTrip, setActiveTrip] = useState()
+
+	useEffect(()=> {
+		console.log("refresh side list")
+		let trip = accountData.trips.find(item => item.isActive === true)
+		trip? setActiveTrip(trip) : setActiveTrip(null)
+	})
 
 	useEffect(() => { // ＡＰＰ整體初始設定
 
@@ -304,18 +313,21 @@ const DrawerNavigator = () => {
 						        bg={"#946aff"}
 						/>
 
-						<Pressable onPress={() => {
-							navigation.navigate("CurrentTrip")
-						}}
-						           w={WIDTH / 2} flexDirection={"row"} justifyContent={"flex-end"} px={20} py={8}>
-							<Text fontWeight={state.index == 1? "bold" : "normal"}
-							      fontSize={state.index == 1? 18 : 17}
-							      color={"#6168ea"}
+						{
+							activeTrip? 	<Pressable onPress={() => {
+								navigation.navigate("CurrentTrip")
+							}}
+							                        w={WIDTH / 2} flexDirection={"row"} justifyContent={"flex-end"} px={20} py={8}>
+								<Text fontWeight={state.index == 1? "bold" : "normal"}
+								      fontSize={state.index == 1? 18 : 17}
+								      color={"#6168ea"}
 
-							>
-								目前旅程
-							</Text>
-						</Pressable>
+								>
+									目前旅程
+								</Text>
+							</Pressable> : <></>
+						}
+
 
 						<Pressable onPress={() => {
 							navigation.navigate("MemEnvelope")

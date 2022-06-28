@@ -1,31 +1,51 @@
 import React, { useEffect, useRef, useState } from "react"
 import LayoutBase from "../../components/LayoutBase"
 import FlatBlock from "../../components/FlatBlock"
-import {
-	HStack,
-	Input,
-	Modal,
-	Pressable,
-	ScrollView,
-	Text,
-	TextArea,
-	useTheme,
-	useToast,
-	View,
-	VStack,
-} from "native-base"
+import { HStack, Input, Modal, Pressable, ScrollView, Text, useTheme, useToast } from "native-base"
 import Block from "../../components/Block"
 import DatePicker from "react-native-date-picker"
 import Feather from "react-native-vector-icons/Feather"
 import { GradientBorderButton, GradientButton } from "../../components/GradientButton"
 import { selectAccount } from "../../globalstate/accountSlice"
-import { FlatList, Keyboard } from "react-native"
+import { FlatList, Image, Keyboard } from "react-native"
 import { HEIGHT, WIDTH } from "../../Util"
 import { useDispatch, useSelector } from "react-redux"
-import { appleAuth } from "@invertase/react-native-apple-authentication"
-import { pushTrip, pushTripNote, selectData, setCurrentTrip } from "../../globalstate/dataSlice"
+import { pushTripNote, selectData } from "../../globalstate/dataSlice"
 import { apiRequest, geocodingRequest } from "../../apis/api"
 import Geolocation from "react-native-geolocation-service"
+import ImagePicker from "react-native-image-crop-picker"
+import { uploadImageInit } from "../../apis/fileManager"
+import RNFS from "react-native-fs"
+
+
+const ImageItem = (props) => {
+
+	const accountData = useSelector(selectData)
+	const account = useSelector(selectAccount)
+
+	const theme = useTheme().colors
+	useEffect(() => {
+		console.log("this is props: " + JSON.stringify(props))
+	}, [])
+
+	return (
+		<HStack mr={8} borderRadius={14} borderColor={theme.primary.text.purple} p={1} borderWidth={2}>
+			<Image
+
+				style={{
+					borderWidth: 1,
+					height: 68,
+					width: 68,
+					borderRadius: 12,
+
+				}}
+
+				alt={"image"}
+				source={{ uri: props.props.uri }}
+			/>
+		</HStack>
+	)
+}
 
 const NewTrip = ({ navigation }) => {
 
@@ -41,6 +61,12 @@ const NewTrip = ({ navigation }) => {
 	const [noteLocation, setNoteLocation] = useState({})
 	const [codedLocation, setCodedLocation] = useState("")
 	const [namedLocation, setNamedLocation] = useState("")
+
+	const [hasImage, setHasImage] = useState(false)
+	const [hasMood, setHasMood] = useState(false)
+
+	const [imageList, setImageList] = useState([])
+	const [mood, setMood] = useState()
 
 	const [noteObject, setNoteObject] = useState({})
 
@@ -71,6 +97,8 @@ const NewTrip = ({ navigation }) => {
 
 	}
 
+	const renderItemImage = props => <ImageItem props={props.item} />
+
 	useEffect(() => {
 
 		getLocation()
@@ -78,28 +106,23 @@ const NewTrip = ({ navigation }) => {
 
 	useEffect(() => {
 
-		console.log(noteLocation)
-	}, [noteLocation])
-
-	useEffect(() => {
-
 		setNoteObject({
 
-			noteID: ""+ date.getTime(),
+			noteID: "" + date.getTime(),
 			recordTime: date,
 			title: noteTitle,
 			content: noteContent,
-			imageKey: [],
+
+			namedLocation: namedLocation,
+			codedLocation: codedLocation,
+
+			imageKey: imageList,
 
 			lon: noteLocation.lon,
 			lat: noteLocation.lat,
 		})
 
-	}, [noteTitle, noteContent])
-
-	useEffect(()=> {
-		console.log(accountData.trips)
-	},[accountData])
+	}, [noteTitle, noteContent, namedLocation, codedLocation])
 
 	function closeInfoToast() {
 		if (toastInfoRef.current) {
@@ -122,13 +145,38 @@ const NewTrip = ({ navigation }) => {
 
 	const ToastInfo = (info) => {
 		return (
-			<HStack
 
+			<HStack
 				alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.indigo} w={WIDTH * .9} h={64}
 				borderRadius={16} px={24} mb={5}>
 				<Text fontWeight={"bold"} fontSize={16} color={"white"}>{info}</Text>
 			</HStack>
 		)
+	}
+
+	const updateImage = async () => {
+
+		ImagePicker.openPicker({
+			width: 512,
+			height: 512,
+			mediaType: "photo",
+			cropping: true,
+
+		}).then(async image => {
+
+			console.log("Setting profile image...")
+
+			const accountID = account.info.id
+			const URI = await uploadImageInit(image, accountID)
+
+			setImageList((prev) => [...prev, { uri: URI }])
+
+			// uploadProfilePicture(account.info.id, account.info.id, URI)
+
+			// apiRequest("put", "/api/travelope/update-user-has-picture", {
+			// 	id: accountID,
+			// })
+		})
 	}
 
 	return (
@@ -179,11 +227,79 @@ const NewTrip = ({ navigation }) => {
 				}}
 			/>
 
-
 			<ScrollView
 				showsVerticalScrollIndicator={false}
 				flex={1}
 			>
+
+				{/*<KeyboardAvoidingView flex={1} pb={400}>*/}
+
+				<HStack justifyContent={"flex-end"}>
+
+
+					{hasImage?
+						<GradientButton w={72} color={"white"} title={"照片"} onPress={() => {
+
+							setHasImage(prev => !prev)
+						}}
+						/> :
+						<GradientBorderButton w={72} color={theme.primary.text.purple} title={"照片"} onPress={() => {
+
+							setHasImage(prev => !prev)
+						}}
+						/>
+					}
+
+					{hasMood?
+						<GradientButton ml={8} w={72} color={"white"} title={"心情"} onPress={() => {
+
+							setHasImage(prev => !prev)
+						}}
+						/> :
+						<GradientBorderButton ml={8} w={72} color={theme.primary.text.purple} title={"心情"} onPress={() => {
+
+							setHasImage(prev => !prev)
+						}}
+						/>
+					}
+
+				</HStack>
+
+				{hasImage?
+
+					<HStack w={"100%"} mt={16} alignItems={"center"} justifyContent={"flex-end"}>
+
+						<FlatList
+							inverted
+							horizontal={true}
+							// keyExtractor={item => item.uri}
+							data={imageList}
+							renderItem={renderItemImage}
+						/>
+
+						<Pressable
+
+							onPress={() => {
+								updateImage()
+							}}
+
+							h={72}
+							w={72}
+							ml={8}
+							flexDirection={"row"}
+							justifyContent={"center"}
+							alignItems={"center"}
+							borderRadius={12}
+							borderStyle={"dashed"}
+							borderWidth={2}
+							borderColor={theme.primary.placeholder.indigo}
+						>
+
+							<Feather name={"image"} size={22} color={theme.primary.placeholder.indigo} />
+
+						</Pressable>
+					</HStack> : <></>
+				}
 
 				<Pressable onPress={() => Keyboard.dismiss()}>
 
@@ -210,7 +326,7 @@ const NewTrip = ({ navigation }) => {
 						borderRadius={16}
 						fontWeight={"bold"}
 						h={48}
-						mt={12}
+						mt={24}
 						mb={16}
 						px={14}
 						py={12}
@@ -289,7 +405,7 @@ const NewTrip = ({ navigation }) => {
 								bg: theme.primary.bg.purple,
 							}}
 							value={namedLocation}
-							onChangeText={(location)=> setNamedLocation(location)}
+							onChangeText={(location) => setNamedLocation(location)}
 							selectionColor={theme.primary.text.purple}
 							placeholderTextColor={theme.primary.placeholder.indigo}
 							borderColor={"transparent"}
@@ -430,28 +546,30 @@ const NewTrip = ({ navigation }) => {
 							寫完了嗎？
 						</Text>
 
-						<GradientButton w={100} h={34} title={"儲存遊記"} onPress={() => {
+						<GradientBorderButton w={72} color={theme.primary.text.purple} title={"取消"} onPress={() => {
+
+							navigation.navigate("CurrentTrip")
+						}}
+						/>
+
+						<GradientButton ml={8} w={96} h={34} title={"儲存遊記"} onPress={() => {
 
 							dispatch(pushTripNote(noteObject))
 
 							apiRequest("post", `/api/travelope/new-trip-note/${account.info.id}`, noteObject)
 
-							// navigation.navigate("CurrentTrip")
+							navigation.navigate("CurrentTrip")
 
 						}} />
 
 					</Block>
 
 				</Pressable>
+				{/*</KeyboardAvoidingView>*/}
+
+				<HStack h={384}></HStack>
 
 			</ScrollView>
-
-
-
-
-
-			{/*</Pressable>*/}
-
 
 		</LayoutBase>
 	)

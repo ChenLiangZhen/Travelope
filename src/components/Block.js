@@ -2,7 +2,7 @@ import { HStack, Text, useTheme, VStack } from "native-base"
 import React from "react";
 
 
-const Block = ({children, bdc, bgc, sc, jc, ai, fd, ...props}) => {
+const Block = ({children, bdc, bgc, sc, jc, ai, fd, px, ...props}) => {
 
 	const theme = useTheme().colors
 
@@ -10,7 +10,7 @@ const Block = ({children, bdc, bgc, sc, jc, ai, fd, ...props}) => {
 
 		<VStack
 
-			px={16}
+			px={px? px : 16}
 			mb={24}
 
 			borderWidth={2}

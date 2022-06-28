@@ -114,9 +114,14 @@ const dataSlice = createSlice({
 			state.trips[state.trips.length - 1].tripNotes.push(action.payload)
 		},
 
-		// setInactive(state) {
-		// 	state.currentTrip.
-		// }
+		delTripNote(state, action) {
+			let targetIndex = state.trips[state.trips.length - 1].tripNotes.findIndex(trip => trip.recordTime === action.payload)
+			state.trips[state.trips.length - 1].tripNotes.splice(targetIndex, 1)
+		},
+
+		setInactive(state) {
+			state.trips[state.trips.length - 1].isActive = false
+		},
 	},
 })
 
@@ -125,8 +130,10 @@ export const {
 
 	purgeAccountData,
 	setTrips,
+	setInactive,
 	pushTrip,
 	pushTripNote,
+	delTripNote,
 	setCurrentTrip,
 } = dataSlice.actions
 export default dataSlice.reducer
