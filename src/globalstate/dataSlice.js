@@ -120,7 +120,7 @@ const dataSlice = createSlice({
 		},
 
 		setInactive(state) {
-			state.trips[state.trips.length - 1].isActive = false
+			state.trips[state.trips.length - 1].isA656555t55ctive = false
 		},
 	},
 })

@@ -278,7 +278,7 @@ const DrawerNavigator = () => {
 
 		<Drawer.Navigator
 
-			initialRouteName={"MainScreen"}
+			initialRouteName={"MemEnvelope"}
 
 			backBehavior="history"
 			drawerContent={({ state, navigation, descriptors }) => {

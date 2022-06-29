@@ -29,13 +29,13 @@ const ImageItem = (props) => {
 	}, [])
 
 	return (
-		<HStack mr={8} borderRadius={14} borderColor={theme.primary.text.purple} p={1} borderWidth={2}>
+		<HStack mr={8} borderRadius={14} borderColor={theme.primary.text.purple} p={2} borderWidth={2}>
 			<Image
 
 				style={{
-					borderWidth: 1,
-					height: 68,
-					width: 68,
+
+					height: 66,
+					width: 66,
 					borderRadius: 12,
 
 				}}
@@ -47,8 +47,9 @@ const ImageItem = (props) => {
 	)
 }
 
-const NewTrip = ({ navigation }) => {
+const NewTrip = ({ navigation, route }) => {
 
+	// const { title, content, noteLoc, codeLoc, hasImage } = route.params
 	const theme = useTheme().colors
 
 	const [noteTitle, setNoteTitle] = useState("")
@@ -115,6 +116,9 @@ const NewTrip = ({ navigation }) => {
 
 			namedLocation: namedLocation,
 			codedLocation: codedLocation,
+
+			hasImage : hasImage,
+			hasMood : hasMood,
 
 			imageKey: imageList,
 
