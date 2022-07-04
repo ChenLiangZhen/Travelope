@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import LayoutBase from "../../components/LayoutBase"
 import { selectAccount } from "../../globalstate/accountSlice"
 import { useDispatch, useSelector } from "react-redux"
@@ -17,9 +17,11 @@ import {
 	VStack,
 } from "native-base"
 import Feather from "react-native-vector-icons/Feather"
+import { useFocusEffect } from "@react-navigation/native"
+import ViewShot from "react-native-view-shot"
 
 
-const MemEnvelope = ({route}) => {
+const MemEnvelope = ({navigation, route}) => {
 
 	// const { tripID } = route.params
 
@@ -32,9 +34,43 @@ const MemEnvelope = ({route}) => {
 	const [paperStyle, setPaperStyle] = useState("")
 	const [fontFamily, setFontFamily] = useState("")
 
+	const [imageURI, setImageURI] = useState()
+	const [imageReady, setImageReady] = useState()
+
+	const ref = useRef()
+
+	useFocusEffect(
+		React.useCallback(() => {
+
+			ref.current.capture().then(uri => {
+				setImageURI(uri)
+				console.log("ViewShotCompleted.")
+			})
+
+		}, []),
+	)
+
+	useFocusEffect(
+		React.useCallback(async() => {
+
+			if(imageURI !== ""){
+
+				console.log(imageURI)
+				setImageReady(true)
+
+				await new Promise(resolve => setTimeout(resolve, 1500))
+				navigation.navigate("TripPostcard", { uri: imageURI } )
+			}
+
+		}, [imageURI]),
+	)
+
 	return (
 
 		<LayoutBase>
+
+			<ViewShot ref={ref} options={{ fileName: "Your-File-Name", format: "jpg", quality: 0.9 }}>
+
 
 			<HStack h={48} justifyContent={"flex-end"}>
 
@@ -223,6 +259,8 @@ const MemEnvelope = ({route}) => {
 				</HStack>
 
 			</VStack>
+
+			</ViewShot>
 
 		</LayoutBase>
 	)

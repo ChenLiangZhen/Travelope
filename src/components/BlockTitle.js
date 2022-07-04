@@ -5,7 +5,7 @@ import LinearGradient from "react-native-linear-gradient";
 import MaskedView from "@react-native-masked-view/masked-view";
 import { useNavigation } from "@react-navigation/native";
 
-const BlockTitle = ({text, color, icon, onPress, rightElement}) => {
+const BlockTitle = ({text, color, icon, onPress, rightElement, ...props}) => {
 
 	const navigation = useNavigation()
 
@@ -17,6 +17,7 @@ const BlockTitle = ({text, color, icon, onPress, rightElement}) => {
 		        px={4}
 		        justifyContent={"space-between"}
 		        alignItems={"center"}
+		        {...props}
 		>
 			{/*<MaskedView*/}
 			{/*	style={{ width: 200, justifyContent: "center", alignItems: "center"}}*/}

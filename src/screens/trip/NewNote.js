@@ -16,6 +16,7 @@ import Geolocation from "react-native-geolocation-service"
 import ImagePicker from "react-native-image-crop-picker"
 import { uploadImageInit } from "../../apis/fileManager"
 import RNFS from "react-native-fs"
+import {useFocusEffect} from "@react-navigation/native";
 
 
 const ImageItem = (props) => {
@@ -27,6 +28,8 @@ const ImageItem = (props) => {
 	useEffect(() => {
 		console.log("this is props: " + JSON.stringify(props))
 	}, [])
+
+
 
 	return (
 		<HStack mr={8} borderRadius={14} borderColor={theme.primary.text.purple} p={2} borderWidth={2}>
@@ -47,7 +50,13 @@ const ImageItem = (props) => {
 	)
 }
 
-const NewTrip = ({ navigation, route }) => {
+const NewNote = ({ navigation, route }) => {
+
+	const param = { item : {} }
+
+	{
+		route.params? param.item = route.params.item : null
+	}
 
 	// const { title, content, noteLoc, codeLoc, hasImage } = route.params
 	const theme = useTheme().colors
@@ -105,14 +114,30 @@ const NewTrip = ({ navigation, route }) => {
 		getLocation()
 	}, [])
 
+	useFocusEffect(
+
+		React.useCallback(() => {
+
+			setNoteTitle("")
+			setNoteObject({})
+			setNoteContent("")
+			setNoteLocation("")
+			setNamedLocation("")
+			setCodedLocation("")
+			setImageList([])
+
+		}, []),
+	)
+
 	useEffect(() => {
 
 		setNoteObject({
 
 			noteID: "" + date.getTime(),
+
 			recordTime: date,
-			title: noteTitle,
-			content: noteContent,
+			noteTitle: noteTitle,
+			noteContent: noteContent,
 
 			namedLocation: namedLocation,
 			codedLocation: codedLocation,
@@ -120,7 +145,7 @@ const NewTrip = ({ navigation, route }) => {
 			hasImage : hasImage,
 			hasMood : hasMood,
 
-			imageKey: imageList,
+			imageList: imageList,
 
 			lon: noteLocation.lon,
 			lat: noteLocation.lat,
@@ -465,7 +490,7 @@ const NewTrip = ({ navigation, route }) => {
 								color: theme.primary.text.purple,
 								bg: theme.primary.bg.purple,
 							}}
-							value={codedLocation}
+							// value={codedLocation}
 							selectionColor={theme.primary.text.purple}
 							placeholderTextColor={theme.primary.placeholder.indigo}
 							borderColor={"transparent"}
@@ -579,4 +604,4 @@ const NewTrip = ({ navigation, route }) => {
 	)
 }
 
-export default NewTrip
+export default NewNote

@@ -1,18 +1,19 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, {useCallback, useEffect, useRef, useState} from "react"
 import LayoutBase from "../../components/LayoutBase"
 import FlatBlock from "../../components/FlatBlock"
-import { HStack, Pressable, Text, useTheme, View } from "native-base"
+import {HStack, Pressable, Text, useTheme, View} from "native-base"
 import Feather from "react-native-vector-icons/Feather"
-import { GradientBorderButton, GradientButton } from "../../components/GradientButton"
+import {GradientBorderButton, GradientButton} from "../../components/GradientButton"
 import Block from "../../components/Block"
-import { useDispatch, useSelector } from "react-redux"
-import { selectAccount } from "../../globalstate/accountSlice"
-import { FlatList } from "react-native"
-import SwipeableItem, { useSwipeableItemParams } from "react-native-swipeable-item"
-import { StyleSheet, TouchableOpacity } from "react-native"
-import Animated, { useAnimatedStyle } from "react-native-reanimated"
-import { delTripNote, selectData, setInactive } from "../../globalstate/dataSlice"
-import { useFocusEffect, useNavigation } from "@react-navigation/native"
+import {useDispatch, useSelector} from "react-redux"
+import {selectAccount} from "../../globalstate/accountSlice"
+import {FlatList} from "react-native"
+import SwipeableItem, {useSwipeableItemParams} from "react-native-swipeable-item"
+import {StyleSheet, TouchableOpacity} from "react-native"
+import Animated, {useAnimatedStyle} from "react-native-reanimated"
+import {delTripNote, selectData, setInactive} from "../../globalstate/dataSlice"
+import {useFocusEffect, useNavigation} from "@react-navigation/native"
+import {config, useSpring, animated} from "@react-spring/native"
 
 const styles = StyleSheet.create({
 	container: {
@@ -39,11 +40,11 @@ const styles = StyleSheet.create({
 const OVERSWIPE_DIST = 0
 const NUM_ITEMS = 20
 
-const UnderlayLeft = ({ drag }: { drag: () => void }) => {
+const UnderlayLeft = ({drag}: { drag: () => void }) => {
 
 	const theme = useTheme().colors
 	const dispatch = useDispatch()
-	const { item, percentOpen } = useSwipeableItemParams()
+	const {item, percentOpen} = useSwipeableItemParams()
 
 	const animStyle = useAnimatedStyle(
 		() => ({
@@ -58,13 +59,13 @@ const UnderlayLeft = ({ drag }: { drag: () => void }) => {
 			style={[styles.row, styles.underlayLeft, animStyle]} // Fade in on open
 		>
 
-			<Block px={2} h={72} w={58} borderWidth={1} borderColor={theme.primary.text.indigo}>
+			<Block px={2} h={72} w={58} sc={"#fff"} borderWidth={1} borderColor={theme.primary.text.indigo}>
 
 				<Pressable flex={1} w={52} justifyContent={"center"} alignItems={"center"} onPress={() => {
 					dispatch(delTripNote(item.recordTime))
 				}}>
 
-					<Feather size={20} name={"trash"} color={theme.primary.text.indigo} />
+					<Feather size={20} name={"trash"} color={theme.primary.text.indigo}/>
 				</Pressable>
 
 			</Block>
@@ -73,11 +74,13 @@ const UnderlayLeft = ({ drag }: { drag: () => void }) => {
 	)
 }
 
-function RowItem({ item, itemRefs, drag }) {
+function RowItem({item, itemRefs, drag}) {
 
 	const theme = useTheme().colors
+	const navigation = useNavigation()
 
 	return (
+
 		<SwipeableItem
 
 			key={item.id}
@@ -87,7 +90,7 @@ function RowItem({ item, itemRefs, drag }) {
 					itemRefs.current.set(item.id, ref)
 				}
 			}}
-			onChange={({ open }) => {
+			onChange={({open}) => {
 				if (open) {
 					// Close all other open items
 					[...itemRefs.current.entries()].forEach(([key, ref]) => {
@@ -97,14 +100,27 @@ function RowItem({ item, itemRefs, drag }) {
 			}}
 
 			overSwipe={OVERSWIPE_DIST}
-			renderUnderlayLeft={() => <UnderlayLeft drag={drag} />}
+			renderUnderlayLeft={() => <UnderlayLeft drag={drag}/>}
 			snapPointsLeft={[70]}
 		>
-			<Block justifyContent={"flex-start"} alignItems={"center"} flexDirection={"row"} borderWidth={1} h={72}>
+			<Block sc={"#fff"} justifyContent={"flex-start"} alignItems={"center"} flexDirection={"row"}
+			       bdc={theme.primary.placeholder.purple} borderWidth={2} h={72}>
 				<Pressable flex={1} flexDirection={"row"} justifyContent={"space-between"} flex={1}
-				           onPress={() => console.log("eawgfw")} onPressIn={drag}>
+
+				           onPress={() => {
+					           navigation.navigate("NewNote", { item: item })
+				           }}
+
+				           onPressIn={drag}
+				>
 					<Text fontSize={16} fontWeight={"bold"} color={theme.primary.text.purple}>{item.title}</Text>
-					<Text fontSize={16} fontWeight={"bold"} color={theme.primary.text.purple}>{item.namedLocation}</Text>
+
+					<HStack alignItems={"center"}>
+						<Feather name={"map-pin"} color={theme.primary.text.purple} size={18}/>
+						<Text ml={4} fontSize={16} fontWeight={"bold"}
+						      color={theme.primary.text.purple}>{item.namedLocation}</Text>
+					</HStack>
+
 					{/*<Text fontSize={16} fontWeight={"bold"} color={theme.primary.text.purple}>{"" + (new Date(item.recordTime).getMonth() + 1) + "月" + new Date(item.recordTime).getDate() + "日" + new Date(item.recordTime).getHours() + new Date(item.recordTime).getMinutes()}</Text>*/}
 				</Pressable>
 			</Block>
@@ -112,7 +128,7 @@ function RowItem({ item, itemRefs, drag }) {
 	)
 }
 
-const CurrentTrip = ({ navigation }) => {
+const CurrentTrip = () => {
 
 	const theme = useTheme().colors
 	const account = useSelector(selectAccount)
@@ -124,36 +140,80 @@ const CurrentTrip = ({ navigation }) => {
 
 	const dispatch = useDispatch()
 
+	const anim = useSpring({
+		loop: false,
+		to: {opacity: 1, color: '#ffaaee'},
+		from: {opacity: 0, color: 'red'},
+	})
+
+	//ANIMATION CONTROLLER
+
+	const navigation = useNavigation()
+
+	// const [present, setPresent] = useState(false)
+	//
+	// const anim = useSpring({
+	// 	opacity: present ? 1 : 0,
+	// 	top: present ? 0 : 50,
+	// 	delay: 0,
+	// 	config: config.slow
+	// })
+	//
+	// useEffect(() => {
+	//
+	// 	console.log("Navigation State Changed!")
+	// 	const unsubscribe = navigation.addListener('drawerItemPress', (e) => {
+	// 		// Prevent default behavior
+	// 		e.preventDefault();
+	//
+	// 		setPresent(false)
+	// 		console.log("RESET!!!")
+	// 	});
+	//
+	// 	return unsubscribe;
+	// }, []);
+	//
+	// useFocusEffect(
+	// 	React.useCallback(() => {
+	//
+	// 		setPresent(true)
+	//
+	// 	}, ),
+	// )
+
+	// ANIMATION CONTROLLER
+
 	useFocusEffect(
 		React.useCallback(() => {
 
 			let trip = accountData.trips.find(item => item.isActive === true)
-			trip? setActiveTrip(trip) : setActiveTrip(null)
+			trip ? setActiveTrip(trip) : setActiveTrip(null)
 
 		}, [accountData]),
 	)
 
 	const renderItem = useCallback((params) => {
-		return <RowItem {...params} itemRefs={itemRefs} />
+		return <RowItem {...params} itemRefs={itemRefs}/>
 	}, [])
 
 	return (
 
+
 		<LayoutBase>
 
-			{activeTrip?
+
+			{activeTrip ?
 				<>
-					<Block h={132} w={"100%"} py={16} flexDirection={"column"} justifyContent={"space-between"}>
 
-						<HStack h={32} w={"100%"} alignItems={"center"} justifyContent={"space-between"}>
+					<animated.View style={anim}>
 
-							<HStack flex={1} mr={24} alignItems={"center"}>
-								<Feather name={"send"} size={20} color={theme.primary.text.purple} />
-								<Text numberOfLines={1} fontWeight={"bold"} ml={8} fontSize={17}
-								      color={theme.primary.text.purple}>{activeTrip.tripName}</Text>
-							</HStack>
+						<HStack h={32} w={"100%"} alignItems={"center"} mb={12} justifyContent={"flex-end"}>
 
-							<GradientBorderButton w={72} title={"地圖"} color={theme.primary.text.purple} onPress={() => navigation.navigate("TripOnMap")} />
+							<GradientBorderButton
+								w={112} title={"地圖檢視"}
+								onPress={() => navigation.navigate("TripOnMap")} flexDrection={"row"} ml={8}
+								icon={"map"} iconSize={16} iconColor={theme.primary.text.purple}
+								color={theme.primary.text.purple} title={"地圖檢視"}/>
 
 							<GradientButton //結束旅程並設定此旅程為inactive。
 								onPress={() => {
@@ -161,64 +221,94 @@ const CurrentTrip = ({ navigation }) => {
 									console.log("setInactive")
 									dispatch(setInactive())
 
-									navigation.navigate("MainScreen")
+									// await new Promise(resolve => setTimeout(resolve, 1500))
 
+									navigation.navigate("MainScreen")
 								}}
+
 								flexDrection={"row"} ml={8}
 								icon={"x-circle"} iconSize={18} iconColor={"white"} w={80}
 								color={"white"} title={"結束"}/>
 
 						</HStack>
 
-						{/*<View w={"100%"} h={1} bg={theme.primary.placeholder.indigo} />*/}
+						<Block h={132} w={"100%"} py={16} flexDirection={"column"} justifyContent={"space-between"}>
 
-						<HStack h={48} px={8} w={"100%"} borderRadius={12} alignItems={"center"} borderWidth={2}
-						        borderColor={theme.primary.placeholder.purple} borderStyle={"dotted"} bg={theme.primary.bg.indigo}>
-							<Text numberOfLines={1} ml={8} color={theme.primary.text.purple}
-							      fontSize={16}>{activeTrip.tripDescription}</Text>
-						</HStack>
+							<HStack h={32} w={"100%"} alignItems={"center"} justifyContent={"space-between"}>
 
-					</Block>
+								<HStack flex={1} mr={24} alignItems={"center"}>
+									<Feather name={"send"} size={20} color={theme.primary.text.purple}/>
+									<Text numberOfLines={1} fontWeight={"bold"} ml={8} fontSize={17}
+									      color={theme.primary.text.purple}>{activeTrip.tripName}</Text>
+								</HStack>
 
-					{/*<HStack px={4} mb={16}>*/}
+								<GradientBorderButton //結束旅程並設定此旅程為inactive。
+									onPress={() => {
+
+										console.log("setInactive")
+										dispatch(setInactive())
+
+										navigation.navigate("MainScreen")
+
+									}}
+									flexDrection={"row"} ml={8}
+									icon={"align-left"} iconSize={18} iconColor={theme.primary.text.purple} w={80}
+									color={theme.primary.text.purple} title={"資訊"}/>
+
+							</HStack>
+
+							{/*<View w={"100%"} h={1} bg={theme.primary.placeholder.indigo} />*/}
+
+							<HStack h={48} px={8} w={"100%"} borderRadius={12} alignItems={"center"} borderWidth={2}
+							        borderColor={theme.primary.placeholder.purple} borderStyle={"dotted"}
+							        bg={theme.primary.bg.indigo}>
+								<Text numberOfLines={1} ml={8} color={theme.primary.text.purple}
+								      fontSize={14}>{activeTrip.tripDescription}</Text>
+							</HStack>
+
+						</Block>
+
+						{/*<HStack px={4} mb={16}>*/}
 
 
-					{/*</HStack>*/}
+						{/*</HStack>*/}
 
-					<Pressable
+						<Pressable
 
-						onPress={() => navigation.navigate("NewNote")}
+							onPress={() => navigation.navigate("NewNote")}
 
-						h={72}
-						w={"100%"}
-						mb={32}
-						flexDirection={"row"}
-						justifyContent={"center"}
-						alignItems={"center"}
-						borderRadius={18}
-						borderStyle={"dashed"}
-						borderWidth={2}
-						borderColor={theme.primary.placeholder.indigo}
-					>
+							h={72}
+							w={"100%"}
+							mb={32}
+							flexDirection={"row"}
+							justifyContent={"center"}
+							alignItems={"center"}
+							borderRadius={18}
+							borderStyle={"dashed"}
+							borderWidth={2}
+							borderColor={theme.primary.placeholder.indigo}
+						>
 
-						<Feather name={"plus-circle"} size={22} color={theme.primary.placeholder.indigo} />
+							<Feather name={"plus-circle"} size={22} color={theme.primary.placeholder.indigo}/>
 
-						<Text fontSize={16} fontWeight={"bold"} letterSpacing={1} color={theme.primary.placeholder.indigo} ml={8}>
-							寫遊記
-						</Text>
+							<Text fontSize={16} fontWeight={"bold"} letterSpacing={1} color={theme.primary.placeholder.indigo}
+							      ml={8}>
+								寫遊記
+							</Text>
 
-					</Pressable>
+						</Pressable>
 
-					<FlatList
+						<FlatList
 
-						style={{
-							height: 100,
-						}}
+							style={{}}
 
-						renderItem={renderItem}
-						data={activeTrip.tripNotes}
-						keyExtractor={item => item.key}
-					/>
+							renderItem={renderItem}
+							data={activeTrip.tripNotes}
+							keyExtractor={item => item.key}
+						/>
+
+					</animated.View>
+
 				</>
 
 				:
@@ -231,6 +321,8 @@ const CurrentTrip = ({ navigation }) => {
 
 
 		</LayoutBase>
+
+
 	)
 }
 

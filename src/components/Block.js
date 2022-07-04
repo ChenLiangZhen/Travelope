@@ -18,7 +18,7 @@ const Block = ({children, bdc, bgc, sc, jc, ai, fd, px, ...props}) => {
 
 			bg={ bgc? bgc : "#fff" }
 			borderColor={ bdc? bdc : theme.primary.text.purple }
-			shadowColor={sc? sc : "#908dff"}
+			shadowColor={sc? sc : theme.primary.text.purple}
 			shadowRadius={0}
 			shadowOpacity={.4}
 			shadowOffset={{

@@ -41,8 +41,11 @@ const TripOnMap = () => {
 
 	const theme = useTheme().colors
 
+	// const [markerData, setMarkerData] = useState(accountData.)
+
 	const accountData = useSelector(selectData)
 	const account = useSelector(selectAccount)
+
 	const dispatch = useDispatch()
 
 	const [stationBike, setStationBike] = useState({
@@ -161,31 +164,16 @@ const TripOnMap = () => {
 
 		<SafeAreaView style={{ flex: 1}}>
 
-			<HStack bg={"transparent"} px={"5%"} justifyContent={"center"} h={48} w={"100%"} zIndex={100} position={"absolute"} top={60}>
-				<Block opacity={.8} flexDirection={"row"} justifyContent={"space-between"} px={14} alignItems={"center"} h={48} w={"100%"} borderRadius={18}>
+			<HStack bg={"transparent"} px={"5%"} justifyContent={"flex-end"} h={48} w={"100%"} zIndex={100} position={"absolute"} top={60}>
 
-					<HStack flex={1} alignItems={"center"}>
+				<Block flexDirection={"row"} justifyContent={"center"} alignItems={"center"} h={48} w={48} borderRadius={18}>
 
-						<Pressable mr={4} h={24} w={24} alignItems={"center"} justifyContent={"center"}>
-							<Feather name={"send"} color={theme.primary.text.purple} size={18}/>
-						</Pressable>
-
-						<Text noOfLines={1} letterSpacing={1} w={"60%"} fontSize={18} fontWeight={"bold"} color={theme.primary.text.purple}>
-							{/*{accountData.currentTrip.tripName}*/}
-							跟同學去宜蘭玩三天
-						</Text>
-
-					</HStack>
-
-					<Pressable h={24} w={24} alignItems={"center"} justifyContent={"center"}>
-						<Feather name={"arrow-left-circle"} color={theme.primary.text.purple} size={22}/>
-					</Pressable>
-
-					{/*<Pressable  h={24} w={24}>*/}
-					{/*	/!*<Feather name={"arrow-left-circle"} size={24}/>*!/*/}
-					{/*</Pressable>*/}
+				<Pressable h={24} w={24} alignItems={"center"} justifyContent={"center"}>
+					<Feather name={"arrow-left"} color={theme.primary.text.purple} size={24}/>
+				</Pressable>
 
 				</Block>
+
 			</HStack>
 
 				<Actionsheet
@@ -261,6 +249,7 @@ const TripOnMap = () => {
 								}}>
 									{"Latitude : " + station.lat}
 								</Text>
+
 								{station.type !== "mrt"?
 									<View style={{
 										borderRadius: 64,
@@ -314,7 +303,6 @@ const TripOnMap = () => {
 
 									: <></>}
 
-
 							</View>
 						</View>
 					</Actionsheet.Content>
@@ -323,7 +311,7 @@ const TripOnMap = () => {
 				<Box flex={1}>
 					<MapView
 						onRegionChangeComplete={onRegionChangeComplete}
-						customMapStyle={require("../../res/mapStyle.json")}
+						// customMapStyle={require("../../res/mapStyle.json")}
 						// provider={PROVIDER_GOOGLE}
 						// initialCamera={{ center: region, altitude: 2500 }}
 						// camera={{
@@ -335,9 +323,9 @@ const TripOnMap = () => {
 					// pitch: number;
 					// zoom: number;
 					// altitude: number;
-						userInterfaceStyle={"light"}
-						mapType={"mutedStandard"}
-						ref={mapRef}
+					// 	userInterfaceStyle={"light"}
+						// mapType={"mutedStandard"}
+						ref={ mapRef }
 						style={{ flex: 1 }}
 						// provider="apple"
 						// customMapStyle={mapStyle}

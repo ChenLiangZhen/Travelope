@@ -21,25 +21,26 @@ const TripsItem = ({ item }) => {
 	const theme = useTheme().colors
 
 	return (
-		<Block h={84} pl={10} flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"}>
+
+		<Block borderColor={theme.primary.placeholder.purple} sc={"white"} mb={12} h={64} pl={14} flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"}>
 
 			<HStack alignItems={"center"}>
-				<Feather name={"navigation-2"} color={theme.primary.placeholder.purple} size={36} />
+				<Feather name={"mail"} color={theme.primary.text.purple} size={32} />
 
 				<VStack ml={12} justifyContent={"center"} w={200}>
-					<Text noOfLines={1} mb={2} mr={16} fontSize={18} color={theme.primary.text.purple}
+					<Text noOfLines={1} mb={2} mr={16} fontSize={16} color={theme.primary.text.purple}
 					      fontWeight={"bold"}>{item.tripName} </Text>
-					<Text noOfLines={1} mr={16} fontSize={18} color={theme.primary.text.purple}
-					      fontWeight={"normal"}>{item.tripDescription}</Text>
+					{/*<Text noOfLines={1} mr={16} fontSize={14} fontWeight={"light"} color={theme.primary.text.purple}*/}
+					{/*      fontWeight={"normal"}>{item.tripDescription}</Text>*/}
 				</VStack>
 			</HStack>
 
-			<VStack borderRadius={12} w={68} bg={theme.primary.placeholder.indigo} h={60} alignItems={"center"}
+			<HStack borderRadius={12} w={64} bg={theme.primary.placeholder.indigo} h={42} alignItems={"center"}
 			        justifyContent={"center"}>
-				<Text fontSize={18} color={"white"} fontWeight={"bold"}> {new Date(item.startTime).getMonth() + 1 + "月"} </Text>
-				<Text fontSize={26} lineHeight={28} letterSpacing={2} color={"white"}
+				<Text fontSize={18} color={"white"} fontWeight={"bold"}> {new Date(item.startTime).getMonth() + 1 + " /"} </Text>
+				<Text fontSize={18} lineHeight={22} color={"white"}
 				      fontWeight={"bold"}> {new Date(item.startTime).getDate()} </Text>
-			</VStack>
+			</HStack>
 
 		</Block>
 	)
@@ -87,14 +88,11 @@ const MainScreen = ({ navigation }) => {
 						desc: res.data.weather[0].description,
 					})
 				})
-			console.log("located! " + JSON.stringify(res))
 
 			weatherForecastRequest(res.coords.longitude, res.coords.latitude)
 				.then(res => {
-					console.log(res.data)
 					setWeatherForecastData(res.data.daily)
 				})
-			console.log("located! " + JSON.stringify(res))
 
 		}, rej => console.log(rej))
 
@@ -115,18 +113,6 @@ const MainScreen = ({ navigation }) => {
 	useEffect(() => {
 
 	}, [location])
-
-
-	// useEffect(() => {
-	//   // on mount
-	//   ref.current.capture()
-	//     .then(uri => {
-	//       console.log("do something with ", uri);
-	//     })
-	//     .catch((e) => {
-	//       console.log(e)
-	//     })
-	// }, []);
 
 	useEffect(() => {
 		CameraRoll.getPhotos()
@@ -149,21 +135,21 @@ const MainScreen = ({ navigation }) => {
 						<HStack alignItems={"center"}>
 
 							<Feather name={"calendar"} size={20} color={theme.primary.text.purple} />
-							<Text ml={6} fontSize={20} color={theme.primary.text.purple}
+							<Text ml={6} fontSize={18} color={theme.primary.text.purple}
 							      fontWeight={"bold"}>{new Date().getMonth() + 1 + "月 "}</Text>
-							<Text fontSize={20} color={theme.primary.text.purple}
+							<Text fontSize={18} color={theme.primary.text.purple}
 							      fontWeight={"bold"}>{new Date().getDate() + "日"}</Text>
 
 						</HStack>
 
 						<HStack alignItems={"center"}>
 
-							<Feather name={"thermometer"} size={20} color={theme.primary.text.purple} />
+							<Feather name={"thermometer"} size={18} color={theme.primary.text.purple} />
 							<Text mr={16} fontSize={18} color={theme.primary.text.purple}
 							      fontWeight={"normal"}>{weatherData.temp + "°C"}</Text>
 
 							<Feather name={"cloud"} size={20} color={theme.primary.text.purple} />
-							<Text ml={6} fontSize={18} color={theme.primary.text.purple}
+							<Text ml={6} fontSize={16} color={theme.primary.text.purple}
 							      fontWeight={"normal"}>{weatherData.desc}</Text>
 
 						</HStack>
@@ -270,7 +256,7 @@ const MainScreen = ({ navigation }) => {
 				{/*<GradientButton w={100} h={34} title={"進入旅程"} />*/}
 			</Block>
 
-			<BlockTitle text={"目前的旅程"} icon={"play-circle"} rightElement={false} color={theme.primary.text.pink}/>
+			<BlockTitle pl={12}  borderRadius={18} text={"目前的旅程"} icon={"play-circle"} rightElement={false} color={theme.primary.text.pink}/>
 
 			{
 				activeTrip?
@@ -279,24 +265,23 @@ const MainScreen = ({ navigation }) => {
 						navigation.navigate("CurrentTrip")
 					}}>
 
-						<Block h={84} pl={10} flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"}>
+						<Block bdc={theme.primary.text.pink} sc={"#fff"} h={84} pl={12} flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"}>
 
 							<HStack alignItems={"center"}>
-								<Feather name={"navigation-2"} color={theme.primary.placeholder.purple} size={36} />
+								<Feather name={"navigation-2"} color={theme.primary.placeholder.pink} size={36} />
 
 								<VStack ml={12} justifyContent={"center"} w={200}>
-									<Text noOfLines={1} mb={2} mr={16} fontSize={18} color={theme.primary.text.purple}
+									<Text noOfLines={1} mb={2} mr={16} fontSize={16} color={theme.primary.text.pink}
 									      fontWeight={"bold"}>{activeTrip.tripName} </Text>
-									<Text noOfLines={1} mr={16} fontSize={18} color={theme.primary.text.purple}
+									<Text noOfLines={1} mr={16} fontSize={14} color={theme.primary.text.pink}
 									      fontWeight={"normal"}>{activeTrip.tripDescription}</Text>
 								</VStack>
 							</HStack>
 
-						<VStack borderRadius={12} w={68} bg={theme.primary.placeholder.indigo} h={60} alignItems={"center"}
-
-						        justifyContent={"center"}>
+							<VStack borderRadius={12} w={68} bg={theme.primary.placeholder.pink} h={60} alignItems={"center"}
+							        justifyContent={"center"}>
 								<Text fontSize={18} color={"white"} fontWeight={"bold"}> {new Date(activeTrip.startTime).getMonth() + 1 + "月"} </Text>
-								<Text fontSize={26} lineHeight={28} letterSpacing={2} color={"white"}
+								<Text fontSize={24} lineHeight={22} letterSpacing={2} color={"white"}
 								      fontWeight={"bold"}> {new Date(activeTrip.startTime).getDate()} </Text>
 							</VStack>
 
@@ -331,7 +316,7 @@ const MainScreen = ({ navigation }) => {
 					</Pressable>
 			}
 
-			<BlockTitle text={"歷史旅程"} icon={"compass"} rightElement={true} color={theme.primary.text.pink}/>
+			<BlockTitle text={"歷史旅程"} icon={"compass"} rightElement={true} color={theme.primary.text.purple}/>
 
 
 			<FlatList
@@ -339,12 +324,15 @@ const MainScreen = ({ navigation }) => {
 
 					<>
 
-						<VStack h={64} pl={40} w={"100%"} alignItems={"flex-start"} justifyContent={"center"}>
-							<Text fontSize={14} color={theme.primary.placeholder.purple}
-							      fontWeight={"bold"}>沒有更多紀錄囉！</Text>
-							<Text fontSize={14} color={theme.primary.placeholder.purple}
-							      fontWeight={"bold"}>出門走走，將旅遊記錄下來吧！</Text>
-						</VStack>
+						{accountData.trips.filter(trip => trip.isActive === true)?
+						<></> :
+							<VStack h={64} pl={40} w={"100%"} alignItems={"flex-start"} justifyContent={"center"}>
+								<Text fontSize={14} color={theme.primary.placeholder.purple}
+								      fontWeight={"bold"}>沒有旅程紀錄，出去走走吧！</Text>
+							</VStack>
+						}
+
+
 
 					</>
 				}

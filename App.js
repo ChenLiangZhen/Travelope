@@ -175,6 +175,7 @@ export default function App() {
 					pink: "#faf2ff",
 					smoke: "#f4f4f4",
 					lightgray: "#eee",
+					midgray: "#ccc",
 					gray: "#888",
 				},
 
@@ -332,7 +333,7 @@ const DrawerNavigator = () => {
 						<Pressable onPress={() => {
 							navigation.navigate("MemEnvelope")
 						}} w={WIDTH / 2} flexDirection={"row"} justifyContent={"flex-end"} px={20} py={8}>
-							<Text fontWeight={state.index == 3? "bold" : "normal"}
+							<Text fontWeight={state.index == 5? "bold" : "normal"}
 							      fontSize={state.index == 3? 18 : 17}
 							      color={"#6f61ea"}
 
@@ -344,7 +345,7 @@ const DrawerNavigator = () => {
 						<Pressable onPress={() => {
 							navigation.navigate("TripPostcard")
 						}} w={WIDTH / 2} flexDirection={"row"} justifyContent={"flex-end"} px={20} py={8}>
-							<Text fontWeight={state.index == 4? "bold" : "normal"}
+							<Text fontWeight={state.index == 6? "bold" : "normal"}
 							      fontSize={state.index == 4? 18 : 17}
 							      color={"#7361ea"}
 
@@ -360,7 +361,7 @@ const DrawerNavigator = () => {
 						<Pressable onPress={() => {
 							navigation.navigate("MyZone")
 						}} w={WIDTH / 2} flexDirection={"row"} justifyContent={"flex-end"} px={20} py={8}>
-							<Text fontWeight={state.index == 5? "bold" : "normal"}
+							<Text fontWeight={state.index == 7? "bold" : "normal"}
 							      fontSize={state.index == 5? 18 : 17}
 							      color={"#7f61ea"}
 
@@ -372,7 +373,7 @@ const DrawerNavigator = () => {
 						<Pressable onPress={() => {
 							navigation.navigate("Settings")
 						}} w={WIDTH / 2} flexDirection={"row"} justifyContent={"flex-end"} px={20} py={8}>
-							<Text fontWeight={state.index == 6? "bold" : "normal"}
+							<Text fontWeight={state.index == 8? "bold" : "normal"}
 							      fontSize={state.index == 6? 18 : 17}
 							      color={"#8361ea"}
 

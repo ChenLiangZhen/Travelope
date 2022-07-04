@@ -36,6 +36,7 @@ export const GradientBorderButton = ({ icon, iconSize, iconColor, h, w, color, b
               w={ w? w -4: 72 -4}
               justifyContent={"center"}
               alignItems={"center"}
+
         >
 
           {icon? <Feather name={icon} size={iconSize} color={iconColor} /> : <></>}
