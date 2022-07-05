@@ -74,7 +74,7 @@ const AppHeader = (props) => {
 				setTranslatedTitle("個人設定")
 				break
 			case "NewNote":
-				setTranslatedTitle("新增遊記")
+				setTranslatedTitle("旅遊日記")
 				break
 			default:
 				setTranslatedTitle("尚未翻譯")
@@ -171,8 +171,8 @@ const AppHeader = (props) => {
 									useAngle={true}
 									angle={170}
 									angleCenter={{ x: 0.2, y: 0.7 }}
-									locations={[0.5, 1]}
-									colors={["#4d5dff", "#ad4cff"]}
+									locations={[0.2, 1]}
+									colors={["#6575ff", "#e159ff"]}
 									style={{ height: "100%", width: "100%" }}
 								/>
 							</MaskedView>

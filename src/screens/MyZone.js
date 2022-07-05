@@ -1,35 +1,31 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, {useCallback, useEffect, useRef, useState} from "react"
 import LayoutBase from "../components/LayoutBase"
 import Block from "../components/Block"
 import {
-	Actionsheet, AlertDialog,
-	Box, Button,
+	Actionsheet,
+	Box,
 	Center,
 	HStack,
 	Input,
 	Pressable,
-	Select, Spinner,
+	Select,
+	Spinner,
 	Text,
 	useDisclose,
-	useTheme, useToast,
+	useTheme,
+	useToast,
 	VStack,
 } from "native-base"
 import Feather from "react-native-vector-icons/Feather"
-import { useDispatch, useSelector } from "react-redux"
-import { addFriend, delFriend, selectAccount } from "../globalstate/accountSlice"
-import { Alert, FlatList, Image, Keyboard } from "react-native"
-import { WIDTH } from "../Util"
+import {useDispatch, useSelector} from "react-redux"
+import {addFriend, delFriend, selectAccount} from "../globalstate/accountSlice"
+import {Alert, FlatList, Image, Keyboard, StyleSheet} from "react-native"
+import {WIDTH} from "../Util"
 
-import SwipeableItem, { useSwipeableItemParams } from "react-native-swipeable-item"
-import { StyleSheet, TouchableOpacity } from "react-native"
-import Animated, { useAnimatedStyle } from "react-native-reanimated"
-import { downloadProfilePicture } from "../apis/transferManager"
-import RNFS from "react-native-fs"
-import FlatBlock from "../components/FlatBlock"
-import { apiRequest } from "../apis/api"
-import { GradientButton } from "../components/GradientButton"
-import { useFocusEffect } from "@react-navigation/native"
-import { appleAuth } from "@invertase/react-native-apple-authentication"
+import SwipeableItem, {useSwipeableItemParams} from "react-native-swipeable-item"
+import Animated, {useAnimatedStyle} from "react-native-reanimated"
+import {apiRequest} from "../apis/api"
+import {GradientButton} from "../components/GradientButton"
 
 const styles = StyleSheet.create({
 	container: {

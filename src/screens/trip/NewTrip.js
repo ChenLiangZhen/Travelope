@@ -65,8 +65,6 @@ const NewTrip = ({ navigation }) => {
 
 		setTripObject({
 
-			isActive: true,
-
 			tripID: "" + new Date().getTime(),
 			tripName: tripName,
 			tripDescription: tripDescription,

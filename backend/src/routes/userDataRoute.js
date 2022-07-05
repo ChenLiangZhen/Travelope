@@ -1,6 +1,6 @@
 const express = require("express")
 const mongoose = require("mongoose")
-const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken")
 const User = mongoose.model("user_account")
 const UserData = mongoose.model("user_data")
 const SoupData = mongoose.model("soup_data")
@@ -13,7 +13,7 @@ router_data.get("/api/travelope/get-trips/:accountID", userAuth, async (req, res
 	const { accountID } = req.params
 
 	try {
-		UserData.findOne({userLink: req.query.id}, (e, data) => {
+		UserData.findOne({ userLink: req.query.id }, (e, data) => {
 			if (e || !data) {
 				return res.status(404).send("ERROR")
 			}
@@ -31,17 +31,95 @@ router_data.get("/api/travelope/get-trips/:accountID", userAuth, async (req, res
 
 router_data.post("/api/travelope/new-trip/:accountID", async (req, res) => {
 
+
+	console.log("running !!")
 	const { accountID } = req.params
 	const tripData = req.body
 
 	try {
-		UserData.findOne({userLink: accountID}, (e, userData) => {
+		UserData.findOne({ userLink: accountID }, async (e, userData) => {
 			if (e || !userData) {
 				return res.status(404).send("ERROR")
 			}
 
+			console.log(userData)
+
+			let prevActiveTripIndex = userData.trips.findIndex(trip => trip.isActive === true)
+			if (prevActiveTripIndex >= 0) {
+
+				console.log("found previous active trip.")
+
+				userData.trips[prevActiveTripIndex].isActive = false
+				await userData.save()
+			}
+
 			userData.trips.push(tripData)
-			userData.save()
+			await userData.save()
+
+			res.status(200)
+		})
+
+	} catch (e) {
+
+		res.status(422).send("Update Data Failed: " + e)
+		console.log("[Update Data Failed]: " + e)
+	}
+
+})
+
+router_data.post("/api/travelope/new-trip-note/:accountID", async (req, res) => {
+
+	const { accountID } = req.params
+	const tripNoteData = req.body
+
+	console.log(tripNoteData)
+
+	try {
+		UserData.findOne({ userLink: accountID }, async (e, userData) => {
+
+			if (e || !userData) {
+				return res.status(404).send("ERROR")
+			}
+
+			let targetTripIndex = userData.trips.findIndex(trip => trip.isActive === true)
+			if (targetTripIndex >= 0) {
+
+				userData.trips[targetTripIndex].tripNotes.push(tripNoteData)
+				await userData.save()
+			}
+
+			res.status(200)
+		})
+
+	} catch (e) {
+
+		res.status(422).send("Update Data Failed: " + e)
+		console.log("[Update Data Failed]: " + e)
+	}
+
+})
+
+router_data.put("/api/travelope/update-trip-note/:accountID", async (req, res) => {
+
+	const { accountID } = req.params
+	const tripNoteData = req.body
+
+	console.log(tripNoteData)
+
+	try {
+		UserData.findOne({ userLink: accountID }, async (e, userData) => {
+
+			if (e || !userData) {
+				return res.status(404).send("ERROR")
+			}
+
+			let targetTripIndex = userData.trips.findIndex(trip => trip.isActive === true)
+			if (targetTripIndex >= 0) {
+
+				userData.trips[targetTripIndex].tripNotes.push(tripNoteData)
+				await userData.save()
+			}
+
 			res.status(200)
 		})
 
@@ -55,10 +133,10 @@ router_data.post("/api/travelope/new-trip/:accountID", async (req, res) => {
 
 router_data.put(`/api/travelope/update-data`, userAuth, async (req, res) => {
 
-	const {data, userLink} = req.body
+	const { data, userLink } = req.body
 
 	try {
-		UserData.updateOne({userLink: userLink}, {data: data}, {}, (e, res) => {
+		UserData.updateOne({ userLink: userLink }, { data: data }, {}, (e, res) => {
 			console.log(res.matchedCount)
 		})
 

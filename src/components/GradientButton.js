@@ -61,7 +61,7 @@ export const GradientBorderButton = ({ icon, iconSize, iconColor, h, w, color, b
 
 };
 
-export const GradientButton = ({ flex, icon, iconSize, iconColor, h, w, color, bgc, title, fs, onPress, ...props }) => {
+export const GradientButton = ({ pureIcon, flex, icon, iconSize, iconColor, h, w, color, bgc, title, fs, onPress, ...props }) => {
 
   return (
 
@@ -87,15 +87,20 @@ export const GradientButton = ({ flex, icon, iconSize, iconColor, h, w, color, b
 
         {icon? <Feather name={icon} size={iconSize} color={iconColor} /> : <></>}
 
-        <Text
-          ml={icon? 6 : 0}
-          mr={icon? 2 : 0}
-          fontSize={fs? fs: 15}
-          fontWeight={"bold"}
-          color={color? color: "white"}
-        >
-          {title}
-        </Text>
+         {pureIcon? <></> :
+
+            <Text
+               ml={icon? 6 : 0}
+               mr={icon? 2 : 0}
+               fontSize={fs? fs: 15}
+               fontWeight={"bold"}
+               color={color? color: "white"}
+            >
+               {title}
+            </Text>
+
+         }
+
 
       </LinearGradient>
     </Pressable>

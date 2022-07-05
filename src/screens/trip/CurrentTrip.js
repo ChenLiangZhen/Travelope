@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useRef, useState} from "react"
 import LayoutBase from "../../components/LayoutBase"
 import FlatBlock from "../../components/FlatBlock"
-import {HStack, Pressable, Text, useTheme, View} from "native-base"
+import {HStack, Modal, Pressable, Text, useTheme, View, VStack} from "native-base"
 import Feather from "react-native-vector-icons/Feather"
 import {GradientBorderButton, GradientButton} from "../../components/GradientButton"
 import Block from "../../components/Block"
@@ -12,8 +12,9 @@ import SwipeableItem, {useSwipeableItemParams} from "react-native-swipeable-item
 import {StyleSheet, TouchableOpacity} from "react-native"
 import Animated, {useAnimatedStyle} from "react-native-reanimated"
 import {delTripNote, selectData, setInactive} from "../../globalstate/dataSlice"
-import {useFocusEffect, useNavigation} from "@react-navigation/native"
+import {useFocusEffect, useIsFocused, useNavigation} from "@react-navigation/native"
 import {config, useSpring, animated} from "@react-spring/native"
+import {HEIGHT, WIDTH} from "../../Util";
 
 const styles = StyleSheet.create({
 	container: {
@@ -55,17 +56,18 @@ const UnderlayLeft = ({drag}: { drag: () => void }) => {
 	)
 
 	return (
+
 		<Animated.View
 			style={[styles.row, styles.underlayLeft, animStyle]} // Fade in on open
 		>
 
-			<Block px={2} h={72} w={58} sc={"#fff"} borderWidth={1} borderColor={theme.primary.text.indigo}>
+			<Block mb={12} px={2} h={64} w={58} sc={"#fff"} borderWidth={2} borderColor={theme.primary.placeholder.pink}>
 
 				<Pressable flex={1} w={52} justifyContent={"center"} alignItems={"center"} onPress={() => {
 					dispatch(delTripNote(item.recordTime))
 				}}>
 
-					<Feather size={20} name={"trash"} color={theme.primary.text.indigo}/>
+					<Feather size={20} name={"trash"} color={theme.primary.text.pink}/>
 				</Pressable>
 
 			</Block>
@@ -90,6 +92,7 @@ function RowItem({item, itemRefs, drag}) {
 					itemRefs.current.set(item.id, ref)
 				}
 			}}
+
 			onChange={({open}) => {
 				if (open) {
 					// Close all other open items
@@ -103,27 +106,28 @@ function RowItem({item, itemRefs, drag}) {
 			renderUnderlayLeft={() => <UnderlayLeft drag={drag}/>}
 			snapPointsLeft={[70]}
 		>
-			<Block sc={"#fff"} justifyContent={"flex-start"} alignItems={"center"} flexDirection={"row"}
-			       bdc={theme.primary.placeholder.purple} borderWidth={2} h={72}>
-				<Pressable flex={1} flexDirection={"row"} justifyContent={"space-between"} flex={1}
+			<Pressable pl={18} pr={16} borderRadius={18} borderColor={theme.primary.placeholder.purple} mb={12}
+			           justifyContent={"space-between"} alignItems={"center"} flexDirection={"row"}
+			           bdc={theme.primary.placeholder.purple} borderWidth={2} h={64}
 
-				           onPress={() => {
-					           navigation.navigate("NewNote", { item: item })
-				           }}
+			           onPress={() => {
+				           navigation.navigate("NewNote", {item: item, isNew: false})
+			           }}
 
-				           onPressIn={drag}
-				>
-					<Text fontSize={16} fontWeight={"bold"} color={theme.primary.text.purple}>{item.title}</Text>
+			           onPressIn={drag}
+			>
+				<Text noOfLines={1} w={"50%"} fontSize={16} fontWeight={"bold"}
+				      color={theme.primary.text.purple}>{item.noteTitle}</Text>
 
-					<HStack alignItems={"center"}>
-						<Feather name={"map-pin"} color={theme.primary.text.purple} size={18}/>
-						<Text ml={4} fontSize={16} fontWeight={"bold"}
-						      color={theme.primary.text.purple}>{item.namedLocation}</Text>
-					</HStack>
+				<HStack w={100} justifyContent={"flex-end"} alignItems={"center"}>
+					<Feather name={"map-pin"} color={theme.primary.text.purple} size={18}/>
+					<Text noOfLines={1} ml={4} fontSize={16} fontWeight={"bold"}
+					      color={theme.primary.text.purple}>{item.namedLocation}</Text>
+				</HStack>
 
-					{/*<Text fontSize={16} fontWeight={"bold"} color={theme.primary.text.purple}>{"" + (new Date(item.recordTime).getMonth() + 1) + "月" + new Date(item.recordTime).getDate() + "日" + new Date(item.recordTime).getHours() + new Date(item.recordTime).getMinutes()}</Text>*/}
-				</Pressable>
-			</Block>
+				{/*<Text fontSize={16} fontWeight={"bold"} color={theme.primary.text.purple}>{"" + (new Date(item.recordTime).getMonth() + 1) + "月" + new Date(item.recordTime).getDate() + "日" + new Date(item.recordTime).getHours() + new Date(item.recordTime).getMinutes()}</Text>*/}
+			</Pressable>
+
 		</SwipeableItem>
 	)
 }
@@ -139,6 +143,10 @@ const CurrentTrip = () => {
 	const itemRefs = useRef(new Map())
 
 	const dispatch = useDispatch()
+
+	const isFocused = useIsFocused()
+
+	const [modalVisible, setModalVisible] = useState(false)
 
 	const anim = useSpring({
 		loop: false,
@@ -189,7 +197,7 @@ const CurrentTrip = () => {
 			let trip = accountData.trips.find(item => item.isActive === true)
 			trip ? setActiveTrip(trip) : setActiveTrip(null)
 
-		}, [accountData]),
+		}, [isFocused, accountData]),
 	)
 
 	const renderItem = useCallback((params) => {
@@ -201,6 +209,78 @@ const CurrentTrip = () => {
 
 		<LayoutBase>
 
+			<Modal isOpen={modalVisible} onClose={() => setModalVisible()} justifyContent="flex-end" bottom={HEIGHT * .3}
+			       shadowOpacity={.2}
+			       shadowRadius={24}
+			       shadowOffset={{
+				       height: 4,
+			       }}
+			       _backdrop={{bg: "#000", opacity: .25}}
+			>
+
+				<Modal.Content borderRadius={24} w={WIDTH * .9} px={20} h={HEIGHT * .35} alignSelf={"center"} py={12}>
+
+					<HStack mt={4} h={30} mb={20} justifyContent={"space-between"} alignItems={"center"}>
+
+						<HStack alignItems={"center"}>
+							<Feather name={"info"} color={theme.primary.text.indigo} size={22}/>
+							<Text ml={8} fontSize={18} letterSpacing={1} fontWeight={"bold"} color={theme.primary.text.indigo}>
+								旅程資訊
+							</Text>
+						</HStack>
+
+						<Pressable alignItems={"center"} juatifyContent={"center"} onPress={async () => {
+
+							setModalVisible()
+						}} justifyContent={"center"} alignItems={"center"} w={28}
+						           h={28}>
+							<Feather name={"x"} size={20} color={theme.primary.text.indigo}/>
+						</Pressable>
+
+					</HStack>
+
+					<VStack mt={4} h={20} mb={16} justifyContent={"space-between"} alignItems={"center"}>
+
+						<HStack px={16} w={"100%"} h={32} alignItems={"center"}>
+
+							<Text mr={12} fontSize={16} fontWeight={"bold"}
+							      color={theme.primary.placeholder.indigo}>旅程 ID：</Text>
+							<Text fontSize={16} fontWeight={"bold"}
+							      color={theme.primary.bg.gray}>{activeTrip.tripID}</Text>
+
+						</HStack>
+
+						<HStack px={16} w={"100%"} h={32} alignItems={"center"}>
+
+							<Text mr={12} fontSize={16} fontWeight={"bold"}
+							      color={theme.primary.placeholder.indigo}>旅程名稱：</Text>
+							<Text fontSize={16} fontWeight={"bold"} color={theme.primary.bg.gray}>{activeTrip.tripName}</Text>
+
+						</HStack>
+
+						<HStack px={16} w={"100%"} h={32} alignItems={"center"}>
+
+							<Text mr={12} fontSize={16} fontWeight={"bold"}
+							      color={theme.primary.placeholder.indigo}>旅程描述：</Text>
+							<Text fontSize={16} fontWeight={"bold"}
+							      color={theme.primary.bg.gray}>{activeTrip.tripDescription}</Text>
+
+						</HStack>
+
+						<HStack px={16} w={"100%"} h={32} alignItems={"center"}>
+
+							<Text mr={12} fontSize={16} fontWeight={"bold"}
+							      color={theme.primary.placeholder.indigo}>開始時間：</Text>
+							<Text fontSize={16} fontWeight={"bold"}
+							      color={theme.primary.bg.gray}>{"" + new Date(activeTrip.startTime).getFullYear() + "年" + (new Date(activeTrip.startTime).getMonth() + 1)  + "月" + new Date(activeTrip.startTime).getDate()  + "日  " + new Date(activeTrip.startTime).getHours()  + "：" + new Date(activeTrip.startTime).getMinutes()}</Text>
+
+						</HStack>
+
+					</VStack>
+
+				</Modal.Content>
+
+			</Modal>
 
 			{activeTrip ?
 				<>
@@ -242,18 +322,26 @@ const CurrentTrip = () => {
 									      color={theme.primary.text.purple}>{activeTrip.tripName}</Text>
 								</HStack>
 
-								<GradientBorderButton //結束旅程並設定此旅程為inactive。
-									onPress={() => {
+								<Pressable onPress={() => {
+									setModalVisible(true)
+								}} h={32} w={32} alignItems={"center"} justifyContent={"center"}
+								           flexDirection={"row"}>
+									<Feather name={"info"} size={22} color={theme.primary.text.purple}/>
+								</Pressable>
 
-										console.log("setInactive")
-										dispatch(setInactive())
+								{/*<GradientBorderButton //結束旅程並設定此旅程為inactive。*/}
+								{/*	onPress={() => {*/}
 
-										navigation.navigate("MainScreen")
+								{/*		console.log("setInactive")*/}
+								{/*		dispatch(setInactive())*/}
 
-									}}
-									flexDrection={"row"} ml={8}
-									icon={"align-left"} iconSize={18} iconColor={theme.primary.text.purple} w={80}
-									color={theme.primary.text.purple} title={"資訊"}/>
+								{/*		navigation.navigate("MainScreen")*/}
+
+								{/*	}}*/}
+
+								{/*	flexDrection={"row"} ml={8}*/}
+								{/*	icon={"align-left"} iconSize={18} iconColor={theme.primary.text.purple} w={80}*/}
+								{/*	color={theme.primary.text.purple} title={"資訊"}/>*/}
 
 							</HStack>
 
@@ -273,39 +361,65 @@ const CurrentTrip = () => {
 
 						{/*</HStack>*/}
 
-						<Pressable
+						{accountData.trips[accountData.trips.length - 1].tripNotes.length > 0 ?
 
-							onPress={() => navigation.navigate("NewNote")}
+							<>
+							</>
 
-							h={72}
-							w={"100%"}
-							mb={32}
-							flexDirection={"row"}
-							justifyContent={"center"}
-							alignItems={"center"}
-							borderRadius={18}
-							borderStyle={"dashed"}
-							borderWidth={2}
-							borderColor={theme.primary.placeholder.indigo}
-						>
+							:
 
-							<Feather name={"plus-circle"} size={22} color={theme.primary.placeholder.indigo}/>
+							<Pressable
 
-							<Text fontSize={16} fontWeight={"bold"} letterSpacing={1} color={theme.primary.placeholder.indigo}
-							      ml={8}>
-								寫遊記
-							</Text>
+								onPress={() => navigation.navigate("NewNote", {item: null, isNew: true})}
 
-						</Pressable>
+								h={64}
+								w={"100%"}
+								mb={32}
+								flexDirection={"row"}
+								justifyContent={"center"}
+								alignItems={"center"}
+								borderRadius={18}
+								borderStyle={"dashed"}
+								borderWidth={2}
+								borderColor={theme.primary.placeholder.indigo}
+							>
+
+								<Feather name={"plus-circle"} size={22} color={theme.primary.placeholder.indigo}/>
+
+								<Text fontSize={16} fontWeight={"bold"} letterSpacing={1}
+								      color={theme.primary.placeholder.indigo}
+								      ml={8}>
+									寫遊記
+								</Text>
+
+							</Pressable>
+						}
 
 						<FlatList
 
-							style={{}}
+							style={{marginBottom: 24}}
+
+							contentContainerStyle={{
+
+								marginBottom: 48
+							}}
+
+							ListFooterComponent={
+
+								accountData.trips[accountData.trips.length - 1].tripNotes.length > 0 ?
+
+									<HStack mt={16} w={"100%"} justifyContent={"center"} alignItems={"center"}>
+
+										<GradientButton onPress={() => navigation.navigate("NewNote", {item: null, isNew: true})
+										} pureIcon h={36} w={36} icon={"plus"} iconSize={24} iconColor={"white"}/>
+									</HStack> : <></>
+							}
 
 							renderItem={renderItem}
 							data={activeTrip.tripNotes}
-							keyExtractor={item => item.key}
+							keyExtractor={item => item.noteID}
 						/>
+
 
 					</animated.View>
 
@@ -318,7 +432,6 @@ const CurrentTrip = () => {
 				</>
 
 			}
-
 
 		</LayoutBase>
 

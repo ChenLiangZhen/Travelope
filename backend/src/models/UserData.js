@@ -1,6 +1,73 @@
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
 
+const Notes = new mongoose.Schema({
+
+	noteID: {
+		type: String,
+	},
+
+	recordTime: {
+		type: Object
+	},
+
+	title: {
+		type: String
+	},
+
+	content: {
+		type: String
+	},
+
+	imageKey: {
+		type: []
+	},
+
+	lon: {
+		type: String
+	},
+
+	lat: {
+		type: String
+	},
+
+})
+
+const Trip = new mongoose.Schema({
+
+	isActive: {
+		type: Boolean
+	},
+
+	tripID: {
+		type: Object
+	},
+
+	tripName: {
+		type: String
+	},
+
+	tripDescription: {
+		type: String
+	},
+
+	startTime: {
+		type: Object
+	},
+
+	endTime: {
+		type: Object
+	},
+
+	fellowList: {
+		type: []
+	},
+
+	tripNotes: {
+		type: [Notes]
+	},
+})
+
 const UserDataSchema = new mongoose.Schema({
 	userLink: {
 		type: String,
@@ -8,8 +75,7 @@ const UserDataSchema = new mongoose.Schema({
 		required: true
 	},
 	trips: {
-		type: [],
-		required: true
+		type: [Trip],
 	},
 }, {
 	collection: "user_data"

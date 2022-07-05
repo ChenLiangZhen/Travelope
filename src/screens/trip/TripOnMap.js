@@ -12,6 +12,8 @@ import { selectData } from "../../globalstate/dataSlice"
 import { selectAccount } from "../../globalstate/accountSlice"
 import Geolocation from 'react-native-geolocation-service'
 import Block from "../../components/Block"
+import {GradientButton} from "../../components/GradientButton";
+import {useIsFocused} from "@react-navigation/native";
 
 const getUbike = async () => {
 	return await axios.get("https://data.ntpc.gov.tw/api/datasets/71CD1490-A2DF-4198-BEF1-318479775E8A/json?page=0&size=200")
@@ -32,14 +34,16 @@ const getUbike = async () => {
 // 	)
 // }, site)
 
-const TripOnMap = () => {
+const TripOnMap = ({navigation}) => {
 
 	const mapRef = useRef()
 
 	const [msg, setMsg] = useState("Waiting...");
 	const [onCurrentLocation, setOnCurrentLocation] = useState(false);
+	const [pressedNote, setPressedNote] = useState({})
 
 	const theme = useTheme().colors
+	const isFocused = useIsFocused()
 
 	// const [markerData, setMarkerData] = useState(accountData.)
 
@@ -84,9 +88,10 @@ const TripOnMap = () => {
 		// address: "台北市和平東路二段134號",
 	});
 
-	const [ubikeData, setUbikeData] = useState()
+	const [noteLocationData, setNoteLocationData] = useState([])
 
 	const onRegionChangeComplete = (rgn) => {
+
 		if (rgn.longitudeDelta > 0.02)
 			setZoomRatio(0.02 / rgn.longitudeDelta);
 		else
@@ -148,11 +153,30 @@ const TripOnMap = () => {
 
 	useEffect(() => {
 
+		// var reformattedArray = kvArray.map(function(obj) {
+		// 	var rObj = {};
+		// 	rObj[obj.key] = obj.value;
+		// 	return rObj;
+		// });
+
 		getLocation();
+
+		const locationArray = accountData.trips[accountData.trips.length - 1].tripNotes.map( item => {
+			return {
+				data: item,
+
+				key: item.noteID,
+				lon: item.lon,
+				lat: item.lat,
+			}
+		})
+
+		console.log(locationArray)
+		setNoteLocationData(locationArray)
 
 		// await new Promise(resolve => setTimeout(resolve, 5000))
 
-	},[]);
+	},[isFocused]);
 
 	const {
 		isOpen,
@@ -164,15 +188,11 @@ const TripOnMap = () => {
 
 		<SafeAreaView style={{ flex: 1}}>
 
-			<HStack bg={"transparent"} px={"5%"} justifyContent={"flex-end"} h={48} w={"100%"} zIndex={100} position={"absolute"} top={60}>
+			<HStack bg={"transparent"} px={18} justifyContent={"flex-end"} h={48} w={"100%"} zIndex={100} position={"absolute"} top={60}>
 
-				<Block flexDirection={"row"} justifyContent={"center"} alignItems={"center"} h={48} w={48} borderRadius={18}>
-
-				<Pressable h={24} w={24} alignItems={"center"} justifyContent={"center"}>
-					<Feather name={"arrow-left"} color={theme.primary.text.purple} size={24}/>
-				</Pressable>
-
-				</Block>
+					<GradientButton w={100} title={"返回旅程"} onPress={ () => {
+						navigation.goBack()
+					}}/>
 
 			</HStack>
 
@@ -180,130 +200,25 @@ const TripOnMap = () => {
 					isOpen={isOpen} onClose={onClose}
 				>
 					<Actionsheet.Content
-						background={"#222"}
+						background={"white"}
 					>
 						<View style={{
 							padding: 16,
 							height: 256,
 							width: "100%",
 							flexDirection: "column",
-
-							backgroundColor: "#222"
+							backgroundColor: "white"
 						}}>
 							<Text style={{
 								marginLeft: 8,
 								fontSize: 26,
-								color: "#eee",
+								color: theme.primary.text.purple,
 								fontWeight: "bold"
 							}}>
-								{station.type === "mrt"?
-									"捷運" + station.title + "站" : "UBike" + station.title + "站"
-								}
+								{pressedNote.title}
+
 							</Text>
 
-							<Text style={{
-								marginLeft: 8,
-								color: "#eee",
-
-								fontSize: 16,
-								fontWeight: "normal",
-								paddingTop: 8,
-								letterSpacing: .5,
-							}}>
-								{station.description}
-							</Text>
-
-							<View style={{
-								height: "auto",
-								width: "100%",
-								borderRadius: 24,
-								marginTop: 24,
-								backgroundColor: "#222",
-								borderColor: "#fff",
-								borderWidth: 2,
-								padding: 16,
-							}}>
-								<Text style={{
-
-									color: "#eee",
-									paddingLeft: 4,
-
-
-									fontSize: 16,
-									fontWeight: "normal",
-
-									letterSpacing: .5,
-								}}>
-									{"Longitude : " + station.lon}
-								</Text>
-
-								<Text style={{
-
-									color: "#eee",
-									paddingLeft: 4,
-
-									fontSize: 16,
-									fontWeight: "normal",
-
-									letterSpacing: .5,
-								}}>
-									{"Latitude : " + station.lat}
-								</Text>
-
-								{station.type !== "mrt"?
-									<View style={{
-										borderRadius: 64,
-
-										marginTop: 16,
-										overflow: "hidden",
-										flexDirection: "row",
-										width: "100%",
-										height: 32,
-										backgroundColor: "#00f",
-										// zIndex: 100
-									}}>
-										<Text style={{
-											top: 6,
-											left: 16,
-											position: "absolute",
-											fontSize: 16,
-											fontWeight: "bold",
-											color: "#ffffff",
-											zIndex: 1000
-										}}>
-											{"可租  " + (stationBike.bikes)}
-										</Text>
-
-										<Text style={{
-											top: 6,
-											right: 16,
-											position: "absolute",
-											fontSize: 16,
-											fontWeight: "bold",
-											color: "#000000",
-											zIndex: 1000
-										}}>
-											{"空位 " + (stationBike.total - stationBike.bikes)}
-										</Text>
-
-										<View style={{
-											flexDirection: "row",
-											width: (WIDTH - 80) * ((stationBike.bikes) / (stationBike.total)),
-											height: 32,
-											backgroundColor: "#ff0076"
-										}} />
-										<View style={{
-											flexDirection: "row",
-											width: (WIDTH - 80) * ((stationBike.total - stationBike.bikes) / (stationBike.total)),
-											height: 32,
-											backgroundColor: "#d2d2d2"
-										}} />
-
-									</View>
-
-									: <></>}
-
-							</View>
 						</View>
 					</Actionsheet.Content>
 				</Actionsheet>
@@ -323,7 +238,7 @@ const TripOnMap = () => {
 					// pitch: number;
 					// zoom: number;
 					// altitude: number;
-					// 	userInterfaceStyle={"light"}
+						userInterfaceStyle={"light"}
 						// mapType={"mutedStandard"}
 						ref={ mapRef }
 						style={{ flex: 1 }}
@@ -366,40 +281,36 @@ const TripOnMap = () => {
 								</Callout>
 						</Marker>
 
-						{(zoomRatio > 0.25) && ubikeData? ubikeData.data.map((site) => (
-
+						{ noteLocationData? noteLocationData.map((location) => (
 
 							<Marker
 								tracksViewChanges={false}
-								coordinate={{ latitude: site.lat, longitude: site.lng }}
-								key={`${site.sno}`}
-								title={site.sna}
-								description={site.address}
+								coordinate={{ latitude: location.lat, longitude: location.lon }}
+								key={`${location.key}`}
+								// title={site.sna}
+								description={location.address}
 								onPress={() => {
-									onOpen()
-									setStation({
-										type: "bike",
-										title: site.sna,
-										description: site.ar,
-										lat: site.lat,
-										lon: site.lng,
-										slot: {
-											available: site.sbi,
-											empties: site.bemp
-										}
-									})
 
-									setStationBike({
-										total: site.tot,
-										bikes: site.sbi
+									onOpen()
+
+									setPressedNote({
+										type: "bike",
+										title: location.data.noteTitle,
+										description: location.data.noteContent,
+										lat: location.lat,
+										lon: location.lon,
 									})
 								}}
 							>
-
-								<Center bg={"white"} opacity={.5} borderRadius={60} p={1.5}
-								        borderWidth={3}>
-									<FontAwesome5 name={"bicycle"} size={20} color="black" />
-								</Center>
+								{/*<Center bg={"white"} opacity={.5} borderRadius={60} p={1.5}*/}
+								{/*        borderWidth={3}>*/}
+								{/*	<FontAwesome5 name={"bicycle"} size={20} color="black" />*/}
+								{/*</Center>*/}
+								<Callout tooltip>
+									<View shadowOpacity={.25} shadowRadius={8} shadowOffset={{height: 1}} p={8} bg={"white"} borderRadius={12}>
+										<Text fontSize={14} color={theme.primary.text.purple}>{location.data.noteTitle}</Text>
+									</View>
+								</Callout>
 
 							</Marker>
 						)) : null}

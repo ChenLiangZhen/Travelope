@@ -1,23 +1,22 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, {useEffect, useRef, useState} from "react"
 import LayoutBase from "../../components/LayoutBase"
 import FlatBlock from "../../components/FlatBlock"
-import { HStack, Input, Modal, Pressable, ScrollView, Text, useTheme, useToast } from "native-base"
+import {HStack, Input, Modal, Pressable, ScrollView, Text, useTheme, useToast} from "native-base"
 import Block from "../../components/Block"
 import DatePicker from "react-native-date-picker"
 import Feather from "react-native-vector-icons/Feather"
-import { GradientBorderButton, GradientButton } from "../../components/GradientButton"
-import { selectAccount } from "../../globalstate/accountSlice"
-import { FlatList, Image, Keyboard } from "react-native"
-import { HEIGHT, WIDTH } from "../../Util"
-import { useDispatch, useSelector } from "react-redux"
-import { pushTripNote, selectData } from "../../globalstate/dataSlice"
-import { apiRequest, geocodingRequest } from "../../apis/api"
+import {GradientBorderButton, GradientButton} from "../../components/GradientButton"
+import {selectAccount} from "../../globalstate/accountSlice"
+import {FlatList, Image, Keyboard} from "react-native"
+import {HEIGHT, WIDTH} from "../../Util"
+import {useDispatch, useSelector} from "react-redux"
+import {pushTripNote, selectData, updateTripNote} from "../../globalstate/dataSlice"
+import {apiRequest, geocodingRequest} from "../../apis/api"
 import Geolocation from "react-native-geolocation-service"
 import ImagePicker from "react-native-image-crop-picker"
-import { uploadImageInit } from "../../apis/fileManager"
+import {uploadImageInit} from "../../apis/fileManager"
 import RNFS from "react-native-fs"
-import {useFocusEffect} from "@react-navigation/native";
-
+import {useFocusEffect, useIsFocused} from "@react-navigation/native";
 
 const ImageItem = (props) => {
 
@@ -25,11 +24,6 @@ const ImageItem = (props) => {
 	const account = useSelector(selectAccount)
 
 	const theme = useTheme().colors
-	useEffect(() => {
-		console.log("this is props: " + JSON.stringify(props))
-	}, [])
-
-
 
 	return (
 		<HStack mr={8} borderRadius={14} borderColor={theme.primary.text.purple} p={2} borderWidth={2}>
@@ -44,21 +38,18 @@ const ImageItem = (props) => {
 				}}
 
 				alt={"image"}
-				source={{ uri: props.props.uri }}
+				source={{uri: props.props.uri}}
 			/>
 		</HStack>
 	)
 }
 
-const NewNote = ({ navigation, route }) => {
-
-	const param = { item : {} }
-
-	{
-		route.params? param.item = route.params.item : null
-	}
+const NewNote = ({navigation, route}) => {
 
 	// const { title, content, noteLoc, codeLoc, hasImage } = route.params
+
+	const {item, isNew} = route.params
+
 	const theme = useTheme().colors
 
 	const [noteTitle, setNoteTitle] = useState("")
@@ -87,47 +78,71 @@ const NewNote = ({ navigation, route }) => {
 	const toastInfoRef = useRef()
 	const toast = useToast()
 
+	const isFocused = useIsFocused()
+
 	const getLocation = async () => {
 
 		console.log("exec")
-
 		let status = await Geolocation.requestAuthorization("whenInUse")
-
 		if (status !== "granted") {
-			console.log("Permission to access location was denied")
 			return
 		}
-
 		Geolocation.getCurrentPosition((res) => {
-
-			setNoteLocation({ lat: res.coords.latitude, lon: res.coords.longitude })
-
-			console.log("located! " + JSON.stringify(res))
+			setNoteLocation({lat: res.coords.latitude, lon: res.coords.longitude})
 		}, rej => console.log(rej))
-
 	}
 
-	const renderItemImage = props => <ImageItem props={props.item} />
+	const renderItemImage = props => <ImageItem props={props.item}/>
 
 	useEffect(() => {
 
-		getLocation()
-	}, [])
+		if (isNew) {
 
-	useFocusEffect(
-
-		React.useCallback(() => {
+			console.log("isNewNote: " + isNew)
 
 			setNoteTitle("")
-			setNoteObject({})
 			setNoteContent("")
-			setNoteLocation("")
+			setNoteLocation({})
 			setNamedLocation("")
 			setCodedLocation("")
 			setImageList([])
 
-		}, []),
-	)
+			setDate(new Date())
+
+			getLocation()
+				.then(res => {
+					geocodingRequest(noteLocation.lon, noteLocation.lat)
+						.then(res => {
+
+								setCodedLocation(res.data.results[0].formatted_address)
+								console.log("已經進行定位")
+
+							},
+							rej => console.log(rej))
+				})
+
+		} else {
+
+			console.log("isNewNote: " + isNew)
+
+			setNoteTitle(item.noteTitle)
+			setNoteContent(item.noteContent)
+			setNoteLocation({lon: item.lon, lat: item.lat})
+			setNamedLocation(item.namedLocation)
+			setCodedLocation(item.codedLocation)
+			setImageList(item.imageList)
+		}
+
+	}, [isFocused])
+
+	// useFocusEffect(
+	//
+	// 	React.useCallback(() => {
+	//
+	//
+	//
+	// 	}, []),
+	// )
 
 	useEffect(() => {
 
@@ -142,8 +157,8 @@ const NewNote = ({ navigation, route }) => {
 			namedLocation: namedLocation,
 			codedLocation: codedLocation,
 
-			hasImage : hasImage,
-			hasMood : hasMood,
+			hasImage: hasImage,
+			hasMood: hasMood,
 
 			imageList: imageList,
 
@@ -152,6 +167,12 @@ const NewNote = ({ navigation, route }) => {
 		})
 
 	}, [noteTitle, noteContent, namedLocation, codedLocation])
+
+	useEffect(() => {
+
+		console.log("NOTE OBJECT NOW: " + JSON.stringify(noteObject))
+
+	}, [noteObject])
 
 	function closeInfoToast() {
 		if (toastInfoRef.current) {
@@ -165,7 +186,7 @@ const NewNote = ({ navigation, route }) => {
 				id: "warningInfo",
 				render: () => {
 					return (
-						<ToastInfo />
+						<ToastInfo/>
 					)
 				},
 			})
@@ -193,12 +214,10 @@ const NewNote = ({ navigation, route }) => {
 
 		}).then(async image => {
 
-			console.log("Setting profile image...")
-
 			const accountID = account.info.id
 			const URI = await uploadImageInit(image, accountID)
 
-			setImageList((prev) => [...prev, { uri: URI }])
+			setImageList((prev) => [...prev, {uri: URI}])
 
 			// uploadProfilePicture(account.info.id, account.info.id, URI)
 
@@ -212,45 +231,20 @@ const NewNote = ({ navigation, route }) => {
 
 		<LayoutBase>
 
-			<Modal isOpen={modalVisible} onClose={() => setModalVisible()} justifyContent="flex-end" bottom={HEIGHT * .25}
-			       shadowOpacity={.2}
-			       shadowRadius={24}
-			       shadowOffset={{
-				       height: 4,
-			       }}
-			       _backdrop={{ bg: "#000", opacity: .25 }}
-			>
-
-				<Modal.Content borderRadius={24} w={WIDTH * .9} px={20} h={HEIGHT * .5} alignSelf={"center"} py={12}>
-
-					<HStack mt={4} h={30} mb={20} justifyContent={"space-between"} alignItems={"center"}>
-
-						<Text ml={8} fontSize={18} letterSpacing={1} fontWeight={"normal"} color={theme.primary.text.indigo}>
-							選擇朋友
-						</Text>
-
-						<Pressable onPress={() => setModalVisible()} justifyContent={"center"} alignItems={"center"} w={28}
-						           h={28}>
-							<Feather name={"x"} size={20} color={theme.primary.text.indigo} />
-						</Pressable>
-
-					</HStack>
-
-				</Modal.Content>
-
-			</Modal>
-
 			<DatePicker
+
 				modal
 				theme={"light"}
 				mode={"datetime"}
 				title={"撰寫時間"}
 				open={open}
 				date={date}
+
 				onConfirm={(date) => {
 					setOpen(false)
 					setDate(date)
 				}}
+
 				onCancel={() => {
 					setOpen(false)
 				}}
@@ -266,20 +260,23 @@ const NewNote = ({ navigation, route }) => {
 				<HStack justifyContent={"flex-end"}>
 
 
-					{hasImage?
+					{hasImage ?
+
 						<GradientButton w={72} color={"white"} title={"照片"} onPress={() => {
 
 							setHasImage(prev => !prev)
 						}}
 						/> :
+
 						<GradientBorderButton w={72} color={theme.primary.text.purple} title={"照片"} onPress={() => {
 
 							setHasImage(prev => !prev)
 						}}
 						/>
+
 					}
 
-					{hasMood?
+					{hasMood ?
 						<GradientButton ml={8} w={72} color={"white"} title={"心情"} onPress={() => {
 
 							setHasImage(prev => !prev)
@@ -294,7 +291,7 @@ const NewNote = ({ navigation, route }) => {
 
 				</HStack>
 
-				{hasImage?
+				{hasImage ?
 
 					<HStack w={"100%"} mt={16} alignItems={"center"} justifyContent={"flex-end"}>
 
@@ -324,7 +321,7 @@ const NewNote = ({ navigation, route }) => {
 							borderColor={theme.primary.placeholder.indigo}
 						>
 
-							<Feather name={"image"} size={22} color={theme.primary.placeholder.indigo} />
+							<Feather name={"image"} size={22} color={theme.primary.placeholder.indigo}/>
 
 						</Pressable>
 					</HStack> : <></>
@@ -361,20 +358,8 @@ const NewNote = ({ navigation, route }) => {
 						py={12}
 						fontSize={16}
 						textAlign={"left"}
+
 					/>
-
-					{/*</FlatBlock>*/}
-
-					{/*<FlatBlock*/}
-					{/*	h={104}*/}
-					{/*	mb={16}*/}
-					{/*	borderWidth={1}*/}
-					{/*	flexDirection={"row"}*/}
-					{/*	bg={"white"}*/}
-					{/*	shadowColor={theme.primary.bg.litgray}*/}
-					{/*	borderColor={theme.primary.text.purple}*/}
-					{/*	ai={"center"}*/}
-					{/*>*/}
 
 					<Input
 						_focus={{
@@ -406,17 +391,15 @@ const NewNote = ({ navigation, route }) => {
 						textAlign={"left"}
 					/>
 
-					{/*</FlatBlock>*/}
-
 					<FlatBlock
 						h={64}
 						mb={16}
-						borderWidth={1}
+						borderWidth={2}
 						pr={8}
 						flexDirection={"row"}
 						bg={"white"}
 						shadowColor={theme.primary.bg.litgray}
-						borderColor={theme.primary.text.purple}
+						borderColor={theme.primary.placeholder.purple}
 						ai={"center"}
 					>
 						<Text
@@ -427,12 +410,14 @@ const NewNote = ({ navigation, route }) => {
 						>地點</Text>
 
 						<Input
+
 							onPress={() => console.log("gjreo")}
 							_focus={{
 								borderColor: theme.primary.text.purple,
 								color: theme.primary.text.purple,
 								bg: theme.primary.bg.purple,
 							}}
+
 							value={namedLocation}
 							onChangeText={(location) => setNamedLocation(location)}
 							selectionColor={theme.primary.text.purple}
@@ -452,28 +437,18 @@ const NewNote = ({ navigation, route }) => {
 							textAlign={"left"}
 						/>
 
-						{/*<Pressable h={32} justifyContent={"center"} onPress={async () => {*/}
-						{/*	geocodingRequest(noteLocation.lon, noteLocation.lat)*/}
-						{/*		.then(res => {*/}
-						{/*				setCodedLocation(res.data.results[0].formatted_address)*/}
-						{/*				console.log(res.data.results[0].formatted_address)*/}
-						{/*			},*/}
-						{/*			rej => console.log(rej))*/}
-						{/*}}>*/}
-
-						{/*	<Feather name={"map-pin"} color={theme.primary.text.indigo} size={20} />*/}
-						{/*</Pressable>*/}
-
 					</FlatBlock>
+
 
 					<FlatBlock
 						h={64}
 						mb={16}
-						borderWidth={1}
+						borderWidth={2}
+						pr={8}
 						flexDirection={"row"}
 						bg={"white"}
 						shadowColor={theme.primary.bg.litgray}
-						borderColor={theme.primary.text.purple}
+						borderColor={theme.primary.placeholder.purple}
 						ai={"center"}
 					>
 						<Text
@@ -481,54 +456,22 @@ const NewNote = ({ navigation, route }) => {
 							fontSize={16}
 							fontWeight={"bold"}
 							mr={20}
-						>位置</Text>
+						>地址</Text>
 
-						<Input
-							onPress={() => console.log("gjreo")}
-							_focus={{
-								borderColor: theme.primary.text.purple,
-								color: theme.primary.text.purple,
-								bg: theme.primary.bg.purple,
-							}}
-							// value={codedLocation}
-							selectionColor={theme.primary.text.purple}
-							placeholderTextColor={theme.primary.placeholder.indigo}
-							borderColor={"transparent"}
-							color={theme.primary.text.purple}
-							bg={theme.primary.bg.smoke}
-							borderWidth={1}
-							borderRadius={16}
-							fontWeight={"bold"}
-							mr={16}
-							h={36}
-							flex={8}
-							px={20}
-							fontSize={16}
-							textAlign={"left"}
-						/>
-
-						<Pressable h={32} justifyContent={"center"} onPress={async () => {
-							geocodingRequest(noteLocation.lon, noteLocation.lat)
-								.then(res => {
-										setCodedLocation(res.data.results[0].formatted_address)
-										console.log(res.data.results[0].formatted_address)
-									},
-									rej => console.log(rej))
-						}}>
-
-							<Feather name={"map-pin"} color={theme.primary.text.indigo} size={20} />
-						</Pressable>
+						<Text flex={1} noOfLines={1} fontSize={16} color={theme.primary.text.purple}>
+							{codedLocation}
+						</Text>
 
 					</FlatBlock>
 
 					<FlatBlock
 						h={64}
 						mb={36}
-						borderWidth={1}
+						borderWidth={2}
 						flexDirection={"row"}
 						bg={"white"}
 						shadowColor={theme.primary.bg.litgray}
-						borderColor={theme.primary.text.purple}
+						borderColor={theme.primary.placeholder.purple}
 						ai={"center"}
 					>
 						<Text
@@ -561,7 +504,7 @@ const NewNote = ({ navigation, route }) => {
 						/>
 
 						<Pressable h={32} justifyContent={"center"} onPress={() => setOpen(true)}>
-							<Feather name={"calendar"} color={theme.primary.text.indigo} size={20} />
+							<Feather name={"calendar"} color={theme.primary.text.indigo} size={20}/>
 						</Pressable>
 
 					</FlatBlock>
@@ -583,13 +526,21 @@ const NewNote = ({ navigation, route }) => {
 
 						<GradientButton ml={8} w={96} h={34} title={"儲存遊記"} onPress={() => {
 
-							dispatch(pushTripNote(noteObject))
+							if (!isNew) {
+								dispatch(updateTripNote({
+									noteID: item.noteID,
+									item: noteObject
+								}))
 
-							apiRequest("post", `/api/travelope/new-trip-note/${account.info.id}`, noteObject)
+							} else {
+
+								apiRequest("post", `/api/travelope/new-trip-note/${account.info.id}`, noteObject)
+								dispatch(pushTripNote(noteObject))
+							}
 
 							navigation.navigate("CurrentTrip")
 
-						}} />
+						}}/>
 
 					</Block>
 
