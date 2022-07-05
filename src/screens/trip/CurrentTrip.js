@@ -15,6 +15,7 @@ import {delTripNote, selectData, setInactive} from "../../globalstate/dataSlice"
 import {useFocusEffect, useIsFocused, useNavigation} from "@react-navigation/native"
 import {config, useSpring, animated} from "@react-spring/native"
 import {HEIGHT, WIDTH} from "../../Util";
+import {apiRequest} from "../../apis/api";
 
 const styles = StyleSheet.create({
 	container: {
@@ -47,6 +48,9 @@ const UnderlayLeft = ({drag}: { drag: () => void }) => {
 	const dispatch = useDispatch()
 	const {item, percentOpen} = useSwipeableItemParams()
 
+	const account = useSelector(selectAccount)
+	const accountData = useSelector(selectData)
+
 	const animStyle = useAnimatedStyle(
 		() => ({
 			opacity: percentOpen.value,
@@ -65,6 +69,8 @@ const UnderlayLeft = ({drag}: { drag: () => void }) => {
 
 				<Pressable flex={1} w={52} justifyContent={"center"} alignItems={"center"} onPress={() => {
 					dispatch(delTripNote(item.recordTime))
+					apiRequest("post", `/api/travelope/del-trip-note/${account.info.id}/${item.noteID}`, {})
+
 				}}>
 
 					<Feather size={20} name={"trash"} color={theme.primary.text.pink}/>
@@ -246,7 +252,7 @@ const CurrentTrip = () => {
 							<Text mr={12} fontSize={16} fontWeight={"bold"}
 							      color={theme.primary.placeholder.indigo}>旅程 ID：</Text>
 							<Text fontSize={16} fontWeight={"bold"}
-							      color={theme.primary.bg.gray}>{activeTrip.tripID}</Text>
+							      color={theme.primary.bg.gray}>{activeTrip ? activeTrip.tripID : ""}</Text>
 
 						</HStack>
 
@@ -254,7 +260,8 @@ const CurrentTrip = () => {
 
 							<Text mr={12} fontSize={16} fontWeight={"bold"}
 							      color={theme.primary.placeholder.indigo}>旅程名稱：</Text>
-							<Text fontSize={16} fontWeight={"bold"} color={theme.primary.bg.gray}>{activeTrip.tripName}</Text>
+							<Text fontSize={16} fontWeight={"bold"}
+							      color={theme.primary.bg.gray}>{activeTrip ? activeTrip.tripName : ""}</Text>
 
 						</HStack>
 
@@ -263,7 +270,7 @@ const CurrentTrip = () => {
 							<Text mr={12} fontSize={16} fontWeight={"bold"}
 							      color={theme.primary.placeholder.indigo}>旅程描述：</Text>
 							<Text fontSize={16} fontWeight={"bold"}
-							      color={theme.primary.bg.gray}>{activeTrip.tripDescription}</Text>
+							      color={theme.primary.bg.gray}>{activeTrip ? activeTrip?.tripDescription : ""}</Text>
 
 						</HStack>
 
@@ -272,7 +279,7 @@ const CurrentTrip = () => {
 							<Text mr={12} fontSize={16} fontWeight={"bold"}
 							      color={theme.primary.placeholder.indigo}>開始時間：</Text>
 							<Text fontSize={16} fontWeight={"bold"}
-							      color={theme.primary.bg.gray}>{"" + new Date(activeTrip.startTime).getFullYear() + "年" + (new Date(activeTrip.startTime).getMonth() + 1)  + "月" + new Date(activeTrip.startTime).getDate()  + "日  " + new Date(activeTrip.startTime).getHours()  + "：" + new Date(activeTrip.startTime).getMinutes()}</Text>
+							      color={theme.primary.bg.gray}>{activeTrip ? "" + new Date(activeTrip.startTime).getFullYear() + "年" + (new Date(activeTrip.startTime).getMonth() + 1) + "月" + new Date(activeTrip.startTime).getDate() + "日  " + new Date(activeTrip.startTime).getHours() + "：" + new Date(activeTrip.startTime).getMinutes() : ""}</Text>
 
 						</HStack>
 
@@ -301,9 +308,22 @@ const CurrentTrip = () => {
 									console.log("setInactive")
 									dispatch(setInactive())
 
+									setActiveTrip(null)
+
 									// await new Promise(resolve => setTimeout(resolve, 1500))
 
+									// navigation.reset({
+									// 	index: 0,
+									// 	routes: [
+									// 		{
+									// 			name: 'CurrentTrip',
+									// 			params: {},
+									// 		},
+									// 	],
+									// })
+
 									navigation.navigate("MainScreen")
+
 								}}
 
 								flexDrection={"row"} ml={8}
@@ -361,38 +381,42 @@ const CurrentTrip = () => {
 
 						{/*</HStack>*/}
 
-						{accountData.trips[accountData.trips.length - 1].tripNotes.length > 0 ?
+						{activeTrip ?
 
-							<>
-							</>
+								accountData.trips[accountData.trips.length - 1].tripNotes.length ?
 
-							:
+									<>
+									</>
 
-							<Pressable
+									:
 
-								onPress={() => navigation.navigate("NewNote", {item: null, isNew: true})}
+									<Pressable
 
-								h={64}
-								w={"100%"}
-								mb={32}
-								flexDirection={"row"}
-								justifyContent={"center"}
-								alignItems={"center"}
-								borderRadius={18}
-								borderStyle={"dashed"}
-								borderWidth={2}
-								borderColor={theme.primary.placeholder.indigo}
-							>
+										onPress={() => navigation.navigate("NewNote", {item: null, isNew: true})}
 
-								<Feather name={"plus-circle"} size={22} color={theme.primary.placeholder.indigo}/>
+										h={64}
+										w={"100%"}
+										mb={32}
+										flexDirection={"row"}
+										justifyContent={"center"}
+										alignItems={"center"}
+										borderRadius={18}
+										borderStyle={"dashed"}
+										borderWidth={2}
+										borderColor={theme.primary.placeholder.indigo}
+									>
 
-								<Text fontSize={16} fontWeight={"bold"} letterSpacing={1}
-								      color={theme.primary.placeholder.indigo}
-								      ml={8}>
-									寫遊記
-								</Text>
+										<Feather name={"plus-circle"} size={22} color={theme.primary.placeholder.indigo}/>
 
-							</Pressable>
+										<Text fontSize={16} fontWeight={"bold"} letterSpacing={1}
+										      color={theme.primary.placeholder.indigo}
+										      ml={8}>
+											寫遊記
+										</Text>
+
+									</Pressable>
+
+							: <></>
 						}
 
 						<FlatList
@@ -406,13 +430,15 @@ const CurrentTrip = () => {
 
 							ListFooterComponent={
 
-								accountData.trips[accountData.trips.length - 1].tripNotes.length > 0 ?
+							activeTrip?
+
+								accountData.trips[accountData.trips.length - 1].tripNotes.length ?
 
 									<HStack mt={16} w={"100%"} justifyContent={"center"} alignItems={"center"}>
 
 										<GradientButton onPress={() => navigation.navigate("NewNote", {item: null, isNew: true})
 										} pureIcon h={36} w={36} icon={"plus"} iconSize={24} iconColor={"white"}/>
-									</HStack> : <></>
+									</HStack> : <></> : <></>
 							}
 
 							renderItem={renderItem}

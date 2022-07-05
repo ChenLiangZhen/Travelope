@@ -87,7 +87,10 @@ router_user.post("/api/travelope/signin", async (req, res) => {
 		await user.comparePassword(password)
 		const token = jwt.sign({ userId: user._id }, "U0VDUkVUX0tFWV9PRl9NSURURVJNX1BST0pFQ1Q=")
 
-		const userData = await UserData.findOne({ userLink: user._id })
+		const userData = await UserData.findOne({ userLink: user.id })
+
+		console.log("userData: " + userData)
+		console.log("user: " + user)
 
 		res.send({ token, user, userData })
 	} catch (e) {

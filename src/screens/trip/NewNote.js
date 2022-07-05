@@ -527,6 +527,8 @@ const NewNote = ({navigation, route}) => {
 						<GradientButton ml={8} w={96} h={34} title={"儲存遊記"} onPress={() => {
 
 							if (!isNew) {
+
+								apiRequest("put", `/api/travelope/update-trip-note/${account.info.id}/${item.noteID}`, noteObject)
 								dispatch(updateTripNote({
 									noteID: item.noteID,
 									item: noteObject
@@ -535,6 +537,10 @@ const NewNote = ({navigation, route}) => {
 							} else {
 
 								apiRequest("post", `/api/travelope/new-trip-note/${account.info.id}`, noteObject)
+									.then(res=> {}, rej=> {
+										// console.log(JSON.stringify(rej))
+									})
+
 								dispatch(pushTripNote(noteObject))
 							}
 

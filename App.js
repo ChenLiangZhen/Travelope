@@ -254,6 +254,8 @@ const DrawerNavigator = () => {
 	const [activeTrip, setActiveTrip] = useState()
 
 	useEffect(()=> {
+
+
 		console.log("refresh side list")
 		let trip = accountData.trips.find(item => item.isActive === true)
 		trip? setActiveTrip(trip) : setActiveTrip(null)

@@ -1,20 +1,144 @@
 import { HStack, Pressable, ScrollView, StatusBar, Text, useTheme, VStack } from "native-base"
-import React, { useEffect, useRef, useState } from "react"
+import React, {useCallback, useEffect, useRef, useState} from "react"
 import Block from "../components/Block"
 import BlockTitle from "../components/BlockTitle"
 import LayoutBase from "../components/LayoutBase"
 import { GradientButton } from "../components/GradientButton"
 
 import CameraRoll from "@react-native-community/cameraroll"
-import { FlatList } from "react-native"
-import { selectData } from "../globalstate/dataSlice"
+import {FlatList, StyleSheet, Animated} from "react-native"
+import {delTrip, delTripNote, selectData} from "../globalstate/dataSlice"
 import { useDispatch, useSelector } from "react-redux"
 import { selectAccount } from "../globalstate/accountSlice"
 import FlatBlock from "../components/FlatBlock"
 import Geolocation from "react-native-geolocation-service"
-import { weatherForecastRequest, weatherRequest } from "../apis/api"
+import {apiRequest, weatherForecastRequest, weatherRequest} from "../apis/api"
 import Feather from "react-native-vector-icons/Feather"
-import { useFocusEffect } from "@react-navigation/native"
+import {useFocusEffect, useNavigation} from "@react-navigation/native"
+import {useAnimatedStyle} from "react-native-reanimated";
+
+import SwipeableItem, {useSwipeableItemParams} from "react-native-swipeable-item"
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+	},
+	row: {
+		flexDirection: "row",
+		flex: 1,
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	text: {
+		fontWeight: "bold",
+		color: "white",
+		fontSize: 32,
+	},
+	underlayLeft: {
+		flex: 1,
+		backgroundColor: "transparent",
+		justifyContent: "flex-end",
+	},
+})
+
+const OVERSWIPE_DIST = 0
+const NUM_ITEMS = 20
+
+const UnderlayLeft = ({drag}: { drag: () => void }) => {
+
+	const theme = useTheme().colors
+	const dispatch = useDispatch()
+	const {item, percentOpen} = useSwipeableItemParams()
+
+	const account = useSelector(selectAccount)
+	const accountData = useSelector(selectData)
+
+	const animStyle = useAnimatedStyle(
+		() => ({
+			opacity: percentOpen.value,
+			bottom: 32 - percentOpen.value * 32,
+		}),
+		[percentOpen],
+	)
+
+	return (
+
+		<Animated.View
+			style={[styles.row, styles.underlayLeft, animStyle]} // Fade in on open
+		>
+
+			<Block mb={12} px={2} h={64} w={58} sc={"#fff"} borderWidth={2} borderColor={theme.primary.placeholder.pink}>
+
+				<Pressable flex={1} w={52} justifyContent={"center"} alignItems={"center"} onPress={() => {
+					dispatch(delTrip(item.tripID))
+					apiRequest("post", `/api/travelope/del-trip/${account.info.id}/${item.tripID}`, {})
+
+				}}>
+
+					<Feather size={20} name={"trash"} color={theme.primary.text.pink}/>
+				</Pressable>
+
+			</Block>
+
+		</Animated.View>
+	)
+}
+
+function RowItem({item, itemRefs, drag}) {
+
+	const theme = useTheme().colors
+	const navigation = useNavigation()
+
+	return (
+
+		<SwipeableItem
+
+			key={item.id}
+			item={item}
+			ref={(ref) => {
+				if (ref && !itemRefs.current.get(item.id)) {
+					itemRefs.current.set(item.id, ref)
+				}
+			}}
+
+			onChange={({open}) => {
+				if (open) {
+					// Close all other open items
+					[...itemRefs.current.entries()].forEach(([key, ref]) => {
+						if (key !== item.id && ref) ref.close()
+					})
+				}
+			}}
+
+			overSwipe={OVERSWIPE_DIST}
+			renderUnderlayLeft={() => <UnderlayLeft drag={drag}/>}
+			snapPointsLeft={[70]}
+		>
+			<Block borderColor={theme.primary.placeholder.purple} sc={"white"} mb={12} h={64} pl={14} flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"}>
+
+				<HStack alignItems={"center"}>
+					<Feather name={"mail"} color={theme.primary.text.purple} size={32} />
+
+					<VStack ml={12} justifyContent={"center"} w={200}>
+						<Text noOfLines={1} mb={2} mr={16} fontSize={16} color={theme.primary.text.purple}
+						      fontWeight={"bold"}>{item.tripName} </Text>
+						{/*<Text noOfLines={1} mr={16} fontSize={14} fontWeight={"light"} color={theme.primary.text.purple}*/}
+						{/*      fontWeight={"normal"}>{item.tripDescription}</Text>*/}
+					</VStack>
+				</HStack>
+
+				<HStack borderRadius={12} w={64} bg={theme.primary.placeholder.indigo} h={42} alignItems={"center"}
+				        justifyContent={"center"}>
+					<Text fontSize={18} color={"white"} fontWeight={"bold"}> {new Date(item.startTime).getMonth() + 1 + " /"} </Text>
+					<Text fontSize={18} lineHeight={22} color={"white"}
+					      fontWeight={"bold"}> {new Date(item.startTime).getDate()} </Text>
+				</HStack>
+
+			</Block>
+
+		</SwipeableItem>
+	)
+}
 
 const TripsItem = ({ item }) => {
 
@@ -50,6 +174,8 @@ const TripsItem = ({ item }) => {
 const MainScreen = ({ navigation }) => {
 
 	const ref = useRef()
+	const itemRefs = useRef(new Map())
+
 
 	const theme = useTheme().colors
 
@@ -67,6 +193,9 @@ const MainScreen = ({ navigation }) => {
 	const [weatherForecastData, setWeatherForecastData] = useState([])
 
 	const renderItemTrip = ({ item }) => <TripsItem item={item} />
+	const renderItemTripSlide = useCallback((params) => {
+		return <RowItem {...params} itemRefs={itemRefs}/>
+	}, [])
 
 	const getLocation = async () => {
 
@@ -97,7 +226,6 @@ const MainScreen = ({ navigation }) => {
 		}, rej => console.log(rej))
 
 	}
-
 
 	useFocusEffect(
 
@@ -342,8 +470,10 @@ const MainScreen = ({ navigation }) => {
 
 					</>
 				}
+
+				keyExtractor={item => item.tripID}
 				data={accountData.trips.filter(trip => trip.isActive === false)}
-				renderItem={renderItemTrip}
+				renderItem={renderItemTripSlide}
 			/>
 
 

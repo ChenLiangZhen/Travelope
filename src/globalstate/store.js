@@ -6,16 +6,21 @@ import thunk from "redux-thunk";
 import accountReducer from "./accountSlice";
 import dataReducer from "./dataSlice";
 
-const persistConfig = {
-    key: 'root',
+const persistAccount = {
+    key: 'account',
+    storage: AsyncStorage,
+};
+
+const persistData = {
+    key: 'data',
     storage: AsyncStorage,
 };
 
 export const store = configureStore({
 
     reducer: {
-        account: persistReducer(persistConfig, accountReducer),
-        data: persistReducer(persistConfig, dataReducer)
+        account: persistReducer(persistAccount, accountReducer),
+        data: persistReducer(persistData, dataReducer)
     },
 
     devTools: process.env.NODE_ENV !== 'production',

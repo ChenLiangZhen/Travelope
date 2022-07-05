@@ -11,15 +11,15 @@ const Notes = new mongoose.Schema({
 		type: Object
 	},
 
-	title: {
+	noteTitle: {
 		type: String
 	},
 
-	content: {
+	noteContent: {
 		type: String
 	},
 
-	imageKey: {
+	imageList: {
 		type: []
 	},
 

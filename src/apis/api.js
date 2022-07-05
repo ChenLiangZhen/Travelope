@@ -79,6 +79,7 @@ export async function apiRequest(method, route, req) {
 	// console.log("token: " + pureToken)
 
 	return new Promise(async (resolve, reject) => {
+
 		switch (method) {
 
 			case "get":

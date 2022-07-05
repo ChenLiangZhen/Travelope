@@ -2,86 +2,40 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 export const initialState = {
 
-	currentTrip: {
-
-		isActive: true,
-		tripName: "",
-		startTime: {},
-		endTime: {},
-		fellowList: [],
-
-		// fellow: {
-		//   name: "",
-		//   key: ""
-		// },
-
-		tripNotes: [],
-
-		// tripNote: {
-		//
-		//   recordTime: {},
-		//
-		//   title: "",
-		//   description: "",
-		//   mood: "",
-		//   imageKey: "",
-		//
-		//   longitude: "",
-		//   latitude: "",
-		//
-		//   adjPhrases: [],
-		//   weather: "",
-		// }
-
-	},
-
-
+	// currentTrip: {
+	//
+	// 	isActive: true,
+	// 	tripName: "",
+	// 	startTime: {},
+	// 	endTime: {},
+	// 	fellowList: [],
+	//
+	// 	// fellow: {
+	// 	//   name: "",
+	// 	//   key: ""
+	// 	// },
+	//
+	// 	tripNotes: [],
+	//
+	// 	// tripNote: {
+	// 	//
+	// 	//   recordTime: {},
+	// 	//
+	// 	//   title: "",
+	// 	//   description: "",
+	// 	//   mood: "",
+	// 	//   imageKey: "",
+	// 	//
+	// 	//   longitude: "",
+	// 	//   latitude: "",
+	// 	//
+	// 	//   adjPhrases: [],
+	// 	//   weather: "",
+	// 	// }
+	//
+	// },
 	trips: [
 
-		// {
-		// 	isActive: false,
-		// 	tripName: "",
-		// 	tripID: "",
-		// 	startTime: {},
-		// 	endTime: {},
-		// 	fellowList: [],
-		//
-		// 	fellow: {
-		// 		name: "",
-		// 		key: "",
-		// 	},
-		//
-		// 	tripNotes: [{
-		//
-		// 		title: "",
-		// 		description: "",
-		// 		mood: "",
-		// 		imageKey: "",
-		//
-		// 		longitude: "",
-		// 		latitude: "",
-		//
-		// 		adjPhrases: [],
-		// 		weather: "",
-		//
-		// 	}, {
-		//
-		// 		recordTime: {},
-		//
-		// 		title: "",
-		// 		description: "",
-		// 		mood: "",
-		// 		imageKey: "",
-		//
-		// 		longitude: "",
-		// 		latitude: "",
-		//
-		// 		adjPhrases: [],
-		// 		weather: "",
-		//
-		// 	}],
-		//
-		// },
 	],
 
 }
@@ -117,6 +71,14 @@ const dataSlice = createSlice({
 			state.trips.push(action.payload)
 		},
 
+		delTrip(state, action) { //建立一個新的旅程，一個新的旅程只會執行一次這個函式。
+
+			console.log("DEL TRIP")
+			const targetIndex = state.trips.findIndex(trip => trip.tripID = action.payload)
+			console.log(targetIndex)
+			state.trips.splice(targetIndex, 1)
+		},
+
 		pushTripNote(state, action) { //在當前旅程新增遊記。
 
 			console.log("PUSH TRIP NOTE")
@@ -126,8 +88,8 @@ const dataSlice = createSlice({
 		updateTripNote(state, action) { //在當前旅程新增遊記。
 
 			console.log("UPDATE TRIP NOTE")
-			const targetID = state.trips[state.trips.length - 1].tripNotes.findIndex( note => note.noteID  === action.payload.noteID)
-			state.trips[state.trips.length - 1].tripNotes[targetID] = action.payload.item
+			const targetIndex = state.trips[state.trips.length - 1].tripNotes.findIndex( note => note.noteID  === action.payload.noteID)
+			state.trips[state.trips.length - 1].tripNotes[targetIndex] = action.payload.item
 		},
 
 		delTripNote(state, action) {
@@ -152,6 +114,7 @@ export const {
 	pushTrip,
 	pushTripNote,
 	delTripNote,
+	delTrip,
 	setCurrentTrip,
 	updateTripNote
 

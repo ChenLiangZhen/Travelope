@@ -36,7 +36,7 @@ import RNFS from "react-native-fs"
 import { profilePictureInit } from "../apis/fileManager"
 import { downloadProfilePicture, uploadProfilePicture } from "../apis/transferManager"
 import { dataControl } from "../globalstate/store"
-import { purgeAccountData } from "../globalstate/dataSlice"
+import {purgeAccountData, setTrips} from "../globalstate/dataSlice"
 
 function SignModal({ modalVisible, setModalVisible }) {
 
@@ -274,6 +274,10 @@ function SignModal({ modalVisible, setModalVisible }) {
 													         await downloadProfilePicture(res.data.user.id, res.data.user.id, RNFS.DocumentDirectoryPath + "/travelope/" + res.data.user.id)
 													         dispatch(setProfilePicture(RNFS.DocumentDirectoryPath + "/travelope/" + res.data.user.id))
 												         }
+
+															dispatch(setTrips(res.data.userData.trips))
+
+												         console.log("FETCHED DATA: " + res.data.userData)
 
 												         setErrorText("")
 												         setWarningText("登入成功！")
