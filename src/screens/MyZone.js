@@ -91,6 +91,7 @@ const UnderlayLeft = ({ drag }: { drag: () => void }) => {
 	}
 
 	const ToastInfo = ({ warningText }) => {
+
 		return (
 			<HStack
 				alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.indigo} w={WIDTH * .9} h={64}
@@ -101,6 +102,7 @@ const UnderlayLeft = ({ drag }: { drag: () => void }) => {
 	}
 
 	return (
+
 		<Animated.View
 			style={[styles.row, styles.underlayLeft, animStyle]} // Fade in on open
 		>
@@ -129,7 +131,7 @@ const UnderlayLeft = ({ drag }: { drag: () => void }) => {
 				)
 
 			}}>
-				<Block borderWidth={1} borderColor={theme.primary.text.indigo} h={64} jc={"center"} ai={"center"}>
+				<Block mb={18} borderWidth={1} borderColor={theme.primary.text.indigo} h={64} jc={"center"} ai={"center"}>
 					<Feather size={20} name={"trash"} color={theme.primary.text.indigo} />
 				</Block>
 			</Pressable>
@@ -140,9 +142,11 @@ const UnderlayLeft = ({ drag }: { drag: () => void }) => {
 
 function RowItem({ item, itemRefs, drag }) {
 
+	const theme = useTheme().colors
 
 	return (
 		<SwipeableItem
+
 
 			key={item.id}
 			item={item}
@@ -165,7 +169,7 @@ function RowItem({ item, itemRefs, drag }) {
 			snapPointsLeft={[70]}
 		>
 			<Block borderWidth={1} w={"100%"} h={64} justifyContent={"space-between"} alignItems={"center"}
-			       flexDirection={"row"}>
+			       flexDirection={"row"} mb={18}>
 				{/*<Image*/}
 				{/*  style={{*/}
 				{/*    borderRadius: 100,*/}
@@ -178,13 +182,35 @@ function RowItem({ item, itemRefs, drag }) {
 
 				{/*await downloadProfilePicture(res.data.user.id, res.data.user.id, RNFS.DocumentDirectoryPath + "/travelope/" + res.data.user.id)*/}
 
-				<Text numberOfLines={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-					{item.name}
-				</Text>
+				<HStack alignItems={"center"}>
+
+					<HStack borderWidth={2} borderColor={theme.primary.text.purple} borderRadius={100} mr={12} p={1}>
+						<Image
+
+							style={{
+
+								borderRadius: 100,
+								height: 36,
+								width: 36,
+
+							}}
+
+							source={{ uri: item.pictureURL }}
+							alt={"userImage"}
+						/>
+					</HStack>
+
+
+					<Text numberOfLines={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+						{item.name}
+					</Text>
+
+				</HStack>
 
 				<Text numberOfLines={1} color={"#abadff"} fontSize={17}>
 					{item.tag}
 				</Text>
+
 			</Block>
 		</SwipeableItem>
 	)
@@ -254,6 +280,7 @@ const MyZone = () => {
 		if (warningMessage === "找不到用戶") {
 			setCanShowResult(true)
 		}
+
 	}, [warningMessage])
 
 	useEffect(()=>  {
@@ -489,11 +516,13 @@ const MyZone = () => {
 														account.info.profilePictureLocalPath !== ""?
 
 															<Image
+
 																style={{
 																	borderRadius: 100,
 																	height: 88,
 																	width: 88,
 																}}
+
 																source={{ uri: targetImageURL }}
 																alt={"userImage"}
 															/>
@@ -527,6 +556,7 @@ const MyZone = () => {
 														dispatch(addFriend({
 															key: targetData.id,
 															name: targetData.nickname,
+															pictureURL: targetImageURL,
 															tag: "friend",
 														}))
 

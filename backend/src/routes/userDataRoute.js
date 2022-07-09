@@ -10,10 +10,10 @@ const router_data = express.Router()
 
 router_data.get("/api/travelope/get-trips/:accountID", userAuth, async (req, res) => {
 
-	const { accountID } = req.params
+	const {accountID} = req.params
 
 	try {
-		UserData.findOne({ userLink: req.query.id }, (e, data) => {
+		UserData.findOne({userLink: req.query.id}, (e, data) => {
 			if (e || !data) {
 				return res.status(404).send("ERROR")
 			}
@@ -29,15 +29,15 @@ router_data.get("/api/travelope/get-trips/:accountID", userAuth, async (req, res
 
 })
 
-router_data.post("/api/travelope/new-trip/:accountID", async (req, res) => {
+router_data.post("/api/travelope/new-trip/:accountID", userAuth, async (req, res) => {
 
-	const { accountID } = req.params
+	const {accountID} = req.params
 	const tripData = req.body
 
 	console.log("new Trip")
 
 	try {
-		UserData.findOne({ userLink: accountID }, async (e, userData) => {
+		UserData.findOne({userLink: accountID}, async (e, userData) => {
 			if (e || !userData) {
 				return res.status(404).send("ERROR")
 			}
@@ -67,12 +67,56 @@ router_data.post("/api/travelope/new-trip/:accountID", async (req, res) => {
 
 })
 
-router_data.post("/api/travelope/del-trip/:accountID/:tripID", async (req, res) => {
+router_data.post("/api/travelope/new-shared-trip/:sharedAccountID/:fromAccountID:/fromAccountNickname", userAuth, async (req, res) => {
 
-	const { accountID, tripID } = req.params
+	const {sharedAccountID, fromAccountID, fromAccountNickname} = req.params
+	const tripData = req.body
+
+	console.log("new shared Trip")
 
 	try {
-		UserData.findOne({ userLink: accountID }, async (e, userData) => {
+		UserData.findOne({userLink: sharedAccountID}, async (e, userData) => {
+
+			if (e || !userData) {
+				return res.status(404).send("ERROR")
+			}
+
+			console.log(userData)
+
+			// let prevActiveTripIndex = userData.trips.findIndex(trip => trip.isActive === true)
+			// if (prevActiveTripIndex >= 0) {
+			//
+			// 	console.log("found previous active trip.")
+			//
+			// 	userData.trips[prevActiveTripIndex].isActive = false
+			// 	await userData.save()
+			// }
+
+			userData.trips.push({
+				...tripData,
+				sharedAccountID: sharedAccountID,
+				fromAccountID: fromAccountID,
+				fromAccountNickname: fromAccountNickname
+			})
+			await userData.save()
+
+			res.status(200)
+		})
+
+	} catch (e) {
+
+		res.status(422).send("Update Data Failed: " + e)
+		console.log("[Update Data Failed]: " + e)
+	}
+
+})
+
+router_data.post("/api/travelope/del-trip/:accountID/:tripID", userAuth, async (req, res) => {
+
+	const {accountID, tripID} = req.params
+
+	try {
+		UserData.findOne({userLink: accountID}, async (e, userData) => {
 			if (e || !userData) {
 				return res.status(404).send("ERROR")
 			}
@@ -102,15 +146,15 @@ router_data.post("/api/travelope/del-trip/:accountID/:tripID", async (req, res) 
 
 })
 
-router_data.post("/api/travelope/new-trip-note/:accountID", async (req, res) => {
+router_data.post("/api/travelope/new-trip-note/:accountID", userAuth, async (req, res) => {
 
-	const { accountID } = req.params
+	const {accountID} = req.params
 	const tripNoteData = req.body
 
 	console.log(tripNoteData)
 
 	try {
-		UserData.findOne({ userLink: accountID }, async (e, userData) => {
+		UserData.findOne({userLink: accountID}, async (e, userData) => {
 
 			if (e || !userData) {
 				return res.status(404).send("ERROR")
@@ -134,15 +178,15 @@ router_data.post("/api/travelope/new-trip-note/:accountID", async (req, res) => 
 
 })
 
-router_data.put("/api/travelope/update-trip-note/:accountID/:noteID", async (req, res) => {
+router_data.put("/api/travelope/update-trip-note/:accountID/:noteID", userAuth, async (req, res) => {
 
-	const { accountID, noteID } = req.params
+	const {accountID, noteID} = req.params
 	const tripNoteData = req.body
 
 	console.log("updateTripNote" + tripNoteData)
 
 	try {
-		UserData.findOne({ userLink: accountID }, async (e, userData) => {
+		UserData.findOne({userLink: accountID}, async (e, userData) => {
 
 			if (e || !userData) {
 				return res.status(404).send("ERROR")
@@ -151,7 +195,7 @@ router_data.put("/api/travelope/update-trip-note/:accountID/:noteID", async (req
 			let targetTripIndex = userData.trips.findIndex(trip => trip.isActive === true)
 			if (targetTripIndex >= 0) {
 
-				const targetIndex =userData.trips[targetTripIndex].tripNotes.findIndex( item => item.noteID === noteID )
+				const targetIndex = userData.trips[targetTripIndex].tripNotes.findIndex(item => item.noteID === noteID)
 				userData.trips[targetTripIndex].tripNotes[targetIndex] = tripNoteData
 				await userData.save()
 			}
@@ -167,12 +211,12 @@ router_data.put("/api/travelope/update-trip-note/:accountID/:noteID", async (req
 
 })
 
-router_data.post("/api/travelope/del-trip-note/:accountID/:noteID", async (req, res) => {
+router_data.post("/api/travelope/del-trip-note/:accountID/:noteID", userAuth, async (req, res) => {
 
-	const { accountID, noteID } = req.params
+	const {accountID, noteID} = req.params
 
 	try {
-		UserData.findOne({ userLink: accountID }, async (e, userData) => {
+		UserData.findOne({userLink: accountID}, async (e, userData) => {
 
 			if (e || !userData) {
 				return res.status(404).send("ERROR")
@@ -181,7 +225,7 @@ router_data.post("/api/travelope/del-trip-note/:accountID/:noteID", async (req, 
 			let targetTripIndex = userData.trips.findIndex(trip => trip.isActive === true)
 			if (targetTripIndex >= 0) {
 
-				const targetIndex =userData.trips[targetTripIndex].tripNotes.findIndex( item => item.noteID === noteID )
+				const targetIndex = userData.trips[targetTripIndex].tripNotes.findIndex(item => item.noteID === noteID)
 				userData.trips[targetTripIndex].tripNotes.splice(targetIndex, 1)
 				await userData.save()
 			}
@@ -199,10 +243,10 @@ router_data.post("/api/travelope/del-trip-note/:accountID/:noteID", async (req, 
 
 router_data.put(`/api/travelope/update-data`, userAuth, async (req, res) => {
 
-	const { data, userLink } = req.body
+	const {data, userLink} = req.body
 
 	try {
-		UserData.updateOne({ userLink: userLink }, { data: data }, {}, (e, res) => {
+		UserData.updateOne({userLink: userLink}, {data: data}, {}, (e, res) => {
 			console.log(res.matchedCount)
 		})
 

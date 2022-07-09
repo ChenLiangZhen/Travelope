@@ -6,10 +6,10 @@ import LayoutBase from "../components/LayoutBase"
 import { GradientButton } from "../components/GradientButton"
 
 import CameraRoll from "@react-native-community/cameraroll"
-import {FlatList, StyleSheet, Animated} from "react-native"
+import {FlatList, StyleSheet, Animated, Alert} from "react-native"
 import {delTrip, delTripNote, selectData} from "../globalstate/dataSlice"
 import { useDispatch, useSelector } from "react-redux"
-import { selectAccount } from "../globalstate/accountSlice"
+import {delFriend, selectAccount} from "../globalstate/accountSlice"
 import FlatBlock from "../components/FlatBlock"
 import Geolocation from "react-native-geolocation-service"
 import {apiRequest, weatherForecastRequest, weatherRequest} from "../apis/api"
@@ -70,8 +70,24 @@ const UnderlayLeft = ({drag}: { drag: () => void }) => {
 			<Block mb={12} px={2} h={64} w={58} sc={"#fff"} borderWidth={2} borderColor={theme.primary.placeholder.pink}>
 
 				<Pressable flex={1} w={52} justifyContent={"center"} alignItems={"center"} onPress={() => {
-					dispatch(delTrip(item.tripID))
-					apiRequest("post", `/api/travelope/del-trip/${account.info.id}/${item.tripID}`, {})
+
+
+					Alert.alert(
+						"刪除歷史旅程",
+						"你確定要刪除「" + item.tripName + "」嗎？",
+						[
+							{
+								text: "取消",
+							},
+							{
+								text: "刪除", onPress: () => {
+									dispatch(delTrip(item.tripID))
+									apiRequest("post", `/api/travelope/del-trip/${account.info.id}/${item.tripID}`, {})
+
+								},
+							},
+						],
+					)
 
 				}}>
 
@@ -114,7 +130,9 @@ function RowItem({item, itemRefs, drag}) {
 			renderUnderlayLeft={() => <UnderlayLeft drag={drag}/>}
 			snapPointsLeft={[70]}
 		>
-			<Block borderColor={theme.primary.placeholder.purple} sc={"white"} mb={12} h={64} pl={14} flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"}>
+			<Pressable onPress={()=> {
+				navigation.navigate("LegacyTrip", { item: item })
+			}} borderWidth={2} borderRadius={18} px={12} borderColor={theme.primary.placeholder.purple} sc={"white"} mb={12} h={64} pl={14} flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"}>
 
 				<HStack alignItems={"center"}>
 					<Feather name={"mail"} color={theme.primary.text.purple} size={32} />
@@ -134,7 +152,7 @@ function RowItem({item, itemRefs, drag}) {
 					      fontWeight={"bold"}> {new Date(item.startTime).getDate()} </Text>
 				</HStack>
 
-			</Block>
+			</Pressable>
 
 		</SwipeableItem>
 	)

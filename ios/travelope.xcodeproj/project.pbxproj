@@ -13,6 +13,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		1869FD2FC929C45FA154BAFF /* libPods-travelope.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AACB5D2BFC0C3B726627E00 /* libPods-travelope.a */; };
+		E1A8A9E12F9847938A838777 /* STSongti-TC-Regular.ttc in Resources */ = {isa = PBXBuildFile; fileRef = AE0F13E4BFEB45719416FB1C /* STSongti-TC-Regular.ttc */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +63,7 @@
 		F85951DB3658451D9681370C /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		F8BDA83CFFBA5E768E67674E /* Pods-travelope.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travelope.release.xcconfig"; path = "Target Support Files/Pods-travelope/Pods-travelope.release.xcconfig"; sourceTree = "<group>"; };
 		FC9349D27A4D2B3864C7BAB5 /* libPods-travelope-travelopeTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travelope-travelopeTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AE0F13E4BFEB45719416FB1C /* STSongti-TC-Regular.ttc */ = {isa = PBXFileReference; name = "STSongti-TC-Regular.ttc"; path = "../src/res/fonts/STSongti-TC-Regular.ttc"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +122,7 @@
 				3BAD2E276C6D4DA0AEF3E319 /* Octicons.ttf */,
 				47E6B73A840F4A5387CFC337 /* SimpleLineIcons.ttf */,
 				1F8870FBEBDF457C8160C2A2 /* Zocial.ttf */,
+				AE0F13E4BFEB45719416FB1C /* STSongti-TC-Regular.ttc */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -287,6 +290,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E1A8A9E12F9847938A838777 /* STSongti-TC-Regular.ttc in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,38 +1,23 @@
-import React, { useEffect, useRef, useState } from "react"
-import MapView, { Callout, LatLng, Marker, PROVIDER_GOOGLE } from "react-native-maps"
+import React, {useEffect, useRef, useState} from "react"
+import MapView, {Callout, LatLng, Marker, PROVIDER_GOOGLE} from "react-native-maps"
 import axios from "axios"
-import { Actionsheet, Box, Center, HStack, Pressable, Text, useDisclose, useTheme, View } from "native-base"
+import {Actionsheet, Box, Center, HStack, Pressable, Text, useDisclose, useTheme, View, VStack} from "native-base"
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
 import LayoutBase from "../../components/LayoutBase"
-import { WIDTH } from "../../Util"
-import { SafeAreaView } from "react-native-safe-area-context"
+import {WIDTH} from "../../Util"
+import {SafeAreaView} from "react-native-safe-area-context"
 import Feather from "react-native-vector-icons/Feather"
-import { useDispatch, useSelector } from "react-redux"
-import { selectData } from "../../globalstate/dataSlice"
-import { selectAccount } from "../../globalstate/accountSlice"
+import {useDispatch, useSelector} from "react-redux"
+import {delTripNote, selectData} from "../../globalstate/dataSlice"
+import {selectAccount} from "../../globalstate/accountSlice"
 import Geolocation from 'react-native-geolocation-service'
 import Block from "../../components/Block"
-import {GradientButton} from "../../components/GradientButton";
+import {GradientBorderButton, GradientButton} from "../../components/GradientButton";
 import {useIsFocused} from "@react-navigation/native";
 
 const getUbike = async () => {
 	return await axios.get("https://data.ntpc.gov.tw/api/datasets/71CD1490-A2DF-4198-BEF1-318479775E8A/json?page=0&size=200")
 }
-
-// const MarkerMemo = (site) => useMemo(() => {
-// 	return (
-// 		<Marker
-// 			coordinate={{latitude: site.latitude, longitude: site.longitude}}
-// 			key={`${site.id}${site.line}`}
-// 			title={site.name}
-// 			description={site.address}
-// 		>
-// 			<Center bg={site.line === "南港、板橋、土城線" ? "#7777ff" : "white"} borderRadius={60} p={1.5} borderWidth={3}>
-// 				<MaterialIcons name={"train"} size={24} color="black"/>
-// 			</Center>
-// 		</Marker>
-// 	)
-// }, site)
 
 const TripOnMap = ({navigation}) => {
 
@@ -115,12 +100,6 @@ const TripOnMap = ({navigation}) => {
 		});
 	};
 
-	// const getUbikeData = async () => {
-	// 	const bikeData = await getUbike();
-	// 	setUbikeData(bikeData);
-	// };
-
-
 	const getLocation = async () => {
 
 		console.log("exec")
@@ -132,7 +111,7 @@ const TripOnMap = ({navigation}) => {
 			return;
 		}
 
-		Geolocation.getCurrentPosition((res)=> {
+		Geolocation.getCurrentPosition((res) => {
 			setRegionAndMarker(res);
 			console.log("located! " + JSON.stringify(res))
 		}, rej => console.log(rej));
@@ -140,7 +119,7 @@ const TripOnMap = ({navigation}) => {
 		setOnCurrentLocation(true);
 	}
 
-	useEffect(()=> {
+	useEffect(() => {
 
 		mapRef.current.animateCamera({
 
@@ -161,7 +140,7 @@ const TripOnMap = ({navigation}) => {
 
 		getLocation();
 
-		const locationArray = accountData.trips[accountData.trips.length - 1].tripNotes.map( item => {
+		const locationArray = accountData.trips[accountData.trips.length - 1].tripNotes.map(item => {
 			return {
 				data: item,
 
@@ -171,12 +150,27 @@ const TripOnMap = ({navigation}) => {
 			}
 		})
 
-		console.log(locationArray)
 		setNoteLocationData(locationArray)
 
 		// await new Promise(resolve => setTimeout(resolve, 5000))
 
-	},[isFocused]);
+	}, [isFocused]);
+
+	useEffect(()=> {
+
+		const locationArray = accountData.trips[accountData.trips.length - 1].tripNotes.map(item => {
+			return {
+				data: item,
+
+				key: item.noteID,
+				lon: item.lon,
+				lat: item.lat,
+			}
+		})
+
+		setNoteLocationData(locationArray)
+
+	}, [accountData])
 
 	const {
 		isOpen,
@@ -186,138 +180,272 @@ const TripOnMap = ({navigation}) => {
 
 	return (
 
-		<SafeAreaView style={{ flex: 1}}>
+		<SafeAreaView style={{flex: 1}}>
 
-			<HStack bg={"transparent"} px={18} justifyContent={"flex-end"} h={48} w={"100%"} zIndex={100} position={"absolute"} top={60}>
+			<HStack bg={"transparent"} px={18} justifyContent={"flex-end"} h={48} w={"100%"} zIndex={100}
+			        position={"absolute"} top={60}>
 
-					<GradientButton w={100} title={"返回旅程"} onPress={ () => {
-						navigation.goBack()
-					}}/>
+				<GradientButton w={100} title={"返回旅程"} onPress={() => {
+					navigation.goBack()
+				}}/>
 
 			</HStack>
 
-				<Actionsheet
-					isOpen={isOpen} onClose={onClose}
+			<Actionsheet
+				isOpen={isOpen} onClose={onClose}
+
+			>
+				<Actionsheet.Content
+					h={320}
+					pt={8}
+					background={"white"}
+					_dragIndicatorWrapper={{
+						h: 16,
+						justifyContent: "center",
+					}}
+					_dragIndicator={{
+						display: "none",
+					}}
 				>
-					<Actionsheet.Content
-						background={"white"}
+					<VStack
+						px={20}
+						h={255}
+						w={"100%"}
+						alignItems={"center"}
+						justifyContent={"space-between"}
 					>
-						<View style={{
-							padding: 16,
-							height: 256,
-							width: "100%",
-							flexDirection: "column",
-							backgroundColor: "white"
-						}}>
-							<Text style={{
-								marginLeft: 8,
-								fontSize: 26,
-								color: theme.primary.text.purple,
-								fontWeight: "bold"
-							}}>
-								{pressedNote.title}
+
+						<VStack alignItems={"center"}>
+
+							<Text
+								mb={2}
+								letterSpacing={1}
+								fontSize={24}
+								fontWeight={"bold"}
+								color={theme.primary.text.purple}
+							>
+								{pressedNote.noteTitle}
 
 							</Text>
 
-						</View>
-					</Actionsheet.Content>
-				</Actionsheet>
+							<HStack alignItems={"center"} justifyContent={"center"}>
 
-				<Box flex={1}>
-					<MapView
-						onRegionChangeComplete={onRegionChangeComplete}
-						// customMapStyle={require("../../res/mapStyle.json")}
-						// provider={PROVIDER_GOOGLE}
-						// initialCamera={{ center: region, altitude: 2500 }}
-						// camera={{
-						// 	// center: region,
-						// 	altitude: 2500
-						// }}
+								<Feather name={"map-pin"} size={18} color={theme.primary.bg.mmidgray}/>
+								<Text
+									ml={6}
+									fontSize={14}
+									fontWeight={"normal"}
+									color={theme.primary.bg.mmidgray}
+								>
+									{pressedNote.codedLocation}
+
+								</Text>
+
+							</HStack>
+
+							<HStack px={6}>
+								<HStack mt={30} borderRadius={18} py={8} px={14} w={"100%"} bg={theme.primary.bg.indigo} alignItems={"center"}
+								        justifyContent={"center"}>
+
+									<Text
+										noOfLines={3}
+										ml={4}
+										fontSize={16}
+										fontWeight={"normal"}
+										color={theme.primary.text.indigo}
+									>
+										{pressedNote.noteContent}
+									</Text>
+
+								</HStack>
+							</HStack>
+
+						</VStack>
+
+
+						<HStack w={"100%"} borderRadius={18} px={8} w={"100%"} alignItems={"center"}
+						        justifyContent={"space-between"}>
+
+							<Pressable
+
+								onPress={()=> {
+
+										dispatch(delTripNote(location.noteID))
+								}}
+
+								flex={1}
+
+								justifyContent={"center"}
+								alignItems={"center"}
+
+								borderRadius={18}
+								borderWidth={1}
+								borderColor={theme.primary.text.indigo}
+								h={48}
+							>
+								<Text fontSize={16} color={theme.primary.text.indigo}>
+									刪除日記
+								</Text>
+							</Pressable>
+
+							<Pressable
+								w={24}
+							/>
+
+							<Pressable
+
+								onPress={()=> {
+
+									navigation.navigate("NewNote", {item: pressedNote})
+								}}
+
+								flex={1}
+
+								justifyContent={"center"}
+								alignItems={"center"}
+
+								borderRadius={18}
+								borderWidth={1}
+								bg={theme.primary.text.indigo}
+								borderColor={theme.primary.text.indigo}
+								h={48}
+							>
+								<Text fontWeight={"bold"} fontSize={16} color={"white"}>
+									查看日記
+								</Text>
+							</Pressable>
+
+						</HStack>
+
+					</VStack>
+				</Actionsheet.Content>
+			</Actionsheet>
+
+			<Box flex={1}>
+				<MapView
+					onRegionChangeComplete={onRegionChangeComplete}
+					// customMapStyle={require("../../res/mapStyle.json")}
+					// provider={PROVIDER_GOOGLE}
+					// initialCamera={{ center: region, altitude: 2500 }}
+					// camera={{
+					// 	// center: region,
+					// 	altitude: 2500
+					// }}
 					// 	center: LatLng;
 					// heading: number;
 					// pitch: number;
 					// zoom: number;
 					// altitude: number;
-						userInterfaceStyle={"light"}
-						// mapType={"mutedStandard"}
-						ref={ mapRef }
-						style={{ flex: 1 }}
-						// provider="apple"
-						// customMapStyle={mapStyle}
+					userInterfaceStyle={"light"}
+					// mapType={"mutedStandard"}
+					ref={mapRef}
+					style={{flex: 1}}
+					// provider="apple"
+					// customMapStyle={mapStyle}
+				>
+
+					{/*<Callout*/}
+					{/*	tooltip={}*/}
+					{/*>*/}
+					{/*	<View>*/}
+					{/*		<Block bg={"white"} h={48} w={48} borderRadius={60} opacity={.8}*/}
+					{/*		       borderWidth={2} px={0} py={0} justifyContent={"center"} alignItems={"center"}>*/}
+					{/*			<Feather name={"map-pin"} size={24} color={theme.primary.text.purple} />*/}
+					{/*		</Block>*/}
+					{/*	</View>*/}
+
+
+					{/*</Callout>*/}
+
+					<Marker
+						tracksViewChanges={false}
+						coordinate={{latitude: 25.031845092773438, longitude: 121.46505476503532}}
+						key={"edwf"}
+						title={"yay"}
+						description={"yay"}
+						onPress={() => {
+
+							setRegion({
+								...region,
+								latitude: 25.031845092773438,
+								longitude: 121.46505476503532
+							})
+						}}
 					>
+						<Callout tooltip>
+							<View>
+								<Text>This is ridiculous</Text>
+							</View>
+						</Callout>
+					</Marker>
 
-						{/*<Callout*/}
-						{/*	tooltip={}*/}
-						{/*>*/}
-						{/*	<View>*/}
-						{/*		<Block bg={"white"} h={48} w={48} borderRadius={60} opacity={.8}*/}
-						{/*		       borderWidth={2} px={0} py={0} justifyContent={"center"} alignItems={"center"}>*/}
-						{/*			<Feather name={"map-pin"} size={24} color={theme.primary.text.purple} />*/}
-						{/*		</Block>*/}
-						{/*	</View>*/}
-
-
-						{/*</Callout>*/}
+					{noteLocationData ? noteLocationData.map((location) => (
 
 						<Marker
 							tracksViewChanges={false}
-							coordinate={{ latitude: 25.031845092773438, longitude: 121.46505476503532 }}
-							key={"edwf"}
-							title={"yay"}
-							description={"yay"}
+							coordinate={{latitude: location.lat, longitude: location.lon}}
+							key={`${location.key}`}
+							// title={site.sna}
+							description={location.address}
 							onPress={() => {
 
-								setRegion({
-									...region,
-									latitude: 25.031845092773438,
-									longitude: 121.46505476503532
+								onOpen()
+
+								//    noteID: "" + date.getTime(),
+								//
+								// 	recordTime: date,
+								// 	noteTitle: noteTitle,
+								// 	noteContent: noteContent,
+								//
+								// 	namedLocation: namedLocation,
+								// 	codedLocation: codedLocation,
+								//
+								// 	hasImage: hasImage,
+								// 	hasMood: hasMood,
+								//
+								// 	imageList: imageList,
+								//
+								// 	lon: noteLocation.lon,
+								// 	lat: noteLocation.lat,
+
+								setPressedNote({
+
+									noteID: location.data.noteID,
+
+									recordTime: location.data.recordTime,
+									noteTitle: location.data.noteTitle,
+									noteContent: location.data.noteContent,
+
+									codedLocation: location.data.codedLocation,
+									namedLocation: location.data.namedLocation,
+
+									hasImage: location.data.hasImage,
+									hasMood: location.data.hasMood,
+
+									imageList: location.data.imageList,
+
+									lat: location.lat,
+									lon: location.lon,
 								})
 							}}
 						>
-								<Callout tooltip>
-									<View>
-										<Text>This is ridiculous</Text>
-									</View>
-								</Callout>
+							{/*<Center bg={"white"} opacity={.5} borderRadius={60} p={1.5}*/}
+							{/*        borderWidth={3}>*/}
+							{/*	<FontAwesome5 name={"bicycle"} size={20} color="black" />*/}
+							{/*</Center>*/}
+							<Callout tooltip>
+								<View shadowOpacity={.25} shadowRadius={8} shadowOffset={{height: 1}} p={8} bg={"white"}
+								      borderRadius={12}>
+									<Text fontSize={14} color={theme.primary.text.purple}>{location.data.noteTitle}</Text>
+								</View>
+							</Callout>
+
 						</Marker>
+					)) : null}
 
-						{ noteLocationData? noteLocationData.map((location) => (
+				</MapView>
 
-							<Marker
-								tracksViewChanges={false}
-								coordinate={{ latitude: location.lat, longitude: location.lon }}
-								key={`${location.key}`}
-								// title={site.sna}
-								description={location.address}
-								onPress={() => {
-
-									onOpen()
-
-									setPressedNote({
-										type: "bike",
-										title: location.data.noteTitle,
-										description: location.data.noteContent,
-										lat: location.lat,
-										lon: location.lon,
-									})
-								}}
-							>
-								{/*<Center bg={"white"} opacity={.5} borderRadius={60} p={1.5}*/}
-								{/*        borderWidth={3}>*/}
-								{/*	<FontAwesome5 name={"bicycle"} size={20} color="black" />*/}
-								{/*</Center>*/}
-								<Callout tooltip>
-									<View shadowOpacity={.25} shadowRadius={8} shadowOffset={{height: 1}} p={8} bg={"white"} borderRadius={12}>
-										<Text fontSize={14} color={theme.primary.text.purple}>{location.data.noteTitle}</Text>
-									</View>
-								</Callout>
-
-							</Marker>
-						)) : null}
-
-					</MapView>
-
-				</Box>
+			</Box>
 
 		</SafeAreaView>
 	);

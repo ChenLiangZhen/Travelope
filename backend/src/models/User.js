@@ -8,31 +8,36 @@ const UserSchema = new mongoose.Schema({
 		unique: true,
 		required: true
 	},
+
 	nickname: {
 		type: String,
 		required: true
 	},
+
 	email: {
 		type: String,
 		unique: true,
 		required: true
 	},
+
 	password: {
 		type: String,
 		required: true
 	},
+
 	friends: {
 		type: [],
 	},
 
-	appleAccountLink: {
-		type: Object,
-		required: false
+	isAppleAccount: {
+		type: Boolean
 	},
+
 	hasRemoteProfilePicture: {
 		type: Boolean,
 		required: false
 	}
+
 }, {
 	collection: "user_account"
 });

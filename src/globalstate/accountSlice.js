@@ -19,7 +19,7 @@ export const initialState = {
     profilePictureLocalPath: "",
     hasRemoteProfilePicture: false,
 
-    appleAccountLink: {},
+    isAppleAccount: false
   },
 
   friendData: {

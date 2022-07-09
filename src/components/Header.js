@@ -76,6 +76,12 @@ const AppHeader = (props) => {
 			case "NewNote":
 				setTranslatedTitle("旅遊日記")
 				break
+			case "LegacyTrip":
+				setTranslatedTitle("歷史旅程")
+				break
+			case "LegacyNote":
+				setTranslatedTitle("歷史日記")
+				break
 			default:
 				setTranslatedTitle("尚未翻譯")
 		}

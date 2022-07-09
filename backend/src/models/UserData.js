@@ -68,15 +68,59 @@ const Trip = new mongoose.Schema({
 	},
 })
 
+const SharedTrip = new mongoose.Schema({
+
+	from: {
+		type: String
+	},
+
+	isActive: {
+		type: Boolean
+	},
+
+	tripID: {
+		type: Object
+	},
+
+	tripName: {
+		type: String
+	},
+
+	tripDescription: {
+		type: String
+	},
+
+	startTime: {
+		type: Object
+	},
+
+	endTime: {
+		type: Object
+	},
+
+	fellowList: {
+		type: []
+	},
+
+	tripNotes: {
+		type: [Notes]
+	},
+})
+
 const UserDataSchema = new mongoose.Schema({
 	userLink: {
 		type: String,
 		unique: true,
 		required: true
 	},
+
 	trips: {
 		type: [Trip],
 	},
+
+	sharedTrips: {
+		type: [SharedTrip]
+	}
 }, {
 	collection: "user_data"
 });

@@ -24,6 +24,8 @@ import RNFS from "react-native-fs"
 import NewNote from "./src/screens/trip/NewNote"
 import TripOnMap from "./src/screens/trip/TripOnMap"
 import { selectData } from "./src/globalstate/dataSlice"
+import LegacyTrip from "./src/screens/trip/LegacyTrip";
+import LegacyNote from "./src/screens/trip/LegacyNote";
 
 LogBox.ignoreLogs(["Require cycle"])
 
@@ -176,6 +178,7 @@ export default function App() {
 					smoke: "#f4f4f4",
 					lightgray: "#eee",
 					midgray: "#ccc",
+					mmidgray: "#aaa",
 					gray: "#888",
 				},
 
@@ -297,8 +300,8 @@ const DrawerNavigator = () => {
 							source={require("./src/res/branding_tc.png")}
 							resizeMode={"contain"}
 							alt={"旅信"}
-							w={128}
-							h={128}
+							w={108}
+							h={108}
 						/>
 
 						<Pressable onPress={() => {
@@ -311,10 +314,6 @@ const DrawerNavigator = () => {
 								首頁
 							</Text>
 						</Pressable>
-
-						<HStack w={24} h={6} mx={24} my={20} bg={"black"} borderRadius={16}
-						        bg={"#946aff"}
-						/>
 
 						{
 							activeTrip? 	<Pressable onPress={() => {
@@ -331,6 +330,9 @@ const DrawerNavigator = () => {
 							</Pressable> : <></>
 						}
 
+						<HStack w={24} h={6} mx={24} my={20} bg={"black"} borderRadius={16}
+						        bg={"#946aff"}
+						/>
 
 						<Pressable onPress={() => {
 							navigation.navigate("MemEnvelope")
@@ -344,21 +346,21 @@ const DrawerNavigator = () => {
 							</Text>
 						</Pressable>
 
-						<Pressable onPress={() => {
-							navigation.navigate("TripPostcard")
-						}} w={WIDTH / 2} flexDirection={"row"} justifyContent={"flex-end"} px={20} py={8}>
-							<Text fontWeight={state.index == 6? "bold" : "normal"}
-							      fontSize={state.index == 4? 18 : 17}
-							      color={"#7361ea"}
+						{/*<Pressable onPress={() => {*/}
+						{/*	navigation.navigate("TripPostcard")*/}
+						{/*}} w={WIDTH / 2} flexDirection={"row"} justifyContent={"flex-end"} px={20} py={8}>*/}
+						{/*	<Text fontWeight={state.index == 6? "bold" : "normal"}*/}
+						{/*	      fontSize={state.index == 4? 18 : 17}*/}
+						{/*	      color={"#7361ea"}*/}
 
-							>
-								旅程紀念卡
-							</Text>
-						</Pressable>
+						{/*	>*/}
+						{/*		旅程紀念卡*/}
+						{/*	</Text>*/}
+						{/*</Pressable>*/}
 
-						<HStack w={24} h={6} mx={24} my={20} bg={"black"} borderRadius={16}
-						        bg={"#b16bff"}
-						/>
+						{/*<HStack w={24} h={6} mx={24} my={20} bg={"black"} borderRadius={16}*/}
+						{/*        bg={"#b16bff"}*/}
+						{/*/>*/}
 
 						<Pressable onPress={() => {
 							navigation.navigate("MyZone")
@@ -399,8 +401,10 @@ const DrawerNavigator = () => {
 		>
 			<Drawer.Screen component={MainScreen} name={"MainScreen"} />
 			<Drawer.Screen component={CurrentTrip} name={"CurrentTrip"} />
+			<Drawer.Screen component={LegacyTrip} name={"LegacyTrip"} />
 			<Drawer.Screen component={NewTrip} name={"NewTrip"} />
 			<Drawer.Screen component={NewNote} name={"NewNote"} />
+			<Drawer.Screen component={LegacyNote} name={"LegacyNote"} />
 			<Drawer.Screen component={TripOverview} name={"TripOverview"} />
 			<Drawer.Screen component={MemEnvelope} name={"MemEnvelope"} />
 			<Drawer.Screen component={TripPostcard} name={"TripPostcard"} />

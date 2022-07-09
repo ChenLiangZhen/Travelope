@@ -21,7 +21,7 @@ import { HEIGHT, WIDTH } from "../Util"
 import InputField from "../components/InputField"
 import { appleAuth, AppleButton } from "@invertase/react-native-apple-authentication"
 import { useFocusEffect } from "@react-navigation/native"
-import { apiRequest, signinApi, signupApi } from "../apis/api"
+import {apiRequest, signinApi, signinWithAppleApi, signupApi} from "../apis/api"
 import * as Keychain from "react-native-keychain"
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -37,6 +37,7 @@ import { profilePictureInit } from "../apis/fileManager"
 import { downloadProfilePicture, uploadProfilePicture } from "../apis/transferManager"
 import { dataControl } from "../globalstate/store"
 import {purgeAccountData, setTrips} from "../globalstate/dataSlice"
+import jwt_decode from 'jwt-decode';
 
 function SignModal({ modalVisible, setModalVisible }) {
 
@@ -137,7 +138,57 @@ function SignModal({ modalVisible, setModalVisible }) {
 			requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
 		})
 
-		// get current authentication state for user
+      // other fields are available, but full name is not
+		const { email, email_verified, is_private_email, sub } = jwt_decode(appleAuthRequestResponse.identityToken)
+
+		console.log(email + " / " + email_verified + " / " + is_private_email + " / " + sub)
+
+		signinWithAppleApi.post("/api/travelope/sign-with-apple", {
+
+			email: email,
+			password: sub
+		})
+			.then(async res => {
+
+				await Keychain.setGenericPassword("token", res.data.token)
+
+				setAsync(false)
+				setModalVisible(prev => !prev)
+
+				dispatch(setAccountInfo({
+
+					...account.info,
+
+					isLoggedIn: true,
+					id: res.data.user.id,
+					email: res.data.user.email,
+					nickname: res.data.user.nickname,
+
+				}))
+
+				dispatch(setFriends(res.data.user.friends))
+
+				if (res.data.user.hasRemoteProfilePicture) {
+					await downloadProfilePicture(res.data.user.id, res.data.user.id, RNFS.DocumentDirectoryPath + "/travelope/" + res.data.user.id)
+					dispatch(setProfilePicture(RNFS.DocumentDirectoryPath + "/travelope/" + res.data.user.id))
+				}
+
+				dispatch(setTrips(res.data.userData.trips))
+
+				console.log("FETCHED DATA: " + res.data.userData)
+
+				setErrorText("")
+				setWarningText("登入成功！")
+
+			}, rej => {
+
+				setAsync(false)
+
+				setErrorText("帳戶資訊錯誤")
+				console.log("Signin Rejected: " + rej)
+			})
+
+
 		// /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
 		const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user)
 
@@ -247,6 +298,8 @@ function SignModal({ modalVisible, setModalVisible }) {
 											setAsync(true)
 
 											signinApi.post("/api/travelope/signin", {
+
+												isAppleAccount: false,
 												email: email,
 												password: password,
 											})

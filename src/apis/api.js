@@ -11,6 +11,11 @@ export const signinApi = axios.create({
 	timeout: 10000,
 })
 
+export const signinWithAppleApi = axios.create({
+	baseURL: "https://lightii.ap.ngrok.io",
+	timeout: 10000,
+})
+
 export const request = axios.create({
 	baseURL: "https://lightii.ap.ngrok.io",
 	timeout: 10000,

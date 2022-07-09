@@ -2,38 +2,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 export const initialState = {
 
-	// currentTrip: {
-	//
-	// 	isActive: true,
-	// 	tripName: "",
-	// 	startTime: {},
-	// 	endTime: {},
-	// 	fellowList: [],
-	//
-	// 	// fellow: {
-	// 	//   name: "",
-	// 	//   key: ""
-	// 	// },
-	//
-	// 	tripNotes: [],
-	//
-	// 	// tripNote: {
-	// 	//
-	// 	//   recordTime: {},
-	// 	//
-	// 	//   title: "",
-	// 	//   description: "",
-	// 	//   mood: "",
-	// 	//   imageKey: "",
-	// 	//
-	// 	//   longitude: "",
-	// 	//   latitude: "",
-	// 	//
-	// 	//   adjPhrases: [],
-	// 	//   weather: "",
-	// 	// }
-	//
-	// },
 	trips: [
 
 	],

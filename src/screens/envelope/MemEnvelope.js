@@ -1,8 +1,8 @@
-import React, { useRef, useState } from "react"
+import React, {useRef, useState} from "react"
 import LayoutBase from "../../components/LayoutBase"
-import { selectAccount } from "../../globalstate/accountSlice"
-import { useDispatch, useSelector } from "react-redux"
-import { selectData } from "../../globalstate/dataSlice"
+import {selectAccount} from "../../globalstate/accountSlice"
+import {useDispatch, useSelector} from "react-redux"
+import {selectData} from "../../globalstate/dataSlice"
 import {
 	Center,
 	CheckIcon,
@@ -10,20 +10,21 @@ import {
 	HamburgerIcon,
 	HStack,
 	Menu,
-	Pressable,
+	Pressable, ScrollView,
 	Select,
 	Text,
 	useTheme,
 	VStack,
 } from "native-base"
 import Feather from "react-native-vector-icons/Feather"
-import { useFocusEffect } from "@react-navigation/native"
+import {useFocusEffect} from "@react-navigation/native"
 import ViewShot from "react-native-view-shot"
+import LottieView from "lottie-react-native";
 
 
 const MemEnvelope = ({navigation, route}) => {
 
-	// const { tripID } = route.params
+	// const { item } = route.params
 
 	const theme = useTheme().colors
 
@@ -33,6 +34,9 @@ const MemEnvelope = ({navigation, route}) => {
 
 	const [paperStyle, setPaperStyle] = useState("")
 	const [fontFamily, setFontFamily] = useState("")
+	const [hasBGColor, setHasBGColor] = useState(false)
+	const [showColorPanel, setShowColorPanel] = useState(false)
+	const [selectedBGColor, setSelectedBGColor] = useState("white")
 
 	const [imageURI, setImageURI] = useState()
 	const [imageReady, setImageReady] = useState()
@@ -51,15 +55,15 @@ const MemEnvelope = ({navigation, route}) => {
 	)
 
 	useFocusEffect(
-		React.useCallback(async() => {
+		React.useCallback(async () => {
 
-			if(imageURI !== ""){
+			if (imageURI !== "") {
 
 				console.log(imageURI)
 				setImageReady(true)
 
-				await new Promise(resolve => setTimeout(resolve, 1500))
-				navigation.navigate("TripPostcard", { uri: imageURI } )
+				// await new Promise(resolve => setTimeout(resolve, 1500))
+				// navigation.navigate("TripPostcard", { uri: imageURI } )
 			}
 
 		}, [imageURI]),
@@ -69,196 +73,284 @@ const MemEnvelope = ({navigation, route}) => {
 
 		<LayoutBase>
 
-			<ViewShot ref={ref} options={{ fileName: "Your-File-Name", format: "jpg", quality: 0.9 }}>
+			<LottieView
+				loop
+				autoPlay={true}
+				style={{
+					width: 200,
+					height: 200,
+				}}
+				source={require("../../res/envelope-travelope.lottie.json")}
+				onAnimationFinish={(bool)=>{
+					console.log(bool)
+					console.log("sdgs")
+					// navigation.navigate("MainScreen")
+				}}
+			/>
 
+			<VStack>
+				<HStack mb={12} justifyContent={"flex-end"} alignItems={"center"}>
 
-			<HStack h={48} justifyContent={"flex-end"}>
+					<Select borderRadius={100}
+					        borderColor={theme.primary.placeholder.purple}
+					        borderWidth={1}
+					        h={34}
+					        mr={6}
+					        w={64}
+					        textAlign={"center"}
+						// alignItems={"center"}
+						     color={"#af81ff"}
+						     fontSize={14}
+						     fontFamily={fontFamily === "default" ? null : "STSongti-TC-Regular"}
+						     fontWeight={"bold"}
+						     selectedValue={fontFamily} accessibilityLabel="Choose Service"
+						     placeholder="字體"
 
-				{/*<Select bg={"white"} shadow={ 1 }  py={12} borderRadius={12} mt={4} w={96} selectedValue={position} mx={{*/}
-				{/*	base: 0,*/}
-				{/*	md: "auto"*/}
-				{/*}} accessibilityLabel="Select your favorite programming language" placeholder="Select your favorite programming language" onValueChange={nextValue => setPosition(nextValue)} _selectedItem={{*/}
-				{/*	bg: "cyan.600",*/}
-				{/*	endIcon: <CheckIcon size={24} />*/}
-				{/*}}>*/}
-				{/*	*/}
-				{/*	<Select.Item h={32} pl={12} justifyContent={"center"} label="auto" value="auto" />*/}
-				{/*	<Select.Item label="Top Left" value="top left" />*/}
-				{/*	<Select.Item label="Top" value="top" />*/}
-				{/*	<Select.Item label="Top Right" value="top right" />*/}
+						     dropdownIcon={<></>
 
-				{/*</Select>*/}
+							     // <Center mr={6}>
+							     //   <Feather name={"arrow-down-circle"} size={22} color={"#af81ff"} />
+							     // </Center>
+						     }
 
-				<Select borderRadius={100}
-				        borderColor={"#af81ff"}
-				        borderWidth={2}
-				        h={36}
-				        px={16}
-				        mr={6}
-				        w={84}
-				        textAlign={"center"}
-				        // alignItems={"center"}
-				        color={"#af81ff"}
-				        fontSize={15}
-				        fontWeight={"bold"}
-				        selectedValue={fontFamily} accessibilityLabel="Choose Service"
-				        placeholder="字體"
+						     placeholderTextColor={"#af81ff"}
 
-				        dropdownIcon={ <></>
+						     _actionSheetBody={{
+							     p: 12,
+						     }}
 
-					        // <Center mr={6}>
-						      //   <Feather name={"arrow-down-circle"} size={22} color={"#af81ff"} />
-					        // </Center>
-				        }
+						     _actionSheetContent={{
 
-				        placeholderTextColor={"#af81ff"}
+							     _dragIndicatorWrapper: {
+								     h: 16,
+								     justifyContent: "center",
+								     // bg: "gray.200"
+							     },
+							     _dragIndicator: {
+								     bg: "#a180ff",
+								     h: 4,
+								     w: 48,
+							     },
+						     }}
 
-				        _actionSheetBody={{
-					        p: 12,
-				        }}
+						     _item={{
+							     _text: {
+								     color: "#7f54ff",
+							     },
+							     _pressed: {
+								     bg: "#f2f2ff",
+							     },
+							     my: 8,
+						     }}
 
-				        _actionSheetContent={{
+						     _selectedItem={{
+							     _text: {
+								     color: "#7f54ff",
+								     fontSize: 16,
+								     fontWeight: "bold",
+							     },
+							     bg: "#e9e9ff",
+							     px: 12,
+							     h: 48,
+							     justifyContent: "center",
+							     borderRadius: 8,
+							     startIcon:
 
-					        _dragIndicatorWrapper: {
-						        h: 16,
-						        justifyContent: "center",
-						        // bg: "gray.200"
-					        },
-					        _dragIndicator: {
-						        bg: "#a180ff",
-						        h: 4,
-						        w: 48,
-					        },
-				        }}
+								     <Center mr={6}>
+									     <Feather name={"check"} size={18} color={theme.primary.text.purple}/>
+								     </Center>
 
-				        _item={{
-					        _text: {
-						        color: "#7f54ff",
-					        },
-					        _pressed: {
-						        bg: "#f2f2ff",
-					        },
-					        my: 8,
-				        }}
+						     }} mt={1}
 
-				        _selectedItem={{
-					        _text: {
-						        color: "#7f54ff",
-						        fontSize: 16,
-						        fontWeight: "bold",
-					        },
-					        bg: "#e9e9ff",
-					        px: 12,
-					        h: 48,
-					        justifyContent: "center",
-					        borderRadius: 8,
-					        startIcon:
+						     onValueChange={itemValue => setFontFamily(itemValue)}>
 
-						        <Center mr={6}>
-							        <Feather name={"check"} size={18} color={"#af81ff"} />
-						        </Center>
+						<Select.Item label="系統" value="default"/>
+						<Select.Item label="宋體" value="STSongti-TC-Regular"/>
+					</Select>
 
-				        }} mt={1}
+					<Pressable
 
-				        onValueChange={itemValue => setFontFamily(itemValue)}>
+						flexDirection={"row"}
+						onPress={() => {
+							setShowColorPanel(prev => !prev)
+						}}
 
-					<Select.Item label="系統" value="系統" />
-					<Select.Item label="明體" value="明體" />
-					<Select.Item label="宋體" value="宋體" />
-				</Select>
+						borderRadius={100}
+						borderColor={theme.primary.placeholder.purple}
+						borderWidth={1}
+						h={36}
+						w={96}
+						textAlign={"center"}
+						color={"#af81ff"}
+						fontSize={14}
+						fontWeight={"bold"}
+						alignItems={"center"}
+						justifyContent={"center"}
+					>
 
-				<Select borderRadius={100}
-				        borderColor={"#af81ff"}cx
-				        borderWidth={2}
-				        h={36}
-				        px={16}
-				        w={84}
-				        textAlign={"center"}
-				        // alignItems={"center"}
-				        color={"#af81ff"}
-				        fontSize={15}
-				        fontWeight={"bold"}
-				        selectedValue={paperStyle} accessibilityLabel="Choose Service"
-				        placeholder="紙質"
+						<Text color={theme.primary.text.purple} fontWeight={"normal"} textAlign={"center"}>
+							背景色
+						</Text>
 
-				        dropdownIcon={ <></>
+						<HStack borderWidth={1} borderColor={theme.primary.text.purple} w={16} h={16} ml={6} bg={selectedBGColor}
+						        borderRadius={8}/>
 
-					        // <Center mr={6}>
-						      //   <Feather name={"arrow-down-circle"} size={22} color={"#af81ff"} />
-					        // </Center>
-				        }
-
-				        placeholderTextColor={"#af81ff"}
-
-				        _actionSheetBody={{
-					        p: 12,
-				        }}
-
-				        _actionSheetContent={{
-
-					        _dragIndicatorWrapper: {
-						        h: 16,
-						        justifyContent: "center",
-						        // bg: "gray.200"
-					        },
-					        _dragIndicator: {
-						        bg: "#a180ff",
-						        h: 4,
-						        w: 48,
-					        },
-				        }}
-
-				        _item={{
-					        _text: {
-						        color: "#7f54ff",
-					        },
-					        _pressed: {
-						        bg: "#f2f2ff",
-					        },
-					        my: 8,
-				        }}
-
-				        _selectedItem={{
-					        _text: {
-						        color: "#7f54ff",
-						        fontSize: 16,
-						        fontWeight: "bold",
-					        },
-					        bg: "#e9e9ff",
-					        px: 12,
-					        h: 48,
-					        justifyContent: "center",
-					        borderRadius: 8,
-					        startIcon:
-
-						        <Center mr={6}>
-							        <Feather name={"check"} size={18} color={"#af81ff"} />
-						        </Center>,
-
-				        }} mt={1}
-
-				        onValueChange={itemValue => setPaperStyle(itemValue)}>
-
-					<Select.Item label="無紙質" value="無紙質" />
-					<Select.Item label="輕磅紙" value="輕磅紙" />
-				</Select>
-			</HStack>
-
-			<VStack borderRadius={18} h={"90%"} w={"100%"} bg={theme.primary.darker_bg.purple}>
-
-
-
-				<HStack justifyContent={"center"} alignItems={"center"} w={"100%"} h={64}>
-					<Text fontSize={16} fontWewight={"bold"} color={theme.primary.text.purple}>
-						跟家人出去玩
-					</Text>
-				</HStack>
-
-				<HStack>
+					</Pressable>
 
 				</HStack>
 
+				{showColorPanel ?
+
+					<ScrollView
+						horizontal
+						showsHorizontalScrollIndicator={false}
+						h={40}
+						_contentContainerStyle={{
+							h: 40,
+						}}
+					>
+
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "white" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("white")} p={2} w={32} h={32} borderColor={"gray.300"}
+							           borderWidth={1} bg={"white"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "gray.50" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("gray.50")} p={2} w={32} h={32} borderColor={"gray.300"}
+							           borderWidth={1} bg={"gray.50"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "gray.100" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("gray.100")} p={2} w={32} h={32} borderColor={"gray.300"}
+							           borderWidth={1} bg={"gray.100"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "red.50" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("red.50")} p={2} w={32} h={32} borderWidth={1} borderColor={"gray.300"} bg={"red.50"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "orange.50" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("orange.50")} p={2} w={32} h={32} borderWidth={1} borderColor={"gray.300"} bg={"orange.50"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "yellow.50" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("yellow.50")} p={2} w={32} h={32} borderWidth={1} borderColor={"gray.300"} bg={"yellow.50"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "green.50" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("green.50")} p={2} w={32} h={32} borderWidth={1} borderColor={"gray.300"} bg={"green.50"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "blue.50" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("blue.50")} p={2} w={32} h={32} borderWidth={1} borderColor={"gray.300"} bg={"blue.50"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "indigo.50" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("indigo.50")} p={2} w={32} h={32} borderWidth={1} borderColor={"gray.300"} bg={"indigo.50"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "purple.50" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("purple.50")} p={2} w={32} h={32} borderWidth={1} borderColor={"gray.300"} bg={"purple.50"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "red.100" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("red.100")} p={2} w={32} h={32} bg={"red.100"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "orange.100" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("orange.100")} p={2} w={32} h={32} bg={"orange.100"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "yellow.100" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("yellow.100")} p={2} w={32} h={32} bg={"yellow.100"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "green.100" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("green.100")} p={2} w={32} h={32} bg={"green.100"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "blue.100" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("blue.100")} p={2} w={32} h={32} bg={"blue.100"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "indigo.100" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("indigo.100")} p={2} w={32} h={32} bg={"indigo.100"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+						<HStack p={3} mr={6} borderRadius={8} borderWidth={1}
+						        borderColor={selectedBGColor === "purple.100" ? "gray.400" : "transparent"}>
+							<Pressable onPress={() => setSelectedBGColor("purple.100")} p={2} w={32} h={32} bg={"purple.100"}
+							           borderRadius={6}></Pressable>
+						</HStack>
+
+					</ScrollView> :
+
+					<></>
+
+				}
 			</VStack>
+
+			<ViewShot
+				style={{
+					justifyContent: "center",
+					alignItems: "center"
+				}}
+
+				ref={ref} options={{
+				fileName: "Your-File-Name",
+				format: "jpg",
+				quality: 1,
+				width: 2000,
+				height: 500
+			}}>
+
+				<VStack bg={"black"} borderWidth={1}  borderColor={"lightgray"} borderRadius={18} mt={12} w={"100%"} bg={selectedBGColor} justifyContent={"flex-start"}>
+
+					<HStack justifyContent={"center"} alignItems={"center"} w={"100%"} h={64}>
+						<Text fontFamily={fontFamily === "default" ? null : "STSongti-TC-Regular"} fontSize={16} fontWewight={"bold"} color={theme.primary.text.purple}>
+							跟家人出去玩
+						</Text>
+					</HStack>
+
+					<HStack>
+
+					</HStack>
+
+				</VStack>
 
 			</ViewShot>
 

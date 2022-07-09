@@ -166,7 +166,7 @@ const NewNote = ({navigation, route}) => {
 			lat: noteLocation.lat,
 		})
 
-	}, [noteTitle, noteContent, namedLocation, codedLocation])
+	}, [noteTitle, noteContent, namedLocation, codedLocation, imageList, noteLocation])
 
 	useEffect(() => {
 
@@ -180,20 +180,21 @@ const NewNote = ({navigation, route}) => {
 		}
 	}
 
-	function addToast() {
+	function addToast(info) {
+
 		if (!toast.isActive("warningInfo")) {
 			toastInfoRef.current = toast.show({
 				id: "warningInfo",
 				render: () => {
 					return (
-						<ToastInfo/>
+						<ToastInfo info={info}/>
 					)
 				},
 			})
 		}
 	}
 
-	const ToastInfo = (info) => {
+	const ToastInfo = ({info}) => {
 		return (
 
 			<HStack
@@ -515,39 +516,48 @@ const NewNote = ({navigation, route}) => {
 					       jc={"space-between"}>
 
 						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-							寫完了嗎？
+							編輯完成
 						</Text>
 
 						<GradientBorderButton w={72} color={theme.primary.text.purple} title={"取消"} onPress={() => {
 
 							navigation.navigate("CurrentTrip")
+							// navigation.goBack()
 						}}
 						/>
 
 						<GradientButton ml={8} w={96} h={34} title={"儲存遊記"} onPress={() => {
 
-							if (!isNew) {
+							if (noteTitle === "" || noteContent === "" || namedLocation === "") {
 
-								apiRequest("put", `/api/travelope/update-trip-note/${account.info.id}/${item.noteID}`, noteObject)
-								dispatch(updateTripNote({
-									noteID: item.noteID,
-									item: noteObject
-								}))
+								addToast("必須填寫所有欄位")
 
 							} else {
 
-								apiRequest("post", `/api/travelope/new-trip-note/${account.info.id}`, noteObject)
-									.then(res=> {}, rej=> {
-										// console.log(JSON.stringify(rej))
-									})
+								if (!isNew) {
 
-								dispatch(pushTripNote(noteObject))
+									apiRequest("put", `/api/travelope/update-trip-note/${account.info.id}/${item.noteID}`, noteObject)
+									dispatch(updateTripNote({
+										noteID: item.noteID,
+										item: noteObject
+									}))
+									navigation.navigate("CurrentTrip")
+
+
+								} else {
+
+									apiRequest("post", `/api/travelope/new-trip-note/${account.info.id}`, noteObject)
+										.then(res => {
+										}, rej => {
+											// console.log(JSON.stringify(rej))
+										})
+
+									dispatch(pushTripNote(noteObject))
+									navigation.navigate("CurrentTrip")
+
+								}
 							}
-
-							navigation.navigate("CurrentTrip")
-
 						}}/>
-
 					</Block>
 
 				</Pressable>

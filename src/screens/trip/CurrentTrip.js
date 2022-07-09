@@ -206,6 +206,10 @@ const CurrentTrip = () => {
 		}, [isFocused, accountData]),
 	)
 
+	useEffect(()=> {
+
+	}, [accountData])
+
 	const renderItem = useCallback((params) => {
 		return <RowItem {...params} itemRefs={itemRefs}/>
 	}, [])
@@ -215,13 +219,14 @@ const CurrentTrip = () => {
 
 		<LayoutBase>
 
-			<Modal isOpen={modalVisible} onClose={() => setModalVisible()} justifyContent="flex-end" bottom={HEIGHT * .3}
-			       shadowOpacity={.2}
-			       shadowRadius={24}
-			       shadowOffset={{
-				       height: 4,
-			       }}
-			       _backdrop={{bg: "#000", opacity: .25}}
+			<Modal
+				isOpen={modalVisible} onClose={() => setModalVisible()} justifyContent="flex-end" bottom={HEIGHT * .3}
+				shadowOpacity={.2}
+				shadowRadius={24}
+				shadowOffset={{
+					height: 4,
+				}}
+				_backdrop={{bg: "#000", opacity: .25}}
 			>
 
 				<Modal.Content borderRadius={24} w={WIDTH * .9} px={20} h={HEIGHT * .35} alignSelf={"center"} py={12}>
@@ -229,8 +234,8 @@ const CurrentTrip = () => {
 					<HStack mt={4} h={30} mb={20} justifyContent={"space-between"} alignItems={"center"}>
 
 						<HStack alignItems={"center"}>
-							<Feather name={"info"} color={theme.primary.text.indigo} size={22}/>
-							<Text ml={8} fontSize={18} letterSpacing={1} fontWeight={"bold"} color={theme.primary.text.indigo}>
+							<Feather name={"info"} color={theme.primary.text.indigo} size={20}/>
+							<Text ml={8} fontSize={16} letterSpacing={1} fontWeight={"bold"} color={theme.primary.text.indigo}>
 								旅程資訊
 							</Text>
 						</HStack>
@@ -247,39 +252,39 @@ const CurrentTrip = () => {
 
 					<VStack mt={4} h={20} mb={16} justifyContent={"space-between"} alignItems={"center"}>
 
-						<HStack px={16} w={"100%"} h={32} alignItems={"center"}>
+						<HStack px={16} w={"100%"} h={32} alignItems={"flex-start"}>
 
-							<Text mr={12} fontSize={16} fontWeight={"bold"}
+							<Text mr={12} fontSize={14} fontWeight={"bold"}
 							      color={theme.primary.placeholder.indigo}>旅程 ID：</Text>
-							<Text fontSize={16} fontWeight={"bold"}
-							      color={theme.primary.bg.gray}>{activeTrip ? activeTrip.tripID : ""}</Text>
+							<Text fontSize={14} fontWeight={"bold"}
+							      color={theme.primary.bg.gray}>{activeTrip? activeTrip.tripID: ""}</Text>
 
 						</HStack>
 
-						<HStack px={16} w={"100%"} h={32} alignItems={"center"}>
+						<HStack px={16} w={"100%"} h={32} alignItems={"flex-start"}>
 
-							<Text mr={12} fontSize={16} fontWeight={"bold"}
+							<Text mr={12} fontSize={14} fontWeight={"bold"}
 							      color={theme.primary.placeholder.indigo}>旅程名稱：</Text>
-							<Text fontSize={16} fontWeight={"bold"}
-							      color={theme.primary.bg.gray}>{activeTrip ? activeTrip.tripName : ""}</Text>
+							<Text noOfLines={2} fontSize={14} fontWeight={"bold"}
+							      color={theme.primary.bg.gray}>{activeTrip? activeTrip.tripName: ""}</Text>
 
 						</HStack>
 
-						<HStack px={16} w={"100%"} h={32} alignItems={"center"}>
+						<HStack px={16} w={"100%"} h={64} alignItems={"flex-start"}>
 
-							<Text mr={12} fontSize={16} fontWeight={"bold"}
+							<Text mr={12} fontSize={14} fontWeight={"bold"}
 							      color={theme.primary.placeholder.indigo}>旅程描述：</Text>
-							<Text fontSize={16} fontWeight={"bold"}
-							      color={theme.primary.bg.gray}>{activeTrip ? activeTrip?.tripDescription : ""}</Text>
+							<Text w={200} noOfLines={3} fontSize={14} fontWeight={"bold"}
+							      color={theme.primary.bg.gray}>{activeTrip? activeTrip.tripDescription : ""}</Text>
 
 						</HStack>
 
-						<HStack px={16} w={"100%"} h={32} alignItems={"center"}>
+						<HStack px={16} w={"100%"} h={32} alignItems={"flex-start"}>
 
-							<Text mr={12} fontSize={16} fontWeight={"bold"}
+							<Text mr={12} fontSize={14} fontWeight={"bold"}
 							      color={theme.primary.placeholder.indigo}>開始時間：</Text>
-							<Text fontSize={16} fontWeight={"bold"}
-							      color={theme.primary.bg.gray}>{activeTrip ? "" + new Date(activeTrip.startTime).getFullYear() + "年" + (new Date(activeTrip.startTime).getMonth() + 1) + "月" + new Date(activeTrip.startTime).getDate() + "日  " + new Date(activeTrip.startTime).getHours() + "：" + new Date(activeTrip.startTime).getMinutes() : ""}</Text>
+							<Text fontSize={14} fontWeight={"bold"}
+							      color={theme.primary.bg.gray}>{activeTrip? "" + new Date(activeTrip.startTime).getFullYear() + "年" + (new Date(activeTrip.startTime).getMonth() + 1) + "月" + new Date(activeTrip.startTime).getDate() + "日  " + new Date(activeTrip.startTime).getHours() + "：" + new Date(activeTrip.startTime).getMinutes() : ""}</Text>
 
 						</HStack>
 
@@ -294,9 +299,9 @@ const CurrentTrip = () => {
 
 					<animated.View style={anim}>
 
-						<HStack h={32} w={"100%"} alignItems={"center"} mb={12} justifyContent={"flex-end"}>
+						<HStack h={36} w={"100%"} mb={12} justifyContent={"flex-end"}>
 
-							<GradientBorderButton
+						<GradientBorderButton
 								w={112} title={"地圖檢視"}
 								onPress={() => navigation.navigate("TripOnMap")} flexDrection={"row"} ml={8}
 								icon={"map"} iconSize={16} iconColor={theme.primary.text.purple}
@@ -332,9 +337,9 @@ const CurrentTrip = () => {
 
 						</HStack>
 
-						<Block h={132} w={"100%"} py={16} flexDirection={"column"} justifyContent={"space-between"}>
+						<Block h={120} w={"100%"} py={12} flexDirection={"column"} justifyContent={"space-between"}>
 
-							<HStack h={32} w={"100%"} alignItems={"center"} justifyContent={"space-between"}>
+						<HStack h={32} w={"100%"} alignItems={"center"} justifyContent={"space-between"}>
 
 								<HStack flex={1} mr={24} alignItems={"center"}>
 									<Feather name={"send"} size={20} color={theme.primary.text.purple}/>
@@ -349,23 +354,8 @@ const CurrentTrip = () => {
 									<Feather name={"info"} size={22} color={theme.primary.text.purple}/>
 								</Pressable>
 
-								{/*<GradientBorderButton //結束旅程並設定此旅程為inactive。*/}
-								{/*	onPress={() => {*/}
-
-								{/*		console.log("setInactive")*/}
-								{/*		dispatch(setInactive())*/}
-
-								{/*		navigation.navigate("MainScreen")*/}
-
-								{/*	}}*/}
-
-								{/*	flexDrection={"row"} ml={8}*/}
-								{/*	icon={"align-left"} iconSize={18} iconColor={theme.primary.text.purple} w={80}*/}
-								{/*	color={theme.primary.text.purple} title={"資訊"}/>*/}
-
 							</HStack>
 
-							{/*<View w={"100%"} h={1} bg={theme.primary.placeholder.indigo} />*/}
 
 							<HStack h={48} px={8} w={"100%"} borderRadius={12} alignItems={"center"} borderWidth={2}
 							        borderColor={theme.primary.placeholder.purple} borderStyle={"dotted"}
@@ -376,47 +366,38 @@ const CurrentTrip = () => {
 
 						</Block>
 
-						{/*<HStack px={4} mb={16}>*/}
+						{ accountData.trips[accountData.trips.length - 1].tripNotes.length !== undefined ?
 
+							<>
+							</>
 
-						{/*</HStack>*/}
+							:
 
-						{activeTrip ?
+							<Pressable
 
-								accountData.trips[accountData.trips.length - 1].tripNotes.length ?
+								onPress={() => navigation.navigate("NewNote", {item: null, isNew: true})}
 
-									<>
-									</>
+								h={64}
+								w={"100%"}
+								mb={32}
+								flexDirection={"row"}
+								justifyContent={"center"}
+								alignItems={"center"}
+								borderRadius={18}
+								borderStyle={"dashed"}
+								borderWidth={2}
+								borderColor={theme.primary.placeholder.indigo}
+							>
 
-									:
+								<Feather name={"plus-circle"} size={22} color={theme.primary.placeholder.indigo}/>
 
-									<Pressable
+								<Text fontSize={16} fontWeight={"bold"} letterSpacing={1}
+								      color={theme.primary.placeholder.indigo}
+								      ml={8}>
+									寫遊記
+								</Text>
 
-										onPress={() => navigation.navigate("NewNote", {item: null, isNew: true})}
-
-										h={64}
-										w={"100%"}
-										mb={32}
-										flexDirection={"row"}
-										justifyContent={"center"}
-										alignItems={"center"}
-										borderRadius={18}
-										borderStyle={"dashed"}
-										borderWidth={2}
-										borderColor={theme.primary.placeholder.indigo}
-									>
-
-										<Feather name={"plus-circle"} size={22} color={theme.primary.placeholder.indigo}/>
-
-										<Text fontSize={16} fontWeight={"bold"} letterSpacing={1}
-										      color={theme.primary.placeholder.indigo}
-										      ml={8}>
-											寫遊記
-										</Text>
-
-									</Pressable>
-
-							: <></>
+							</Pressable>
 						}
 
 						<FlatList
@@ -430,15 +411,14 @@ const CurrentTrip = () => {
 
 							ListFooterComponent={
 
-							activeTrip?
 
-								accountData.trips[accountData.trips.length - 1].tripNotes.length ?
+								accountData.trips[accountData.trips.length - 1].tripNotes.length !== undefined ?
 
 									<HStack mt={16} w={"100%"} justifyContent={"center"} alignItems={"center"}>
 
 										<GradientButton onPress={() => navigation.navigate("NewNote", {item: null, isNew: true})
 										} pureIcon h={36} w={36} icon={"plus"} iconSize={24} iconColor={"white"}/>
-									</HStack> : <></> : <></>
+									</HStack> : <></>
 							}
 
 							renderItem={renderItem}

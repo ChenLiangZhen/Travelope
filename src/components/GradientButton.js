@@ -41,15 +41,18 @@ export const GradientBorderButton = ({ icon, iconSize, iconColor, h, w, color, b
 
           {icon? <Feather name={icon} size={iconSize} color={iconColor} /> : <></>}
 
-          <Text
-            ml={icon? 6 : 0}
-            mr={icon? 2 : 0}
-            fontSize={fs? fs: 15}
-            fontWeight={"bold"}
-            color={color? color: "white"}
-          >
-            {title}
-          </Text>
+           {title === "" ? <></> :
+              <Text
+                 ml={icon? 6 : 0}
+                 mr={icon? 2 : 0}
+                 fontSize={fs? fs: 14}
+                 fontWeight={"bold"}
+                 color={color? color: "white"}
+              >
+                 {title}
+              </Text>
+           }
+
 
         </View>
 
@@ -92,7 +95,7 @@ export const GradientButton = ({ pureIcon, flex, icon, iconSize, iconColor, h, w
             <Text
                ml={icon? 6 : 0}
                mr={icon? 2 : 0}
-               fontSize={fs? fs: 15}
+               fontSize={fs? fs: 14}
                fontWeight={"bold"}
                color={color? color: "white"}
             >
