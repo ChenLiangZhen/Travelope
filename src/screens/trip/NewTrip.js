@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, {useEffect, useRef, useState} from "react"
 import LayoutBase from "../../components/LayoutBase"
 import FlatBlock from "../../components/FlatBlock"
 import {
@@ -17,17 +17,18 @@ import {
 import Block from "../../components/Block"
 import DatePicker from "react-native-date-picker"
 import Feather from "react-native-vector-icons/Feather"
-import { GradientBorderButton, GradientButton } from "../../components/GradientButton"
-import { selectAccount } from "../../globalstate/accountSlice"
-import { FlatList, Keyboard } from "react-native"
-import { HEIGHT, WIDTH } from "../../Util"
-import { useDispatch, useSelector } from "react-redux"
-import { appleAuth } from "@invertase/react-native-apple-authentication"
-import { pushTrip, selectData, setCurrentTrip } from "../../globalstate/dataSlice"
-import { apiRequest } from "../../apis/api"
-import { useFocusEffect } from "@react-navigation/native"
+import {GradientBorderButton, GradientButton} from "../../components/GradientButton"
+import {selectAccount} from "../../globalstate/accountSlice"
+import {FlatList, Keyboard} from "react-native"
+import {HEIGHT, WIDTH} from "../../Util"
+import {useDispatch, useSelector} from "react-redux"
+import {appleAuth} from "@invertase/react-native-apple-authentication"
+import {pushTrip, selectData, setCurrentTrip} from "../../globalstate/dataSlice"
+import {apiRequest} from "../../apis/api"
+import {useFocusEffect, useIsFocused} from "@react-navigation/native"
+import {config, useSpring, animated} from "@react-spring/native";
 
-const NewTrip = ({ navigation }) => {
+const NewTrip = ({navigation}) => {
 
 	const theme = useTheme().colors
 	const [hasFellow, setHasFellow] = useState(false)
@@ -51,6 +52,59 @@ const NewTrip = ({ navigation }) => {
 	const toastInfoRef = useRef()
 	const toast = useToast()
 
+	const isFocused = useIsFocused()
+
+	const [wave1, setWave1] = useState(false)
+
+	const wave1Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		config: config.wobbly
+	})
+
+	const wave2Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		delay: 150,
+		config: config.wobbly
+	})
+
+	const wave3Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		delay: 300,
+
+		config: config.wobbly
+	})
+
+	const wave4Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		delay: 450,
+
+		config: config.wobbly
+	})
+
+	useEffect(() => {
+
+		if (isFocused) {
+
+			setWave1(true)
+		}
+
+	}, [isFocused])
+
+	useEffect(() => {
+
+		const unsubscribe = navigation.addListener('blur', () => {
+			console.log("LEAVING EVENT EMITTER")
+			setWave1(false)
+		});
+
+		return unsubscribe;
+
+	}, [navigation])
+
 	useFocusEffect(
 		React.useCallback(() => {
 
@@ -60,6 +114,7 @@ const NewTrip = ({ navigation }) => {
 
 		}, []),
 	)
+
 
 	useEffect(() => {
 
@@ -91,14 +146,14 @@ const NewTrip = ({ navigation }) => {
 				id: "warningInfo",
 				render: () => {
 					return (
-						<ToastInfo info={info} />
+						<ToastInfo info={info}/>
 					)
 				},
 			})
 		}
 	}
 
-	const ToastInfo = ({ info }) => {
+	const ToastInfo = ({info}) => {
 		return (
 			<HStack
 
@@ -109,7 +164,7 @@ const NewTrip = ({ navigation }) => {
 		)
 	}
 
-	const FriendSelect = ({ item }) => {
+	const FriendSelect = ({item}) => {
 
 		// const [selected, setSelected] = useState(false)
 
@@ -128,7 +183,7 @@ const NewTrip = ({ navigation }) => {
 					let result = selectedFriendsArray.find(selected => selected.key === item.key)
 
 					if (!result) {
-						setSelectedFriendsArray(prev => [...prev, { key: item.key, name: item.name }])
+						setSelectedFriendsArray(prev => [...prev, {key: item.key, name: item.name}])
 
 					} else {
 						console.log("found duplicate")
@@ -138,18 +193,18 @@ const NewTrip = ({ navigation }) => {
 
 				borderRadius={18} borderWidth={2} w={"100%"} px={20} flexDirection={"row"} mb={12} h={48}
 				backgroundColor={"gray.100"} alignItems={"center"}
-				borderColor={selectedFriendsArray.find(selected => selected.key === item.key)? theme.primary.placeholder.indigo : "transparent"}
+				borderColor={selectedFriendsArray.find(selected => selected.key === item.key) ? theme.primary.placeholder.indigo : "transparent"}
 				justifyContent={"space-between"}>
 
 				<Text numberOfLines={1}
-				      color={selectedFriendsArray.find(selected => selected.key === item.key)? theme.primary.text.indigo : theme.primary.text.midgray}
+				      color={selectedFriendsArray.find(selected => selected.key === item.key) ? theme.primary.text.indigo : theme.primary.text.midgray}
 				      fontWeight={"bold"} fontSize={15}>
 					{item.name}
 				</Text>
 
 
 				<Text numberOfLines={1}
-				      color={selectedFriendsArray.find(selected => selected.key === item.key)? theme.primary.placeholder.indigo : theme.primary.text.midgray}
+				      color={selectedFriendsArray.find(selected => selected.key === item.key) ? theme.primary.placeholder.indigo : theme.primary.text.midgray}
 				      fontSize={15}>
 					{item.tag}
 				</Text>
@@ -159,7 +214,7 @@ const NewTrip = ({ navigation }) => {
 		)
 	}
 
-	const FriendTag = ({ item }) => {
+	const FriendTag = ({item}) => {
 
 		useEffect(() => {
 			console.log("THIS item:")
@@ -180,8 +235,8 @@ const NewTrip = ({ navigation }) => {
 		)
 	}
 
-	const renderItemSelectFriend = ({ item }) => <FriendSelect item={item} />
-	const renderItemTagFriend = ({ item }) => <FriendTag item={item} />
+	const renderItemSelectFriend = ({item}) => <FriendSelect item={item}/>
+	const renderItemTagFriend = ({item}) => <FriendTag item={item}/>
 
 	return (
 
@@ -193,7 +248,7 @@ const NewTrip = ({ navigation }) => {
 			       shadowOffset={{
 				       height: 4,
 			       }}
-			       _backdrop={{ bg: "#000", opacity: .25 }}
+			       _backdrop={{bg: "#000", opacity: .25}}
 			>
 
 				<Modal.Content borderRadius={24} w={WIDTH * .9} px={20} h={HEIGHT * .5} alignSelf={"center"} py={12}>
@@ -209,7 +264,7 @@ const NewTrip = ({ navigation }) => {
 							setModalVisible()
 						}} justifyContent={"center"} alignItems={"center"} w={28}
 						           h={28}>
-							<Feather name={"x"} size={20} color={theme.primary.text.indigo} />
+							<Feather name={"x"} size={20} color={theme.primary.text.indigo}/>
 						</Pressable>
 
 					</HStack>
@@ -225,7 +280,7 @@ const NewTrip = ({ navigation }) => {
 							{"已選擇：" + selectedFriendsArray.length}
 						</Text>
 
-						<GradientButton title={"確認"} onPress={() => setModalVisible()} />
+						<GradientButton title={"確認"} onPress={() => setModalVisible()}/>
 
 					</HStack>
 
@@ -239,6 +294,7 @@ const NewTrip = ({ navigation }) => {
 				title={"旅遊開始的時間"}
 				open={open}
 				date={date}
+				theme={"light"}
 				onConfirm={(date) => {
 					setOpen(false)
 					setDate(date)
@@ -254,6 +310,8 @@ const NewTrip = ({ navigation }) => {
 				title={"選擇旅遊的日期"}
 				open={openTime}
 				date={date}
+				theme={"light"}
+
 				onConfirm={(date) => {
 					setOpenTime(false)
 					setDate(date)
@@ -263,243 +321,258 @@ const NewTrip = ({ navigation }) => {
 				}}
 			/>
 
+
 			<Pressable onPress={() => Keyboard.dismiss()}>
 
-				<FlatBlock
+				<animated.View style={wave1Anim}>
 
-					h={64}
-					mb={16}
-					borderWidth={1}
-					flexDirection={"row"}
-					bg={"white"}
-					shadowColor={theme.primary.bg.litgray}
-					borderColor={theme.primary.text.purple}
-					ai={"center"}
-				>
-					<Text
-						color={theme.primary.text.purple}
-						fontSize={16}
-						fontWeight={"bold"}
-						mr={20}
-					>名稱</Text>
+					<FlatBlock
 
-					<Input
-						_focus={{
-							borderColor: theme.primary.text.purple,
-							color: theme.primary.text.purple,
-							bg: theme.primary.bg.purple,
-						}}
-
-						value={tripName}
-						onChangeText={name => setTripName(name)}
-						selectionColor={theme.primary.text.indigo}
-						borderColor={"transparent"}
-						color={theme.primary.text.purple}
-						bg={theme.primary.bg.smoke}
+						h={64}
+						mb={16}
 						borderWidth={1}
-						borderRadius={16}
-						fontWeight={"bold"}
-						h={36}
-						flex={8}
-						px={20}
-						fontSize={16}
-						textAlign={"left"}
-					/>
+						flexDirection={"row"}
+						bg={"white"}
+						shadowColor={theme.primary.bg.litgray}
+						borderColor={theme.primary.text.purple}
+						ai={"center"}
+					>
+						<Text
+							color={theme.primary.text.purple}
+							fontSize={16}
+							fontWeight={"bold"}
+							mr={20}
+						>名稱</Text>
 
-				</FlatBlock>
+						<Input
+							_focus={{
+								borderColor: theme.primary.text.purple,
+								color: theme.primary.text.purple,
+								bg: theme.primary.bg.purple,
+							}}
 
-				<FlatBlock
-
-					h={104}
-					mb={16}
-					borderWidth={1}
-					flexDirection={"row"}
-					bg={"white"}
-					shadowColor={theme.primary.bg.litgray}
-					borderColor={theme.primary.text.purple}
-					ai={"center"}
-				>
-					<Text
-						color={theme.primary.text.purple}
-						fontSize={16}
-						fontWeight={"bold"}
-						mr={20}
-					>描述</Text>
-
-					<TextArea
-						_focus={{
-							borderColor: theme.primary.text.purple,
-							color: theme.primary.text.purple,
-							bg: theme.primary.bg.purple,
-						}}
-
-						value={tripDescription}
-						onChangeText={desc => setTripDescription(desc)}
-						selectionColor={theme.primary.text.indigo}
-						borderColor={"transparent"}
-						color={theme.primary.text.purple}
-						bg={theme.primary.bg.smoke}
-						borderWidth={1}
-						borderRadius={16}
-						fontWeight={"bold"}
-						h={72}
-						flex={8}
-						px={20}
-						py={10}
-						fontSize={16}
-						textAlign={"left"}
-					/>
-
-				</FlatBlock>
-
-				<FlatBlock
-					h={64}
-					mb={16}
-					borderWidth={1}
-					flexDirection={"row"}
-					bg={"white"}
-					shadowColor={theme.primary.bg.litgray}
-					borderColor={theme.primary.text.purple}
-					ai={"center"}
-				>
-					<Text
-						color={theme.primary.text.purple}
-						fontSize={16}
-						fontWeight={"bold"}
-						mr={20}
-					>日期</Text>
-
-					<Input
-						_focus={{
-							borderColor: theme.primary.text.purple,
-							color: theme.primary.text.purple,
-							bg: theme.primary.bg.purple,
-						}}
-						value={date.getFullYear() + " - " + (date.getMonth() + 1) + " - " + date.getDate() + "   " + date.getHours() + " : " + date.getMinutes()}
-						selectionColor={theme.primary.text.purple}
-						borderColor={"transparent"}
-						color={theme.primary.text.purple}
-						bg={theme.primary.bg.smoke}
-						borderWidth={1}
-						borderRadius={16}
-						fontWeight={"bold"}
-						mr={16}
-						h={36}
-						flex={8}
-						px={20}
-						fontSize={16}
-						textAlign={"left"}
-					/>
-
-					<Pressable h={32} justifyContent={"center"} onPress={() => setOpen(true)}>
-						<Feather name={"calendar"} color={theme.primary.text.indigo} size={20} />
-					</Pressable>
-
-				</FlatBlock>
-
-				{
-
-					hasFellow?  //新增同行友人
-
-						<FlatBlock
-							h={selectedFriendsArray.length === 0? 64 : 64 + 48 * (selectedFriendsArray.length - 1)}
-							mb={16}
+							value={tripName}
+							onChangeText={name => setTripName(name)}
+							selectionColor={theme.primary.text.indigo}
+							borderColor={"transparent"}
+							color={theme.primary.text.purple}
+							bg={theme.primary.bg.smoke}
 							borderWidth={1}
-							flexDirection={"row"}
-							justifyContent={"space-between"}
-							bg={"white"}
-							shadowColor={theme.primary.bg.litgray}
-							borderColor={theme.primary.text.purple}
-							ai={"center"}
-						>
+							borderRadius={16}
+							fontWeight={"bold"}
+							h={36}
+							flex={8}
+							px={20}
+							fontSize={16}
+							textAlign={"left"}
+						/>
+
+					</FlatBlock>
+				</animated.View>
 
 
-							<HStack alignItems={"center"}>
+				<animated.View style={wave2Anim}>
 
-								<Text
-									color={theme.primary.text.purple}
-									fontSize={16}
-									fontWeight={"bold"}
-									mr={14}
-								>同行</Text>
+					<FlatBlock
 
-								<View h={36 + (selectedFriendsArray.length - 1) * 40} w={4} borderRadius={10}
-								      bg={theme.primary.placeholder.purple} />
+						h={104}
+						mb={16}
+						borderWidth={1}
+						flexDirection={"row"}
+						bg={"white"}
+						shadowColor={theme.primary.bg.litgray}
+						borderColor={theme.primary.text.purple}
+						ai={"center"}
+					>
+						<Text
+							color={theme.primary.text.purple}
+							fontSize={16}
+							fontWeight={"bold"}
+							mr={20}
+						>描述</Text>
 
-								<VStack mx={18} justifyConten={"center"} flex={1} h={32 + (selectedFriendsArray.length - 1) * 40}
-								        justifyContent={"center"} alignItems={"center"}
-								        borderRadius={18}>
+						<TextArea
+							_focus={{
+								borderColor: theme.primary.text.purple,
+								color: theme.primary.text.purple,
+								bg: theme.primary.bg.purple,
+							}}
 
-									<FlatList
-										style={{
+							value={tripDescription}
+							onChangeText={desc => setTripDescription(desc)}
+							selectionColor={theme.primary.text.indigo}
+							borderColor={"transparent"}
+							color={theme.primary.text.purple}
+							bg={theme.primary.bg.smoke}
+							borderWidth={1}
+							borderRadius={16}
+							fontWeight={"bold"}
+							h={72}
+							flex={8}
+							px={20}
+							py={10}
+							fontSize={16}
+							textAlign={"left"}
+						/>
 
-											width: "100%",
-											// marginLeft: 24,
-										}}
+					</FlatBlock>
 
-										contentContainerStyle={{}}
+				</animated.View>
 
-										showsVerticalScrollIndicator={false}
-										data={selectedFriendsArray}
-										renderItem={renderItemTagFriend}
-									/>
+				<animated.View style={wave3Anim}>
+					<FlatBlock
+						h={64}
+						mb={16}
+						borderWidth={1}
+						flexDirection={"row"}
+						bg={"white"}
+						shadowColor={theme.primary.bg.litgray}
+						borderColor={theme.primary.text.purple}
+						ai={"center"}
+					>
+						<Text
+							color={theme.primary.text.purple}
+							fontSize={16}
+							fontWeight={"bold"}
+							mr={20}
+						>日期</Text>
 
-								</VStack>
+						<Input
+							_focus={{
+								borderColor: theme.primary.text.purple,
+								color: theme.primary.text.purple,
+								bg: theme.primary.bg.purple,
+							}}
+							value={date.getFullYear() + " - " + (date.getMonth() + 1) + " - " + date.getDate() + "   " + date.getHours() + " : " + date.getMinutes()}
+							selectionColor={theme.primary.text.purple}
+							borderColor={"transparent"}
+							color={theme.primary.text.purple}
+							bg={theme.primary.bg.smoke}
+							borderWidth={1}
+							borderRadius={16}
+							fontWeight={"bold"}
+							mr={16}
+							h={36}
+							flex={8}
+							px={20}
+							fontSize={16}
+							textAlign={"left"}
+						/>
 
-								<Pressable h={32} justifyContent={"center"} onPress={() => setModalVisible(true)}>
-									<Feather name={"plus-circle"} color={theme.primary.text.indigo} size={20} />
-								</Pressable>
+						<Pressable h={32} justifyContent={"center"} onPress={() => setOpen(true)}>
+							<Feather name={"calendar"} color={theme.primary.text.indigo} size={20}/>
+						</Pressable>
 
-							</HStack>
+					</FlatBlock>
 
+					{
 
-						</FlatBlock> : <></>
+						hasFellow ?  //新增同行友人
 
-				}
-
-				<HStack mb={12} w={"100%"} justifyContent={"flex-end"}>
-					<GradientBorderButton w={96} color={theme.primary.text.purple} title={hasFellow? "移除同行" : "新增同行"}
-					                      onPress={async () => {
-
-						                      if(!account.info.isLoggedIn){
-
-							                      addToast("必須登入才能新增同行人哦！")
-							                      await new Promise(resolve => setTimeout(resolve, 1500))
-							                      closeInfoToast()
-
-							                      return
-						                      }
-
-						                      setHasFellow(prev => !prev)
-					                      }} />
-				</HStack>
+							<FlatBlock
+								h={selectedFriendsArray.length === 0 ? 64 : 64 + 48 * (selectedFriendsArray.length - 1)}
+								mb={16}
+								borderWidth={1}
+								flexDirection={"row"}
+								justifyContent={"space-between"}
+								bg={"white"}
+								shadowColor={theme.primary.bg.litgray}
+								borderColor={theme.primary.text.purple}
+								ai={"center"}
+							>
 
 
-				<Block mt={36} pl={24} pr={18} mb={36} borderRadius={18} fd={"row"} h={64} sc={"#9e66ff"}
-				       bdc={theme.primary.text.purple}
-				       ai={"center"}
-				       jc={"space-between"}>
+								<HStack alignItems={"center"}>
 
-					<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-						開始紀錄旅程！
-					</Text>
+									<Text
+										color={theme.primary.text.purple}
+										fontSize={16}
+										fontWeight={"bold"}
+										mr={14}
+									>同行</Text>
 
-					<GradientButton w={100} h={34} title={"建立旅程"} onPress={() => {
+									<View h={36 + (selectedFriendsArray.length - 1) * 40} w={4} borderRadius={10}
+									      bg={theme.primary.placeholder.purple}/>
 
-						if (tripName === "" || tripDescription === "") {
-							addToast("資料不完整。")
-							return
-						}
+									<VStack mx={18} justifyConten={"center"} flex={1}
+									        h={32 + (selectedFriendsArray.length - 1) * 40}
+									        justifyContent={"center"} alignItems={"center"}
+									        borderRadius={18}>
 
-						dispatch(pushTrip(tripObject))
+										<FlatList
+											style={{
 
-						apiRequest("post", `/api/travelope/new-trip/${account.info.id}`, tripObject)
+												width: "100%",
+												// marginLeft: 24,
+											}}
 
-						navigation.navigate("CurrentTrip")
+											contentContainerStyle={{}}
 
-					}} />
+											showsVerticalScrollIndicator={false}
+											data={selectedFriendsArray}
+											renderItem={renderItemTagFriend}
+										/>
 
-				</Block>
+									</VStack>
+
+									<Pressable h={32} justifyContent={"center"} onPress={() => setModalVisible(true)}>
+										<Feather name={"plus-circle"} color={theme.primary.text.indigo} size={20}/>
+									</Pressable>
+
+								</HStack>
+
+
+							</FlatBlock> : <></>
+
+					}
+
+					<HStack mb={12} w={"100%"} justifyContent={"flex-end"}>
+						<GradientBorderButton w={96} color={theme.primary.text.purple} title={hasFellow ? "移除同行" : "新增同行"}
+						                      onPress={async () => {
+
+							                      if (!account.info.isLoggedIn) {
+
+								                      addToast("必須登入才能新增同行人哦！")
+								                      await new Promise(resolve => setTimeout(resolve, 1500))
+								                      closeInfoToast()
+
+								                      return
+							                      }
+
+							                      setHasFellow(prev => !prev)
+						                      }}/>
+					</HStack>
+
+				</animated.View>
+
+
+				<animated.View style={wave4Anim}>
+					<Block mt={36} pl={24} pr={18} mb={36} borderRadius={18} fd={"row"} h={64} sc={"#9e66ff"}
+					       bdc={theme.primary.text.purple}
+					       ai={"center"}
+					       jc={"space-between"}>
+
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+							開始紀錄旅程！
+						</Text>
+
+						<GradientButton w={100} h={34} title={"建立旅程"} onPress={() => {
+
+							if (tripName === "" || tripDescription === "") {
+								addToast("資料不完整。")
+								return
+							}
+
+							dispatch(pushTrip(tripObject))
+
+							apiRequest("post", `/api/travelope/new-trip/${account.info.id}`, tripObject)
+
+							navigation.navigate("CurrentTrip")
+
+						}}/>
+
+					</Block>
+				</animated.View>
 
 
 			</Pressable>

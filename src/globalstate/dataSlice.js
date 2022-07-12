@@ -6,6 +6,10 @@ export const initialState = {
 
 	],
 
+	sharedTrips: [
+
+	]
+
 }
 
 const dataSlice = createSlice({
@@ -19,12 +23,19 @@ const dataSlice = createSlice({
 
 			console.log("PURGE DATA")
 			state.trips = []
+			state.sharedTrips = []
 		},
 
 		setTrips(state, action) { //用於第一次載入，從後端擷取資料用。
 
 			console.log("SET TRIPS")
 			state.trips = action.payload
+		},
+
+		setSharedTrips(state, action) { //用於第一次載入，從後端擷取資料用。
+
+			console.log("SET SHARED TRIPS")
+			state.sharedTrips = action.payload
 		},
 
 		setCurrentTrip(state, action) { //用於更新目前的旅程用。 最新的旅程為旅程陣列的最後一個元素。
@@ -78,6 +89,7 @@ export const {
 
 	purgeAccountData,
 	setTrips,
+	setSharedTrips,
 	setInactive,
 	pushTrip,
 	pushTripNote,

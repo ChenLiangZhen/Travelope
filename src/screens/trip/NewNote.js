@@ -17,6 +17,7 @@ import ImagePicker from "react-native-image-crop-picker"
 import {uploadImageInit} from "../../apis/fileManager"
 import RNFS from "react-native-fs"
 import {useFocusEffect, useIsFocused} from "@react-navigation/native";
+import {config, useSpring, animated} from "@react-spring/native";
 
 const ImageItem = (props) => {
 
@@ -70,6 +71,8 @@ const NewNote = ({navigation, route}) => {
 	const [mood, setMood] = useState()
 
 	const [noteObject, setNoteObject] = useState({})
+	const isFocused = useIsFocused()
+
 
 	const account = useSelector(selectAccount)
 	const accountData = useSelector(selectData)
@@ -78,7 +81,57 @@ const NewNote = ({navigation, route}) => {
 	const toastInfoRef = useRef()
 	const toast = useToast()
 
-	const isFocused = useIsFocused()
+	const [wave1, setWave1] = useState(false)
+
+	const wave1Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		config: config.wobbly
+	})
+
+	const wave2Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		delay: 150,
+		config: config.wobbly
+	})
+
+	const wave3Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		delay: 300,
+
+		config: config.wobbly
+	})
+
+	const wave4Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		delay: 450,
+
+		config: config.wobbly
+	})
+
+	useEffect(() => {
+
+		if (isFocused) {
+
+			setWave1(true)
+		}
+
+	}, [isFocused])
+
+	useEffect(() => {
+
+		const unsubscribe = navigation.addListener('blur', () => {
+			console.log("LEAVING EVENT EMITTER")
+			setWave1(false)
+		});
+
+		return unsubscribe;
+
+	}, [navigation])
+
 
 	const getLocation = async () => {
 
@@ -258,312 +311,336 @@ const NewNote = ({navigation, route}) => {
 
 				{/*<KeyboardAvoidingView flex={1} pb={400}>*/}
 
-				<HStack justifyContent={"flex-end"}>
-
-
-					{hasImage ?
-
-						<GradientButton w={72} color={"white"} title={"照片"} onPress={() => {
-
-							setHasImage(prev => !prev)
-						}}
-						/> :
-
-						<GradientBorderButton w={72} color={theme.primary.text.purple} title={"照片"} onPress={() => {
-
-							setHasImage(prev => !prev)
-						}}
-						/>
-
-					}
-
-					{hasMood ?
-						<GradientButton ml={8} w={72} color={"white"} title={"心情"} onPress={() => {
-
-							setHasImage(prev => !prev)
-						}}
-						/> :
-						<GradientBorderButton ml={8} w={72} color={theme.primary.text.purple} title={"心情"} onPress={() => {
-
-							setHasImage(prev => !prev)
-						}}
-						/>
-					}
-
-				</HStack>
-
-				{hasImage ?
-
-					<HStack w={"100%"} mt={16} alignItems={"center"} justifyContent={"flex-end"}>
-
-						<FlatList
-							inverted
-							horizontal={true}
-							// keyExtractor={item => item.uri}
-							data={imageList}
-							renderItem={renderItemImage}
-						/>
-
-						<Pressable
-
-							onPress={() => {
-								updateImage()
-							}}
-
-							h={72}
-							w={72}
-							ml={8}
-							flexDirection={"row"}
-							justifyContent={"center"}
-							alignItems={"center"}
-							borderRadius={12}
-							borderStyle={"dashed"}
-							borderWidth={2}
-							borderColor={theme.primary.placeholder.indigo}
-						>
-
-							<Feather name={"image"} size={22} color={theme.primary.placeholder.indigo}/>
-
-						</Pressable>
-					</HStack> : <></>
-				}
-
 				<Pressable onPress={() => Keyboard.dismiss()}>
 
-					<Input
-						_focus={{
-							borderColor: theme.primary.text.purple,
-							placeholderTextColor: theme.primary.placeholder.purple,
+					<animated.View style={wave1Anim}>
 
-							color: theme.primary.text.purple,
-							bg: theme.primary.bg.purple,
-						}}
+						<HStack justifyContent={"flex-end"}>
 
-						value={noteTitle}
-						letterSpacing={1}
-						placeholder={"名稱"}
-						letterSpacing={1}
 
-						onChangeText={title => setNoteTitle(title)}
-						selectionColor={theme.primary.text.indigo}
-						borderColor={"transparent"}
-						color={theme.primary.text.purple}
-						bg={theme.primary.bg.smoke}
-						borderWidth={1}
-						borderRadius={16}
-						fontWeight={"bold"}
-						h={48}
-						mt={24}
-						mb={16}
-						px={14}
-						py={12}
-						fontSize={16}
-						textAlign={"left"}
+							{hasImage ?
 
-					/>
+								<GradientButton w={72} color={"white"} title={"照片"} onPress={() => {
 
-					<Input
-						_focus={{
-							borderColor: theme.primary.text.purple,
-							placeholderTextColor: theme.primary.placeholder.purple,
-							color: theme.primary.text.purple,
-							bg: theme.primary.bg.purple,
-						}}
+									setHasImage(prev => !prev)
+								}}
+								/> :
 
-						multiline={true}
-						value={noteContent}
-						placeholder={"描述"}
-						onChangeText={content => setNoteContent(content)}
+								<GradientBorderButton w={72} color={theme.primary.text.purple} title={"照片"} onPress={() => {
 
-						letterSpacing={1}
-						selectionColor={theme.primary.text.indigo}
-						borderColor={"transparent"}
-						color={theme.primary.text.purple}
-						bg={theme.primary.bg.smoke}
-						borderWidth={1}
-						borderRadius={16}
-						fontWeight={"bold"}
-						mb={32}
+									setHasImage(prev => !prev)
+								}}
+								/>
 
-						h={120}
-						px={14}
-						py={12}
-						fontSize={16}
-						textAlign={"left"}
-					/>
+							}
 
-					<FlatBlock
-						h={64}
-						mb={16}
-						borderWidth={2}
-						pr={8}
-						flexDirection={"row"}
-						bg={"white"}
-						shadowColor={theme.primary.bg.litgray}
-						borderColor={theme.primary.placeholder.purple}
-						ai={"center"}
-					>
-						<Text
-							color={theme.primary.text.purple}
-							fontSize={16}
-							fontWeight={"bold"}
-							mr={20}
-						>地點</Text>
+							{/*{hasMood ?*/}
+							{/*	<GradientButton ml={8} w={72} color={"white"} title={"心情"} onPress={() => {*/}
+
+							{/*		setHasImage(prev => !prev)*/}
+							{/*	}}*/}
+							{/*	/> :*/}
+							{/*	<GradientBorderButton ml={8} w={72} color={theme.primary.text.purple} title={"心情"} onPress={() => {*/}
+
+							{/*		setHasImage(prev => !prev)*/}
+							{/*	}}*/}
+							{/*	/>*/}
+							{/*}*/}
+
+						</HStack>
+
+						{hasImage ?
+
+							<HStack w={"100%"} mt={16} alignItems={"center"} justifyContent={"flex-end"}>
+
+								<FlatList
+									inverted
+									horizontal={true}
+									// keyExtractor={item => item.uri}
+									data={imageList}
+									renderItem={renderItemImage}
+								/>
+
+								<Pressable
+
+									onPress={() => {
+										updateImage()
+									}}
+
+									h={72}
+									w={72}
+									ml={8}
+									flexDirection={"row"}
+									justifyContent={"center"}
+									alignItems={"center"}
+									borderRadius={12}
+									borderStyle={"dashed"}
+									borderWidth={2}
+									borderColor={theme.primary.placeholder.indigo}
+								>
+
+									<Feather name={"image"} size={22} color={theme.primary.placeholder.indigo}/>
+
+								</Pressable>
+							</HStack> : <></>
+						}
+
+					</animated.View>
+
+					<animated.View style={wave2Anim}>
 
 						<Input
-
-							onPress={() => console.log("gjreo")}
 							_focus={{
 								borderColor: theme.primary.text.purple,
+								placeholderTextColor: theme.primary.placeholder.purple,
+
 								color: theme.primary.text.purple,
 								bg: theme.primary.bg.purple,
 							}}
 
-							value={namedLocation}
-							onChangeText={(location) => setNamedLocation(location)}
-							selectionColor={theme.primary.text.purple}
-							placeholderTextColor={theme.primary.placeholder.indigo}
+							value={noteTitle}
+							letterSpacing={1}
+							placeholder={"名稱"}
+							letterSpacing={1}
+
+							onChangeText={title => setNoteTitle(title)}
+							selectionColor={theme.primary.text.indigo}
 							borderColor={"transparent"}
 							color={theme.primary.text.purple}
 							bg={theme.primary.bg.smoke}
 							borderWidth={1}
 							borderRadius={16}
 							fontWeight={"bold"}
-							mr={16}
-							h={36}
-							flex={8}
-							px={20}
-
+							h={48}
+							mt={24}
+							mb={16}
+							px={14}
+							py={12}
 							fontSize={16}
 							textAlign={"left"}
+
 						/>
-
-					</FlatBlock>
-
-
-					<FlatBlock
-						h={64}
-						mb={16}
-						borderWidth={2}
-						pr={8}
-						flexDirection={"row"}
-						bg={"white"}
-						shadowColor={theme.primary.bg.litgray}
-						borderColor={theme.primary.placeholder.purple}
-						ai={"center"}
-					>
-						<Text
-							color={theme.primary.text.purple}
-							fontSize={16}
-							fontWeight={"bold"}
-							mr={20}
-						>地址</Text>
-
-						<Text flex={1} noOfLines={1} fontSize={16} color={theme.primary.text.purple}>
-							{codedLocation}
-						</Text>
-
-					</FlatBlock>
-
-					<FlatBlock
-						h={64}
-						mb={36}
-						borderWidth={2}
-						flexDirection={"row"}
-						bg={"white"}
-						shadowColor={theme.primary.bg.litgray}
-						borderColor={theme.primary.placeholder.purple}
-						ai={"center"}
-					>
-						<Text
-							color={theme.primary.text.purple}
-							fontSize={16}
-							fontWeight={"bold"}
-							mr={20}
-						>時間</Text>
 
 						<Input
 							_focus={{
 								borderColor: theme.primary.text.purple,
+								placeholderTextColor: theme.primary.placeholder.purple,
 								color: theme.primary.text.purple,
 								bg: theme.primary.bg.purple,
 							}}
-							value={date.getFullYear() + " - " + (date.getMonth() + 1) + " - " + date.getDate() + "   " + date.getHours() + " : " + date.getMinutes()}
-							selectionColor={theme.primary.text.purple}
+
+							multiline={true}
+							value={noteContent}
+							placeholder={"描述"}
+							onChangeText={content => setNoteContent(content)}
+
+							letterSpacing={1}
+							selectionColor={theme.primary.text.indigo}
 							borderColor={"transparent"}
 							color={theme.primary.text.purple}
 							bg={theme.primary.bg.smoke}
 							borderWidth={1}
 							borderRadius={16}
 							fontWeight={"bold"}
-							mr={16}
-							h={36}
-							flex={8}
-							px={20}
+							mb={32}
+
+							h={120}
+							px={14}
+							py={12}
 							fontSize={16}
 							textAlign={"left"}
 						/>
 
-						<Pressable h={32} justifyContent={"center"} onPress={() => setOpen(true)}>
-							<Feather name={"calendar"} color={theme.primary.text.indigo} size={20}/>
-						</Pressable>
+					</animated.View>
 
-					</FlatBlock>
+					<animated.View style={wave3Anim}>
 
-					<Block pl={24} pr={18} mb={36} borderRadius={18} fd={"row"} h={64} sc={"#9e66ff"}
-					       bdc={theme.primary.text.purple}
-					       ai={"center"}
-					       jc={"space-between"}>
+						<FlatBlock
+							h={64}
+							mb={16}
+							borderWidth={2}
+							pr={8}
+							flexDirection={"row"}
+							bg={"white"}
+							shadowColor={theme.primary.bg.litgray}
+							borderColor={theme.primary.placeholder.purple}
+							ai={"center"}
+						>
+							<Text
+								color={theme.primary.text.purple}
+								fontSize={16}
+								fontWeight={"bold"}
+								mr={20}
+							>地點</Text>
 
-						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-							編輯完成
-						</Text>
+							<Input
 
-						<GradientBorderButton w={72} color={theme.primary.text.purple} title={"取消"} onPress={() => {
+								onPress={() => console.log("gjreo")}
+								_focus={{
+									borderColor: theme.primary.text.purple,
+									color: theme.primary.text.purple,
+									bg: theme.primary.bg.purple,
+								}}
 
-							navigation.navigate("CurrentTrip")
-							// navigation.goBack()
-						}}
-						/>
+								value={namedLocation}
+								onChangeText={(location) => setNamedLocation(location)}
+								selectionColor={theme.primary.text.purple}
+								placeholderTextColor={theme.primary.placeholder.indigo}
+								borderColor={"transparent"}
+								color={theme.primary.text.purple}
+								bg={theme.primary.bg.smoke}
+								borderWidth={1}
+								borderRadius={16}
+								fontWeight={"bold"}
+								mr={16}
+								h={36}
+								flex={8}
+								px={20}
 
-						<GradientButton ml={8} w={96} h={34} title={"儲存遊記"} onPress={() => {
+								fontSize={16}
+								textAlign={"left"}
+							/>
 
-							if (noteTitle === "" || noteContent === "" || namedLocation === "") {
+						</FlatBlock>
 
-								addToast("必須填寫所有欄位")
+						<FlatBlock
+							h={64}
+							mb={16}
+							borderWidth={2}
+							pr={8}
+							flexDirection={"row"}
+							bg={"white"}
+							shadowColor={theme.primary.bg.litgray}
+							borderColor={theme.primary.placeholder.purple}
+							ai={"center"}
+						>
+							<Text
+								color={theme.primary.text.purple}
+								fontSize={16}
+								fontWeight={"bold"}
+								mr={20}
+							>地址</Text>
 
-							} else {
+							<Text flex={1} noOfLines={1} fontSize={16} color={theme.primary.text.purple}>
+								{codedLocation}
+							</Text>
 
-								if (!isNew) {
+						</FlatBlock>
 
-									apiRequest("put", `/api/travelope/update-trip-note/${account.info.id}/${item.noteID}`, noteObject)
-									dispatch(updateTripNote({
-										noteID: item.noteID,
-										item: noteObject
-									}))
-									navigation.navigate("CurrentTrip")
+						<FlatBlock
+							h={64}
+							mb={36}
+							borderWidth={2}
+							flexDirection={"row"}
+							bg={"white"}
+							shadowColor={theme.primary.bg.litgray}
+							borderColor={theme.primary.placeholder.purple}
+							ai={"center"}
+						>
+							<Text
+								color={theme.primary.text.purple}
+								fontSize={16}
+								fontWeight={"bold"}
+								mr={20}
+							>時間</Text>
 
+							<Input
+								_focus={{
+									borderColor: theme.primary.text.purple,
+									color: theme.primary.text.purple,
+									bg: theme.primary.bg.purple,
+								}}
+								value={date.getFullYear() + " - " + (date.getMonth() + 1) + " - " + date.getDate() + "   " + date.getHours() + " : " + date.getMinutes()}
+								selectionColor={theme.primary.text.purple}
+								borderColor={"transparent"}
+								color={theme.primary.text.purple}
+								bg={theme.primary.bg.smoke}
+								borderWidth={1}
+								borderRadius={16}
+								fontWeight={"bold"}
+								mr={16}
+								h={36}
+								flex={8}
+								px={20}
+								fontSize={16}
+								textAlign={"left"}
+							/>
+
+							<Pressable h={32} justifyContent={"center"} onPress={() => setOpen(true)}>
+								<Feather name={"calendar"} color={theme.primary.text.indigo} size={20}/>
+							</Pressable>
+
+						</FlatBlock>
+
+					</animated.View>
+
+					<animated.View style={wave4Anim}>
+
+						<Block pl={24} pr={18} mb={36} borderRadius={18} fd={"row"} h={64} sc={"#9e66ff"}
+						       bdc={theme.primary.text.purple}
+						       ai={"center"}
+						       jc={"space-between"}>
+
+							<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+								編輯完成
+							</Text>
+
+							<GradientBorderButton w={72} color={theme.primary.text.purple} title={"取消"} onPress={() => {
+
+								navigation.navigate("CurrentTrip")
+								// navigation.goBack()
+							}}
+							/>
+
+							<GradientButton ml={8} w={96} h={34} title={"儲存遊記"} onPress={() => {
+
+								if (noteTitle === "" || noteContent === "" || namedLocation === "") {
+
+									addToast("必須填寫所有欄位")
 
 								} else {
 
-									apiRequest("post", `/api/travelope/new-trip-note/${account.info.id}`, noteObject)
-										.then(res => {
-										}, rej => {
-											// console.log(JSON.stringify(rej))
-										})
+									if (!isNew) {
 
-									dispatch(pushTripNote(noteObject))
-									navigation.navigate("CurrentTrip")
+										apiRequest("put", `/api/travelope/update-trip-note/${account.info.id}/${item.noteID}`, noteObject)
+										dispatch(updateTripNote({
+											noteID: item.noteID,
+											item: noteObject
+										}))
+										navigation.navigate("CurrentTrip")
 
+
+									} else {
+
+										apiRequest("post", `/api/travelope/new-trip-note/${account.info.id}`, noteObject)
+											.then(res => {
+											}, rej => {
+												// console.log(JSON.stringify(rej))
+											})
+
+										dispatch(pushTripNote(noteObject))
+										navigation.navigate("CurrentTrip")
+
+									}
 								}
-							}
-						}}/>
-					</Block>
+							}}/>
+						</Block>
+
+
+
+					</animated.View>
+
+
+					<HStack h={384}></HStack>
+
+
 
 				</Pressable>
 				{/*</KeyboardAvoidingView>*/}
 
-				<HStack h={384}></HStack>
+
+
+
 
 			</ScrollView>
 

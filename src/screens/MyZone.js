@@ -21,13 +21,13 @@ import {useDispatch, useSelector} from "react-redux"
 import {addFriend, delFriend, selectAccount} from "../globalstate/accountSlice"
 import {Alert, FlatList, Image, Keyboard, StyleSheet} from "react-native"
 import {WIDTH} from "../Util"
-
 import SwipeableItem, {useSwipeableItemParams} from "react-native-swipeable-item"
 import Animated, {useAnimatedStyle} from "react-native-reanimated"
 import {apiRequest} from "../apis/api"
 import {GradientButton} from "../components/GradientButton"
 
 const styles = StyleSheet.create({
+
 	container: {
 		flex: 1,
 	},
@@ -37,11 +37,13 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center",
 	},
+
 	text: {
 		fontWeight: "bold",
 		color: "white",
 		fontSize: 32,
 	},
+
 	underlayLeft: {
 		flex: 1,
 		backgroundColor: "transparent",
@@ -52,13 +54,13 @@ const styles = StyleSheet.create({
 const OVERSWIPE_DIST = 0
 const NUM_ITEMS = 20
 
-const UnderlayLeft = ({ drag }: { drag: () => void }) => {
+const UnderlayLeft = ({drag}: { drag: () => void }) => {
 
 	const theme = useTheme().colors
 	const dispatch = useDispatch()
 	const account = useSelector(selectAccount)
 
-	const { item, percentOpen } = useSwipeableItemParams()
+	const {item, percentOpen} = useSwipeableItemParams()
 
 	const animStyle = useAnimatedStyle(
 		() => ({
@@ -83,14 +85,14 @@ const UnderlayLeft = ({ drag }: { drag: () => void }) => {
 				id: "warningInfo",
 				render: () => {
 					return (
-						<ToastInfo warningText={warningText} />
+						<ToastInfo warningText={warningText}/>
 					)
 				},
 			})
 		}
 	}
 
-	const ToastInfo = ({ warningText }) => {
+	const ToastInfo = ({warningText}) => {
 
 		return (
 			<HStack
@@ -120,33 +122,36 @@ const UnderlayLeft = ({ drag }: { drag: () => void }) => {
 							text: "刪除", onPress: () => {
 								dispatch(delFriend(item.key))
 								apiRequest("post", `/api/travelope/del-friend/${account.info.id}/${item.key}`)
-									.then( async res => {
+									.then(async res => {
 										addToast("成功移除朋友： " + item.name)
-											await new Promise(resolve => setTimeout(resolve, 1500))
+										await new Promise(resolve => setTimeout(resolve, 1500))
 										closeInfoToast()
-									}, rej => {})
+									}, rej => {
+									})
 							},
 						},
 					],
 				)
 
 			}}>
+
 				<Block mb={18} borderWidth={1} borderColor={theme.primary.text.indigo} h={64} jc={"center"} ai={"center"}>
-					<Feather size={20} name={"trash"} color={theme.primary.text.indigo} />
+					<Feather size={20} name={"trash"} color={theme.primary.text.indigo}/>
 				</Block>
+
 			</Pressable>
 
 		</Animated.View>
 	)
 }
 
-function RowItem({ item, itemRefs, drag }) {
+function RowItem({item, itemRefs, drag}) {
 
 	const theme = useTheme().colors
 
 	return (
-		<SwipeableItem
 
+		<SwipeableItem
 
 			key={item.id}
 			item={item}
@@ -155,7 +160,8 @@ function RowItem({ item, itemRefs, drag }) {
 					itemRefs.current.set(item.id, ref)
 				}
 			}}
-			onChange={({ open }) => {
+
+			onChange={({open}) => {
 				if (open) {
 					// Close all other open items
 					[...itemRefs.current.entries()].forEach(([key, ref]) => {
@@ -165,7 +171,7 @@ function RowItem({ item, itemRefs, drag }) {
 			}}
 
 			overSwipe={OVERSWIPE_DIST}
-			renderUnderlayLeft={() => <UnderlayLeft drag={drag} />}
+			renderUnderlayLeft={() => <UnderlayLeft drag={drag}/>}
 			snapPointsLeft={[70]}
 		>
 			<Block borderWidth={1} w={"100%"} h={64} justifyContent={"space-between"} alignItems={"center"}
@@ -185,6 +191,7 @@ function RowItem({ item, itemRefs, drag }) {
 				<HStack alignItems={"center"}>
 
 					<HStack borderWidth={2} borderColor={theme.primary.text.purple} borderRadius={100} mr={12} p={1}>
+
 						<Image
 
 							style={{
@@ -195,9 +202,10 @@ function RowItem({ item, itemRefs, drag }) {
 
 							}}
 
-							source={{ uri: item.pictureURL }}
+							source={{uri: item.pictureURL}}
 							alt={"userImage"}
 						/>
+
 					</HStack>
 
 
@@ -216,7 +224,7 @@ function RowItem({ item, itemRefs, drag }) {
 	)
 }
 
-const FriendItem = ({ item }) => {
+const FriendItem = ({item}) => {
 
 	useEffect(() => {
 		console.log("THIS item:")
@@ -246,7 +254,7 @@ const MyZone = () => {
 
 	let [filter, setFilter] = useState("") //friend filter
 
-	const { isOpen, onOpen, onClose } = useDisclose() //open add friend ActionSheet
+	const {isOpen, onOpen, onClose} = useDisclose() //open add friend ActionSheet
 	const account = useSelector(selectAccount)
 	const dispatch = useDispatch()
 
@@ -257,6 +265,8 @@ const MyZone = () => {
 
 	const [warningMessage, setWarningMessage] = useState("")
 	const [canShowResult, setCanShowResult] = useState(false)
+	const [alreadyFriend, setAlreadyFriend] = useState(false)
+	const [isSelf, setIsSelf] = useState(false)
 	const [asyncImg, setAsyncImg] = useState(false)
 	const [asyncData, setAsyncData] = useState(false)
 	const itemRefs = useRef(new Map())
@@ -266,7 +276,7 @@ const MyZone = () => {
 	// const cancelAlertRef = useRef(null)
 
 	const renderItem = useCallback((params) => {
-		return <RowItem {...params} itemRefs={itemRefs} />
+		return <RowItem {...params} itemRefs={itemRefs}/>
 	}, [])
 
 	useEffect(() => {
@@ -281,12 +291,20 @@ const MyZone = () => {
 			setCanShowResult(true)
 		}
 
+		if (warningMessage === "你們已經是朋友囉！") {
+			setCanShowResult(true)
+		}
+
 	}, [warningMessage])
 
-	useEffect(()=>  {
+	useEffect(() => {
 		console.log(account.friendData.friends)
 		console.log(targetData)
 	})
+
+	useEffect(() => {
+		console.log(targetImageURL)
+	}, [targetImageURL])
 
 	const toastInfoRef = useRef()
 	const toast = useToast()
@@ -303,14 +321,14 @@ const MyZone = () => {
 				id: "warningInfo",
 				render: () => {
 					return (
-						<ToastInfo warningText={warningText} />
+						<ToastInfo warningText={warningText}/>
 					)
 				},
 			})
 		}
 	}
 
-	const ToastInfo = ({ warningText }) => {
+	const ToastInfo = ({warningText}) => {
 		return (
 			<HStack
 				alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.indigo} w={WIDTH * .9} h={64}
@@ -406,11 +424,12 @@ const MyZone = () => {
 							</HStack>
 
 							<Pressable
-								onPress={() => {}}
+								onPress={() => {
+								}}
 
 								h={36} w={36} justifyContent={"center"} alignItems={"center"}>
 
-								<Feather name={"copy"} size={20} color={theme.primary.text.indigo} />
+								<Feather name={"copy"} size={20} color={theme.primary.text.indigo}/>
 
 							</Pressable>
 
@@ -436,7 +455,7 @@ const MyZone = () => {
 
 							<HStack>
 
-								{asyncImg === true || asyncData === true?
+								{asyncImg === true || asyncData === true ?
 									<Spinner color={"dimgray"} mr={8} size={"sm"}></Spinner> : <></>}
 
 								<Input
@@ -446,6 +465,8 @@ const MyZone = () => {
 										color: theme.primary.text.indigo,
 										bg: "transparent",
 									}}
+
+									letterSpacing={1}
 
 									value={searchID}
 									onChangeText={id => setSearchID(prev => id)}
@@ -466,23 +487,49 @@ const MyZone = () => {
 
 
 								<Pressable
+
 									onPress={() => {
 
 										Keyboard.dismiss()
+
 										setAsyncImg(true)
 										setAsyncData(true)
 
 										apiRequest("get", `/api/travelope/get-download-link/${searchID}/${searchID}`, {})
-											.then(res => {setTargetImageURL(res.url), setAsyncImg(false)}, rej => {setAsyncImg(false)})
-										apiRequest("get", `/api/travelope/find-user/${searchID}`, {})
-											.then(res => {setWarningMessage("OK"), setTargetData(res), setAsyncData(false)}, rej => { setAsyncData(false), setWarningMessage("找不到用戶"), console.log("REJ: " + rej.message) })
+											.then(res => {
+												setTargetImageURL(res.url), setAsyncImg(false)
+											}, rej => {
+												setAsyncImg(false)
+											})
 
+										apiRequest("get", `/api/travelope/find-user/${searchID}`, {})
+											.then(res => {
+
+												setWarningMessage("OK"), setTargetData(res), setAsyncData(false)
+
+												let friend = account.friendData.friends.findIndex(user => user.key === res.id)
+
+/*												if(res.id === account.info.id) {
+													setIsSelf(true)
+												}*/
+
+												if(friend < 0) {
+													setAlreadyFriend(false)
+												} else {
+													setAlreadyFriend(true)
+												}
+
+											}, rej => {
+												setAsyncData(false), setWarningMessage("找不到用戶"), console.log("REJ: " + rej.message)
+											})
 
 										console.log("Searching")
 
 									}}
+
 									justifyContent={"center"} alignItems={"center"} h={36} w={36}>
-									<Feather name={"search"} color={theme.primary.text.indigo} size={20} />
+									<Feather name={"search"} color={theme.primary.text.indigo} size={20}/>
+
 								</Pressable>
 
 							</HStack>
@@ -493,8 +540,8 @@ const MyZone = () => {
 
 							{
 
-								!canShowResult? <></> :
-									warningMessage === "找不到用戶"?
+								!canShowResult ? <></> :
+									warningMessage === "找不到用戶" ?
 
 										<HStack w={"100%"} h={64} justifyContent={"center"}>
 											<Text fontSize={16} color={theme.primary.placeholder.pink}>{warningMessage}</Text>
@@ -513,20 +560,17 @@ const MyZone = () => {
 													borderColor={theme.primary.text.purple}
 												>
 													{
-														account.info.profilePictureLocalPath !== ""?
+														<Image
+															style={{
+																borderRadius: 100,
+																height: 88,
+																width: 88,
+															}}
 
-															<Image
-
-																style={{
-																	borderRadius: 100,
-																	height: 88,
-																	width: 88,
-																}}
-
-																source={{ uri: targetImageURL }}
-																alt={"userImage"}
-															/>
-															: <Feather name={"user"} color={theme.primary.text.purple} size={32} />
+															source={{uri: targetImageURL}}
+															alt={"userImage"}
+														/>
+														// : <Feather name={"user"} color={theme.primary.text.purple} size={32} />
 													}
 
 												</Center>
@@ -542,58 +586,71 @@ const MyZone = () => {
 
 											<HStack w={"100%"} justifyContent={"center"}>
 
-												<GradientButton w={96} title={"加朋友"} onPress={() => {
+												{
+													isSelf? <></> :
+														<GradientButton w={96} title={alreadyFriend ? "已經是朋友" : "加朋友"}
+														                onPress={async () => {
 
-													let friend = account.friendData.friends.findIndex(user => user.key === targetData.key)
-														console.log(friend)
+															                let friend = account.friendData.friends.findIndex(user => user.key === targetData.id)
 
-													if(friend >= 0){
+															                if (friend >= 0) {
 
-														setWarningMessage("你們已經是朋友囉！")
+																                setWarningMessage("你們已經是朋友囉！")
+																                addToast("你們已經是朋友囉！")
+																                await new Promise(resolve => setTimeout(resolve, 1500))
+																                closeInfoToast()
 
-													} else {
+															                } else {
 
-														dispatch(addFriend({
-															key: targetData.id,
-															name: targetData.nickname,
-															pictureURL: targetImageURL,
-															tag: "friend",
-														}))
+																                onClose()
+																                addToast("成功加入朋友！")
+																                await new Promise(resolve => setTimeout(resolve, 1500))
+																                closeInfoToast()
 
-														apiRequest("post", `/api/travelope/add-friend/${account.info.id}`, {
+																                dispatch(addFriend({
+																	                key: targetData.id,
+																	                name: targetData.nickname,
+																	                pictureURL: targetImageURL,
+																	                tag: "friend",
+																                }))
 
-															key: targetData.id,
-															name: targetData.nickname,
-															tag: "friend",
+																                apiRequest("post", `/api/travelope/add-friend/${account.info.id}`, {
 
-														}).then(
-															async res => {
+																	                key: targetData.id,
+																	                name: targetData.nickname,
+																	                pictureURL: targetImageURL,
+																	                tag: "friend",
 
-																setCanShowResult(false)
-																setTargetData({})
-																setTargetImageURL("")
-																setWarningMessage("")
-																setSearchID("")
+																                }).then(
+																	                async res => {
 
-																addToast("成功加入朋友！")
-																await new Promise(resolve => setTimeout(resolve, 1500))
-																closeInfoToast()
+																		                setCanShowResult(false)
+																		                setTargetData({})
+																		                setTargetImageURL("")
+																		                setWarningMessage("")
+																		                setSearchID("")
 
-															}
-															, async rej => {
+																		                addToast("成功加入朋友！")
+																		                await new Promise(resolve => setTimeout(resolve, 1500))
+																		                closeInfoToast()
 
-																setCanShowResult(false)
-																setTargetData({})
-																setTargetImageURL("")
-																setWarningMessage("")
-																setSearchID("")
+																	                }
+																	                , async rej => {
 
-															})
-													}
+																		                setCanShowResult(false)
+																		                setTargetData({})
+																		                setTargetImageURL("")
+																		                setWarningMessage("")
+																		                setSearchID("")
+
+																	                })
+															                }
 
 
+														                }}/>
+												}
 
-												}} />
+
 
 											</HStack>
 										</>
@@ -623,7 +680,7 @@ const MyZone = () => {
 					        dropdownIcon={
 
 						        <Center mr={6}>
-							        <Feather name={"arrow-down-circle"} size={22} color={"#af81ff"} />
+							        <Feather name={"arrow-down-circle"} size={22} color={"#af81ff"}/>
 						        </Center>
 					        }
 
@@ -671,25 +728,26 @@ const MyZone = () => {
 						        startIcon:
 
 							        <Center mr={6}>
-								        <Feather name={"check"} size={18} color={"#af81ff"} />
+								        <Feather name={"check"} size={18} color={"#af81ff"}/>
 							        </Center>,
 
 					        }} mt={1}
 
 					        onValueChange={itemValue => setFilter(itemValue)}>
 
-						<Select.Item label="朋友" value="朋友" />
-						<Select.Item label="家人 Research" value="家人" />
+						<Select.Item label="朋友" value="朋友"/>
+						<Select.Item label="家人 Research" value="家人"/>
 					</Select>
 				</Box>
 
 				<Pressable onPress={onOpen}
-				           borderColor={"#af81ff"} borderRadius={100} borderWidth={2} h={36} justifyContent={"space-between"}
+				           borderColor={"#af81ff"} borderRadius={100} borderWidth={2} h={36}
+				           justifyContent={"space-between"}
 				           alignItems={"center"} flexDirection={"row"} flex={3}>
 					<Text ml={16} color={"#af81ff"} fontSize={15} mr={4} fontWeight={"bold"}>加入朋友</Text>
 
 					<Center mr={6}>
-						<Feather color={"#af81ff"} name={"plus-circle"} size={22} />
+						<Feather color={"#af81ff"} name={"plus-circle"} size={22}/>
 					</Center>
 				</Pressable>
 
@@ -700,6 +758,16 @@ const MyZone = () => {
 				data={account.friendData.friends}
 				renderItem={renderItem}
 				keyExtractor={item => item.key}
+
+				ListHeaderComponent={
+
+				account.friendData.friends.length === 0?
+					<VStack h={240} w={"100%"} alignItems={"center"} justifyContent={"center"}>
+						<Feather name={"user"} size={96} color={theme.primary.darker_bg.purple}/>
+						<Text ml={8} fontSize={14} mt={16} color={theme.primary.placeholder.purple}
+						      fontWeight={"bold"}>你還沒有加入其他朋友哦！</Text>
+					</VStack> : <></>
+				}
 			/>
 
 		</LayoutBase>

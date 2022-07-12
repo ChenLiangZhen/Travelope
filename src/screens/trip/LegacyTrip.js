@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useRef, useState} from "react"
 import LayoutBase from "../../components/LayoutBase"
 import FlatBlock from "../../components/FlatBlock"
-import {HStack, Modal, Pressable, Text, useTheme, View, VStack} from "native-base"
+import {HStack, Modal, Pressable, Spinner, Text, useTheme, useToast, View, VStack} from "native-base"
 import Feather from "react-native-vector-icons/Feather"
 import {GradientBorderButton, GradientButton} from "../../components/GradientButton"
 import Block from "../../components/Block"
@@ -156,7 +156,61 @@ const LegacyTrip = ({navigation, route}) => {
 	const [shareModalVisible, setShareModalVisible] = useState(false)
 	const [selectedFriend, setSelectedFriend] = useState(false)
 
+	const [async, setAsync] = useState()
+
 	const toastInfoRef = useRef()
+	const toast = useToast()
+
+	const [wave1, setWave1] = useState(false)
+
+	const wave1Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		config: config.wobbly
+	})
+
+	const wave2Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		delay: 150,
+		config: config.wobbly
+	})
+
+	const wave3Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		delay: 300,
+
+		config: config.wobbly
+	})
+
+	const wave4Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		delay: 450,
+
+		config: config.wobbly
+	})
+
+	useEffect(() => {
+
+		if (isFocused) {
+
+			setWave1(true)
+		}
+
+	}, [isFocused])
+
+	useEffect(() => {
+
+		const unsubscribe = navigation.addListener('blur', () => {
+			console.log("LEAVING EVENT EMITTER")
+			setWave1(false)
+		});
+
+		return unsubscribe;
+
+	}, [navigation])
 
 	function closeInfoToast() {
 		if (toastInfoRef.current) {
@@ -164,26 +218,26 @@ const LegacyTrip = ({navigation, route}) => {
 		}
 	}
 
-	function addToast() {
+	function addToast(info) {
 		if (!toast.isActive("warningInfo")) {
 			toastInfoRef.current = toast.show({
 				id: "warningInfo",
 				render: () => {
 					return (
-						<ToastInfo />
+						<ToastInfo info={info}/>
 					)
 				},
 			})
 		}
 	}
 
-	const ToastInfo = () => {
+	const ToastInfo = ({info}) => {
 		return (
 			<HStack
 
 				alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.indigo} w={WIDTH * .9} h={64}
 				borderRadius={16} px={24} mb={5}>
-				<Text fontWeight={"bold"} fontSize={16} color={"white"}>{warningText}</Text>
+				<Text fontWeight={"bold"} fontSize={16} color={"white"}>{info}</Text>
 			</HStack>
 		)
 	}
@@ -329,7 +383,7 @@ const LegacyTrip = ({navigation, route}) => {
 
 			</Modal>
 
-			<Modal isOpen={shareModalVisible} onClose={() => setShareModalVisible()} justifyContent="flex-end" bottom={HEIGHT * .25}
+			<Modal isOpen={shareModalVisible} onClose={() => setShareModalVisible()} justifyContent="flex-end" bottom={HEIGHT * .3}
 			       shadowOpacity={.2}
 			       shadowRadius={24}
 			       shadowOffset={{
@@ -338,7 +392,7 @@ const LegacyTrip = ({navigation, route}) => {
 			       _backdrop={{ bg: "#000", opacity: .25 }}
 			>
 
-				<Modal.Content borderRadius={24} w={WIDTH * .9} px={20} h={HEIGHT * .5} alignSelf={"center"} py={12}>
+				<Modal.Content borderRadius={24} w={WIDTH * .9} px={20} h={HEIGHT * .4} alignSelf={"center"} py={12}>
 
 					<HStack mt={4} h={30} mb={20} justifyContent={"space-between"} alignItems={"center"}>
 
@@ -362,7 +416,11 @@ const LegacyTrip = ({navigation, route}) => {
 						renderItem={renderItemSelectFriend}
 					/>
 
-					<HStack mt={4} h={20} mb={16} justifyContent={"flex-end"} alignItems={"center"}>
+					<HStack mt={4} h={20} mb={16} justifyContent={"space-between"} alignItems={"center"}>
+
+
+						{async?
+							<Spinner size={"sm"} color={"dimgray"} /> : <HStack></HStack>}
 
 						<GradientButton
 
@@ -371,12 +429,29 @@ const LegacyTrip = ({navigation, route}) => {
 							onPress={ async () => {
 
 								console.log(selectedFriend.key + '  ' + account.info.id + '  ' + account.info.nickname)
+								setAsync(true)
 
 								apiRequest("post", `/api/travelope/new-shared-trip/${selectedFriend.key}/${account.info.id}/${account.info.nickname}`, item)
-								.then( res => {
-									console.log(res)
+								.then( async res => {
+
+									console.log("成功分享旅程")
+
+									setAsync(false)
+
 									addToast("成功分享旅程！")
-								}, rej => console.log(rej))
+									await new Promise(resolve => setTimeout(resolve, 1500))
+									closeInfoToast()
+
+								}, async rej => {
+
+									console.log(rej)
+
+									setAsync(false)
+
+									addToast("出現錯誤！")
+									await new Promise(resolve => setTimeout(resolve, 1500))
+									closeInfoToast()
+								})
 
 							}}
 
@@ -389,13 +464,13 @@ const LegacyTrip = ({navigation, route}) => {
 
 			</Modal>
 
-			<animated.View style={anim}>
+			<animated.View style={wave1Anim}>
 
 				<HStack h={36} w={"100%"} mb={12} justifyContent={"flex-end"}>
 
 					<GradientBorderButton
 						w={48} title={""}
-						onPress={() => navigation.navigate("TripOnMap")} flexDrection={"row"} ml={8}
+						onPress={() => navigation.navigate("MemEnvelope", {item : item})} flexDrection={"row"} ml={8}
 						icon={"mail"} iconSize={18} iconColor={theme.primary.text.purple}
 						color={theme.primary.text.purple}/>
 

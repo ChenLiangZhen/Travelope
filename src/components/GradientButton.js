@@ -19,7 +19,7 @@ export const GradientBorderButton = ({ icon, iconSize, iconColor, h, w, color, b
         angle={160}
         angleCenter={{ x: 0.5, y: 0.5 }}
         locations={[0, 1]}
-        colors={["#8b7fff", "#db7fff"]}
+        colors={["#7375ff", "#e174ff"]}
         style={{
           height:h? h : 32,
           width: w?  w : 72,
@@ -78,7 +78,8 @@ export const GradientButton = ({ pureIcon, flex, icon, iconSize, iconColor, h, w
         angle={160}
         angleCenter={{ x: 0.5, y: 0.5 }}
         locations={[0, 1]}
-        colors={["#8b7fff", "#db7fff"]}
+        colors={["#7375ff", "#e174ff"]}
+
         style={{
           height: h ? h : 32,
           width: w ? w : 72,

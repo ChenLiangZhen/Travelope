@@ -19,6 +19,14 @@ const Notes = new mongoose.Schema({
 		type: String
 	},
 
+	namedLocation: {
+		type: String
+	},
+
+	codedLocation: {
+		type: String
+	},
+
 	imageList: {
 		type: []
 	},
@@ -69,6 +77,18 @@ const Trip = new mongoose.Schema({
 })
 
 const SharedTrip = new mongoose.Schema({
+
+	sharedAccountID: {
+		type: String
+	},
+
+	fromAccountID: {
+		type: String
+	},
+
+	fromAccountNickname: {
+		type: String
+	},
 
 	from: {
 		type: String

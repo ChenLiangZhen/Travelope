@@ -208,17 +208,17 @@ const TripOnMap = ({navigation}) => {
 					}}
 				>
 					<VStack
-						px={20}
+						px={32}
 						h={255}
 						w={"100%"}
 						alignItems={"center"}
 						justifyContent={"space-between"}
 					>
 
-						<VStack alignItems={"center"}>
+						<VStack alignItems={"flex-start"}>
 
 							<Text
-								mb={2}
+								mb={4}
 								letterSpacing={1}
 								fontSize={24}
 								fontWeight={"bold"}
@@ -231,6 +231,7 @@ const TripOnMap = ({navigation}) => {
 							<HStack alignItems={"center"} justifyContent={"center"}>
 
 								<Feather name={"map-pin"} size={18} color={theme.primary.bg.mmidgray}/>
+
 								<Text
 									ml={6}
 									fontSize={14}
@@ -243,8 +244,8 @@ const TripOnMap = ({navigation}) => {
 
 							</HStack>
 
-							<HStack px={6}>
-								<HStack mt={30} borderRadius={18} py={8} px={14} w={"100%"} bg={theme.primary.bg.indigo} alignItems={"center"}
+							<HStack>
+								<HStack mt={24} borderRadius={18} w={"100%"} p={8} borderWidth={1} borderColor={theme.primary.placeholder.indigo} borderStyle={"dashed"} alignItems={"center"}
 								        justifyContent={"center"}>
 
 									<Text
@@ -264,56 +265,9 @@ const TripOnMap = ({navigation}) => {
 
 
 						<HStack w={"100%"} borderRadius={18} px={8} w={"100%"} alignItems={"center"}
-						        justifyContent={"space-between"}>
+						        justifyContent={"flex-end"}>
 
-							<Pressable
-
-								onPress={()=> {
-
-										dispatch(delTripNote(location.noteID))
-								}}
-
-								flex={1}
-
-								justifyContent={"center"}
-								alignItems={"center"}
-
-								borderRadius={18}
-								borderWidth={1}
-								borderColor={theme.primary.text.indigo}
-								h={48}
-							>
-								<Text fontSize={16} color={theme.primary.text.indigo}>
-									刪除日記
-								</Text>
-							</Pressable>
-
-							<Pressable
-								w={24}
-							/>
-
-							<Pressable
-
-								onPress={()=> {
-
-									navigation.navigate("NewNote", {item: pressedNote})
-								}}
-
-								flex={1}
-
-								justifyContent={"center"}
-								alignItems={"center"}
-
-								borderRadius={18}
-								borderWidth={1}
-								bg={theme.primary.text.indigo}
-								borderColor={theme.primary.text.indigo}
-								h={48}
-							>
-								<Text fontWeight={"bold"} fontSize={16} color={"white"}>
-									查看日記
-								</Text>
-							</Pressable>
+							<GradientButton w={84} title={"刪除日記"} />
 
 						</HStack>
 
@@ -343,41 +297,6 @@ const TripOnMap = ({navigation}) => {
 					// provider="apple"
 					// customMapStyle={mapStyle}
 				>
-
-					{/*<Callout*/}
-					{/*	tooltip={}*/}
-					{/*>*/}
-					{/*	<View>*/}
-					{/*		<Block bg={"white"} h={48} w={48} borderRadius={60} opacity={.8}*/}
-					{/*		       borderWidth={2} px={0} py={0} justifyContent={"center"} alignItems={"center"}>*/}
-					{/*			<Feather name={"map-pin"} size={24} color={theme.primary.text.purple} />*/}
-					{/*		</Block>*/}
-					{/*	</View>*/}
-
-
-					{/*</Callout>*/}
-
-					<Marker
-						tracksViewChanges={false}
-						coordinate={{latitude: 25.031845092773438, longitude: 121.46505476503532}}
-						key={"edwf"}
-						title={"yay"}
-						description={"yay"}
-						onPress={() => {
-
-							setRegion({
-								...region,
-								latitude: 25.031845092773438,
-								longitude: 121.46505476503532
-							})
-						}}
-					>
-						<Callout tooltip>
-							<View>
-								<Text>This is ridiculous</Text>
-							</View>
-						</Callout>
-					</Marker>
 
 					{noteLocationData ? noteLocationData.map((location) => (
 

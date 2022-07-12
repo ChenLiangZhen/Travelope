@@ -62,6 +62,8 @@ const accountSlice = createSlice({
     },
 
     addFriend(state, action) {
+
+      console.log("ADD FRIEND: " + JSON.stringify(action.payload))
       state.friendData.friends.push(action.payload)
     },
 

@@ -160,6 +160,57 @@ const CurrentTrip = () => {
 		from: {opacity: 0, color: 'red'},
 	})
 
+	const [wave1, setWave1] = useState(false)
+
+	const wave1Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		config: config.wobbly
+	})
+
+	const wave2Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		delay: 150,
+		config: config.wobbly
+	})
+
+	const wave3Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		delay: 300,
+
+		config: config.wobbly
+	})
+
+	const wave4Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		delay: 450,
+
+		config: config.wobbly
+	})
+
+	useEffect(() => {
+
+		if (isFocused) {
+
+			setWave1(true)
+		}
+
+	}, [isFocused])
+
+	useEffect(() => {
+
+		const unsubscribe = navigation.addListener('blur', () => {
+			console.log("LEAVING EVENT EMITTER")
+			setWave1(false)
+		});
+
+		return unsubscribe;
+
+	}, [navigation])
+
 	//ANIMATION CONTROLLER
 
 	const navigation = useNavigation()
@@ -206,7 +257,7 @@ const CurrentTrip = () => {
 		}, [isFocused, accountData]),
 	)
 
-	useEffect(()=> {
+	useEffect(() => {
 
 	}, [accountData])
 
@@ -215,7 +266,6 @@ const CurrentTrip = () => {
 	}, [])
 
 	return (
-
 
 		<LayoutBase>
 
@@ -257,7 +307,7 @@ const CurrentTrip = () => {
 							<Text mr={12} fontSize={14} fontWeight={"bold"}
 							      color={theme.primary.placeholder.indigo}>旅程 ID：</Text>
 							<Text fontSize={14} fontWeight={"bold"}
-							      color={theme.primary.bg.gray}>{activeTrip? activeTrip.tripID: ""}</Text>
+							      color={theme.primary.bg.gray}>{activeTrip ? activeTrip.tripID : ""}</Text>
 
 						</HStack>
 
@@ -266,7 +316,7 @@ const CurrentTrip = () => {
 							<Text mr={12} fontSize={14} fontWeight={"bold"}
 							      color={theme.primary.placeholder.indigo}>旅程名稱：</Text>
 							<Text noOfLines={2} fontSize={14} fontWeight={"bold"}
-							      color={theme.primary.bg.gray}>{activeTrip? activeTrip.tripName: ""}</Text>
+							      color={theme.primary.bg.gray}>{activeTrip ? activeTrip.tripName : ""}</Text>
 
 						</HStack>
 
@@ -275,7 +325,7 @@ const CurrentTrip = () => {
 							<Text mr={12} fontSize={14} fontWeight={"bold"}
 							      color={theme.primary.placeholder.indigo}>旅程描述：</Text>
 							<Text w={200} noOfLines={3} fontSize={14} fontWeight={"bold"}
-							      color={theme.primary.bg.gray}>{activeTrip? activeTrip.tripDescription : ""}</Text>
+							      color={theme.primary.bg.gray}>{activeTrip ? activeTrip.tripDescription : ""}</Text>
 
 						</HStack>
 
@@ -284,7 +334,7 @@ const CurrentTrip = () => {
 							<Text mr={12} fontSize={14} fontWeight={"bold"}
 							      color={theme.primary.placeholder.indigo}>開始時間：</Text>
 							<Text fontSize={14} fontWeight={"bold"}
-							      color={theme.primary.bg.gray}>{activeTrip? "" + new Date(activeTrip.startTime).getFullYear() + "年" + (new Date(activeTrip.startTime).getMonth() + 1) + "月" + new Date(activeTrip.startTime).getDate() + "日  " + new Date(activeTrip.startTime).getHours() + "：" + new Date(activeTrip.startTime).getMinutes() : ""}</Text>
+							      color={theme.primary.bg.gray}>{activeTrip ? "" + new Date(activeTrip.startTime).getFullYear() + "年" + (new Date(activeTrip.startTime).getMonth() + 1) + "月" + new Date(activeTrip.startTime).getDate() + "日  " + new Date(activeTrip.startTime).getHours() + "：" + new Date(activeTrip.startTime).getMinutes() : ""}</Text>
 
 						</HStack>
 
@@ -297,11 +347,11 @@ const CurrentTrip = () => {
 			{activeTrip ?
 				<>
 
-					<animated.View style={anim}>
+					<animated.View style={wave1Anim}>
 
 						<HStack h={36} w={"100%"} mb={12} justifyContent={"flex-end"}>
 
-						<GradientBorderButton
+							<GradientBorderButton
 								w={112} title={"地圖檢視"}
 								onPress={() => navigation.navigate("TripOnMap")} flexDrection={"row"} ml={8}
 								icon={"map"} iconSize={16} iconColor={theme.primary.text.purple}
@@ -312,6 +362,8 @@ const CurrentTrip = () => {
 
 									console.log("setInactive")
 									dispatch(setInactive())
+
+									apiRequest("put", `/api/travelope/set-trip-inactive/${account.info.id}/${activeTrip.tripID}`, {})
 
 									setActiveTrip(null)
 
@@ -339,7 +391,7 @@ const CurrentTrip = () => {
 
 						<Block h={120} w={"100%"} py={12} flexDirection={"column"} justifyContent={"space-between"}>
 
-						<HStack h={32} w={"100%"} alignItems={"center"} justifyContent={"space-between"}>
+							<HStack h={32} w={"100%"} alignItems={"center"} justifyContent={"space-between"}>
 
 								<HStack flex={1} mr={24} alignItems={"center"}>
 									<Feather name={"send"} size={20} color={theme.primary.text.purple}/>
@@ -366,7 +418,7 @@ const CurrentTrip = () => {
 
 						</Block>
 
-						{ accountData.trips[accountData.trips.length - 1].tripNotes.length !== undefined ?
+						{accountData.trips[accountData.trips.length - 1].tripNotes.length !== undefined ?
 
 							<>
 							</>
@@ -410,15 +462,24 @@ const CurrentTrip = () => {
 							}}
 
 							ListFooterComponent={
-
-
-								accountData.trips[accountData.trips.length - 1].tripNotes.length !== undefined ?
+								<>
+								{  accountData.trips[accountData.trips.length - 1].tripNotes.length === 0?
+									<VStack h={240} w={"100%"} alignItems={"center"} justifyContent={"center"}>
+										<Feather name={"feather"} size={96} color={theme.primary.darker_bg.purple}/>
+										<Text ml={8} fontSize={14} mt={16} color={theme.primary.placeholder.purple}
+										      fontWeight={"bold"}>寫個旅遊日記吧！</Text>
+									</VStack> : <></>}
+								{ accountData.trips[accountData.trips.length - 1].tripNotes.length !== undefined ?
 
 									<HStack mt={16} w={"100%"} justifyContent={"center"} alignItems={"center"}>
 
 										<GradientButton onPress={() => navigation.navigate("NewNote", {item: null, isNew: true})
 										} pureIcon h={36} w={36} icon={"plus"} iconSize={24} iconColor={"white"}/>
-									</HStack> : <></>
+									</HStack> : <></>}
+
+
+								</>
+
 							}
 
 							renderItem={renderItem}

@@ -67,7 +67,7 @@ router_data.post("/api/travelope/new-trip/:accountID", userAuth, async (req, res
 
 })
 
-router_data.post("/api/travelope/new-shared-trip/:sharedAccountID/:fromAccountID:/fromAccountNickname", userAuth, async (req, res) => {
+router_data.post("/api/travelope/new-shared-trip/:sharedAccountID/:fromAccountID/:fromAccountNickname", userAuth, async (req, res) => {
 
 	const {sharedAccountID, fromAccountID, fromAccountNickname} = req.params
 	const tripData = req.body
@@ -92,15 +92,16 @@ router_data.post("/api/travelope/new-shared-trip/:sharedAccountID/:fromAccountID
 			// 	await userData.save()
 			// }
 
-			userData.trips.push({
+			userData.sharedTrips.push({
 				...tripData,
 				sharedAccountID: sharedAccountID,
 				fromAccountID: fromAccountID,
 				fromAccountNickname: fromAccountNickname
 			})
-			await userData.save()
 
-			res.status(200)
+			userData.save()
+
+			res.status(200).send("successfully shared trip")
 		})
 
 	} catch (e) {
@@ -132,10 +133,7 @@ router_data.post("/api/travelope/del-trip/:accountID/:tripID", userAuth, async (
 				await userData.save()
 			}
 
-			userData.trips.push(tripData)
-			await userData.save()
-
-			res.status(200)
+			res.status(200).send("Successfully del trip")
 		})
 
 	} catch (e) {
@@ -197,6 +195,38 @@ router_data.put("/api/travelope/update-trip-note/:accountID/:noteID", userAuth, 
 
 				const targetIndex = userData.trips[targetTripIndex].tripNotes.findIndex(item => item.noteID === noteID)
 				userData.trips[targetTripIndex].tripNotes[targetIndex] = tripNoteData
+				await userData.save()
+			}
+
+			res.status(200)
+		})
+
+	} catch (e) {
+
+		res.status(422).send("Update Data Failed: " + e)
+		console.log("[Update Data Failed]: " + e)
+	}
+
+})
+
+router_data.put("/api/travelope/set-trip-inactive/:accountID/:tripID", userAuth, async (req, res) => {
+
+	const {accountID, tripID} = req.params
+
+	console.log("setTripInactive")
+
+	try {
+		UserData.findOne({userLink: accountID}, async (e, userData) => {
+
+			if (e || !userData) {
+				return res.status(404).send("ERROR")
+			}
+
+			let targetTripIndex = userData.trips.findIndex(trip => trip.tripID === tripID)
+			if (targetTripIndex >= 0) {
+
+
+				userData.trips[targetTripIndex].isActive = false
 				await userData.save()
 			}
 

@@ -17,6 +17,7 @@ import ImagePicker from "react-native-image-crop-picker"
 import {uploadImageInit} from "../../apis/fileManager"
 import RNFS from "react-native-fs"
 import {useFocusEffect, useIsFocused} from "@react-navigation/native";
+import {config, useSpring, animated} from "@react-spring/native";
 
 const ImageItem = (props) => {
 
@@ -79,6 +80,57 @@ const LegacyNote = ({navigation, route}) => {
 	const toast = useToast()
 
 	const isFocused = useIsFocused()
+
+	const [wave1, setWave1] = useState(false)
+
+	const wave1Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		config: config.wobbly
+	})
+
+	const wave2Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		delay: 150,
+		config: config.wobbly
+	})
+
+	const wave3Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		delay: 300,
+
+		config: config.wobbly
+	})
+
+	const wave4Anim = useSpring({
+		opacity: wave1 ? 1 : 0,
+		top: wave1 ? 0 : -64,
+		delay: 450,
+
+		config: config.wobbly
+	})
+
+	useEffect(() => {
+
+		if (isFocused) {
+
+			setWave1(true)
+		}
+
+	}, [isFocused])
+
+	useEffect(() => {
+
+		const unsubscribe = navigation.addListener('blur', () => {
+			console.log("LEAVING EVENT EMITTER")
+			setWave1(false)
+		});
+
+		return unsubscribe;
+
+	}, [navigation])
 
 	const getLocation = async () => {
 
@@ -257,273 +309,234 @@ const LegacyNote = ({navigation, route}) => {
 
 				{/*<KeyboardAvoidingView flex={1} pb={400}>*/}
 
-				<HStack justifyContent={"flex-end"}>
+				<animated.View style={wave1Anim}>
 
+					{item.imageList.length > 0 ?
 
-					{hasImage ?
+						<HStack w={"100%"} mt={16} alignItems={"center"} justifyContent={"flex-end"}>
 
-						<GradientButton w={72} color={"white"} title={"照片"} onPress={() => {
-
-							setHasImage(prev => !prev)
-						}}
-						/> :
-
-						<GradientBorderButton w={72} color={theme.primary.text.purple} title={"照片"} onPress={() => {
-
-							setHasImage(prev => !prev)
-						}}
-						/>
-
+							<FlatList
+								inverted
+								horizontal={true}
+								// keyExtractor={item => item.uri}
+								data={imageList}
+								renderItem={renderItemImage}
+							/>
+						</HStack> : <></>
 					}
 
-					{hasMood ?
-						<GradientButton ml={8} w={72} color={"white"} title={"心情"} onPress={() => {
-
-							setHasImage(prev => !prev)
-						}}
-						/> :
-						<GradientBorderButton ml={8} w={72} color={theme.primary.text.purple} title={"心情"} onPress={() => {
-
-							setHasImage(prev => !prev)
-						}}
-						/>
-					}
-
-				</HStack>
-
-				{hasImage ?
-
-					<HStack w={"100%"} mt={16} alignItems={"center"} justifyContent={"flex-end"}>
-
-						<FlatList
-							inverted
-							horizontal={true}
-							// keyExtractor={item => item.uri}
-							data={imageList}
-							renderItem={renderItemImage}
-						/>
-
-						<Pressable
-
-							onPress={() => {
-								updateImage()
-							}}
-
-							h={72}
-							w={72}
-							ml={8}
-							flexDirection={"row"}
-							justifyContent={"center"}
-							alignItems={"center"}
-							borderRadius={12}
-							borderStyle={"dashed"}
-							borderWidth={2}
-							borderColor={theme.primary.placeholder.indigo}
-						>
-
-							<Feather name={"image"} size={22} color={theme.primary.placeholder.indigo}/>
-
-						</Pressable>
-					</HStack> : <></>
-				}
+				</animated.View>
 
 				<Pressable onPress={() => Keyboard.dismiss()}>
 
-					<Input
-						_focus={{
-							borderColor: theme.primary.text.purple,
-							placeholderTextColor: theme.primary.placeholder.purple,
-
-							color: theme.primary.text.purple,
-							bg: theme.primary.bg.purple,
-						}}
-
-						value={noteTitle}
-						letterSpacing={1}
-						placeholder={"名稱"}
-						letterSpacing={1}
-
-						onChangeText={title => setNoteTitle(title)}
-						selectionColor={theme.primary.text.indigo}
-						borderColor={"transparent"}
-						color={theme.primary.text.purple}
-						bg={theme.primary.bg.smoke}
-						borderWidth={1}
-						borderRadius={16}
-						fontWeight={"bold"}
-						h={48}
-						mt={24}
-						mb={16}
-						px={14}
-						py={12}
-						fontSize={16}
-						textAlign={"left"}
-
-					/>
-
-					<Input
-						_focus={{
-							borderColor: theme.primary.text.purple,
-							placeholderTextColor: theme.primary.placeholder.purple,
-							color: theme.primary.text.purple,
-							bg: theme.primary.bg.purple,
-						}}
-
-						multiline={true}
-						value={noteContent}
-						placeholder={"描述"}
-						onChangeText={content => setNoteContent(content)}
-
-						letterSpacing={1}
-						selectionColor={theme.primary.text.indigo}
-						borderColor={"transparent"}
-						color={theme.primary.text.purple}
-						bg={theme.primary.bg.smoke}
-						borderWidth={1}
-						borderRadius={16}
-						fontWeight={"bold"}
-						mb={32}
-
-						h={120}
-						px={14}
-						py={12}
-						fontSize={16}
-						textAlign={"left"}
-					/>
-
-					<FlatBlock
-						h={64}
-						mb={16}
-						borderWidth={2}
-						pr={8}
-						flexDirection={"row"}
-						bg={"white"}
-						shadowColor={theme.primary.bg.litgray}
-						borderColor={theme.primary.placeholder.purple}
-						ai={"center"}
-					>
-						<Text
-							color={theme.primary.text.purple}
-							fontSize={16}
-							fontWeight={"bold"}
-							mr={20}
-						>地點</Text>
+					<animated.View style={wave2Anim}>
 
 						<Input
-
-							onPress={() => console.log("gjreo")}
 							_focus={{
 								borderColor: theme.primary.text.purple,
+								placeholderTextColor: theme.primary.placeholder.purple,
+
 								color: theme.primary.text.purple,
 								bg: theme.primary.bg.purple,
 							}}
 
-							value={namedLocation}
-							onChangeText={(location) => setNamedLocation(location)}
-							selectionColor={theme.primary.text.purple}
-							placeholderTextColor={theme.primary.placeholder.indigo}
+							value={noteTitle}
+							letterSpacing={1}
+							placeholder={"名稱"}
+							letterSpacing={1}
+
+							onChangeText={title => setNoteTitle(title)}
+							selectionColor={theme.primary.text.indigo}
 							borderColor={"transparent"}
 							color={theme.primary.text.purple}
 							bg={theme.primary.bg.smoke}
 							borderWidth={1}
 							borderRadius={16}
 							fontWeight={"bold"}
-							mr={16}
-							h={36}
-							flex={8}
-							px={20}
-
+							h={48}
+							mt={24}
+							mb={16}
+							px={14}
+							py={12}
 							fontSize={16}
 							textAlign={"left"}
+
 						/>
-
-					</FlatBlock>
-
-
-					<FlatBlock
-						h={64}
-						mb={16}
-						borderWidth={2}
-						pr={8}
-						flexDirection={"row"}
-						bg={"white"}
-						shadowColor={theme.primary.bg.litgray}
-						borderColor={theme.primary.placeholder.purple}
-						ai={"center"}
-					>
-						<Text
-							color={theme.primary.text.purple}
-							fontSize={16}
-							fontWeight={"bold"}
-							mr={20}
-						>地址</Text>
-
-						<Text flex={1} noOfLines={1} fontSize={16} color={theme.primary.text.purple}>
-							{codedLocation}
-						</Text>
-
-					</FlatBlock>
-
-					<FlatBlock
-						h={64}
-						mb={36}
-						borderWidth={2}
-						flexDirection={"row"}
-						bg={"white"}
-						shadowColor={theme.primary.bg.litgray}
-						borderColor={theme.primary.placeholder.purple}
-						ai={"center"}
-					>
-						<Text
-							color={theme.primary.text.purple}
-							fontSize={16}
-							fontWeight={"bold"}
-							mr={20}
-						>時間</Text>
 
 						<Input
 							_focus={{
 								borderColor: theme.primary.text.purple,
+								placeholderTextColor: theme.primary.placeholder.purple,
 								color: theme.primary.text.purple,
 								bg: theme.primary.bg.purple,
 							}}
-							value={date.getFullYear() + " - " + (date.getMonth() + 1) + " - " + date.getDate() + "   " + date.getHours() + " : " + date.getMinutes()}
-							selectionColor={theme.primary.text.purple}
+
+							multiline={true}
+							value={noteContent}
+							placeholder={"描述"}
+							onChangeText={content => setNoteContent(content)}
+
+							letterSpacing={1}
+							selectionColor={theme.primary.text.indigo}
 							borderColor={"transparent"}
 							color={theme.primary.text.purple}
 							bg={theme.primary.bg.smoke}
 							borderWidth={1}
 							borderRadius={16}
 							fontWeight={"bold"}
-							mr={16}
-							h={36}
-							flex={8}
-							px={20}
+							mb={32}
+
+							h={120}
+							px={14}
+							py={12}
 							fontSize={16}
 							textAlign={"left"}
 						/>
+					</animated.View>
 
-						<Pressable h={32} justifyContent={"center"} onPress={() => setOpen(true)}>
-							<Feather name={"calendar"} color={theme.primary.text.indigo} size={20}/>
-						</Pressable>
+					<animated.View style={wave3Anim}>
 
-					</FlatBlock>
+						<FlatBlock
+							h={64}
+							mb={16}
+							borderWidth={2}
+							pr={8}
+							flexDirection={"row"}
+							bg={"white"}
+							shadowColor={theme.primary.bg.litgray}
+							borderColor={theme.primary.placeholder.purple}
+							ai={"center"}
+						>
+							<Text
+								color={theme.primary.text.purple}
+								fontSize={16}
+								fontWeight={"bold"}
+								mr={20}
+							>地點</Text>
 
-					<HStack borderRadius={18} fd={"row"} h={32} sc={"#9e66ff"}
-					       bdc={theme.primary.text.purple} alignItems={"center"} justifyContent={"flex-end"}>
+							<Input
 
-						<GradientButton w={72} color={"white"} title={"返回"} onPress={() => {
+								onPress={() => console.log("gjreo")}
+								_focus={{
+									borderColor: theme.primary.text.purple,
+									color: theme.primary.text.purple,
+									bg: theme.primary.bg.purple,
+								}}
 
-							navigation.navigate("CurrentTrip")
-						}}
-						/>
+								value={namedLocation}
+								onChangeText={(location) => setNamedLocation(location)}
+								selectionColor={theme.primary.text.purple}
+								placeholderTextColor={theme.primary.placeholder.indigo}
+								borderColor={"transparent"}
+								color={theme.primary.text.purple}
+								bg={theme.primary.bg.smoke}
+								borderWidth={1}
+								borderRadius={16}
+								fontWeight={"bold"}
+								mr={16}
+								h={36}
+								flex={8}
+								px={20}
 
-					</HStack>
+								fontSize={16}
+								textAlign={"left"}
+							/>
+
+						</FlatBlock>
+
+						<FlatBlock
+							h={64}
+							mb={16}
+							borderWidth={2}
+							pr={8}
+							flexDirection={"row"}
+							bg={"white"}
+							shadowColor={theme.primary.bg.litgray}
+							borderColor={theme.primary.placeholder.purple}
+							ai={"center"}
+						>
+							<Text
+								color={theme.primary.text.purple}
+								fontSize={16}
+								fontWeight={"bold"}
+								mr={20}
+							>地址</Text>
+
+							<Text flex={1} noOfLines={1} fontSize={16} color={theme.primary.text.purple}>
+								{codedLocation}
+							</Text>
+
+						</FlatBlock>
+
+						<FlatBlock
+							h={64}
+							mb={36}
+							borderWidth={2}
+							flexDirection={"row"}
+							bg={"white"}
+							shadowColor={theme.primary.bg.litgray}
+							borderColor={theme.primary.placeholder.purple}
+							ai={"center"}
+						>
+							<Text
+								color={theme.primary.text.purple}
+								fontSize={16}
+								fontWeight={"bold"}
+								mr={20}
+							>時間</Text>
+
+							<Input
+								_focus={{
+									borderColor: theme.primary.text.purple,
+									color: theme.primary.text.purple,
+									bg: theme.primary.bg.purple,
+								}}
+								value={date.getFullYear() + " - " + (date.getMonth() + 1) + " - " + date.getDate() + "   " + date.getHours() + " : " + date.getMinutes()}
+								selectionColor={theme.primary.text.purple}
+								borderColor={"transparent"}
+								color={theme.primary.text.purple}
+								bg={theme.primary.bg.smoke}
+								borderWidth={1}
+								borderRadius={16}
+								fontWeight={"bold"}
+								mr={16}
+								h={36}
+								flex={8}
+								px={20}
+								fontSize={16}
+								textAlign={"left"}
+							/>
+
+							<Pressable h={32} justifyContent={"center"} onPress={() => setOpen(true)}>
+								<Feather name={"calendar"} color={theme.primary.text.indigo} size={20}/>
+							</Pressable>
+
+						</FlatBlock>
+
+					</animated.View>
+
+					<animated.View style={wave4Anim}>
+						<HStack borderRadius={18} fd={"row"} h={32} sc={"#9e66ff"}
+						        bdc={theme.primary.text.purple} alignItems={"center"} justifyContent={"flex-end"}>
+
+							<GradientButton w={72} color={"white"} title={"返回"} onPress={() => {
+
+								navigation.goBack()
+							}}
+							/>
+
+						</HStack>
+					</animated.View>
+
+
+
+
+
+
+
 
 				</Pressable>
-				{/*</KeyboardAvoidingView>*/}
 
-				<HStack h={384}></HStack>
 
 			</ScrollView>
 

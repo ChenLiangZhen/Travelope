@@ -11,10 +11,12 @@ require("dotenv").config()
 const router_transfer = express.Router()
 const bucketName = "horizones-space"
 const doSpaces = new aws.Endpoint("sgp1.digitaloceanspaces.com")
+
 const accessKey = process.env.DOSPACE_ACCESS_KEY
 const secretKey = process.env.DOSPACE_SECRET_KEY
 
 const doClient = new aws.S3({
+
 	endpoint: doSpaces,
 	region: "us-east-1",
 	credentials: {
@@ -30,7 +32,7 @@ router_transfer.get("/api/travelope/get-upload-link/:accountID/:key", userAuth, 
 	const doParams = {
 		Bucket: bucketName,
 		Key: "travelope/user_contents/" + accountID + "/" + key,
-		Expires: 1800,
+		Expires: 10000000,
 		ContentType: "application/octet-stream",
 	}
 
@@ -53,7 +55,7 @@ router_transfer.get("/api/travelope/get-download-link/:accountID/:key", userAuth
 	const doParams = {
 		Bucket: bucketName,
 		Key: "travelope/user_contents/" + accountID + "/" + key,
-		Expires: 1800,
+		Expires: 10000000,
 	}
 
 	try {

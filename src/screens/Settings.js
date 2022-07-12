@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, {useCallback, useEffect, useRef, useState} from "react"
 import LayoutBase from "../components/LayoutBase"
 import {
 	Center,
-	HStack,
+	HStack, Input,
 	KeyboardAvoidingView,
 	Modal,
 	Pressable,
@@ -15,15 +15,15 @@ import {
 } from "native-base"
 import Feather from "react-native-vector-icons/Feather"
 import Block from "../components/Block"
-import { GradientButton } from "../components/GradientButton"
-import { Image, Keyboard, Platform } from "react-native"
-import { HEIGHT, WIDTH } from "../Util"
+import {GradientButton} from "../components/GradientButton"
+import {FlatList, Image, Keyboard, Platform} from "react-native"
+import {HEIGHT, WIDTH} from "../Util"
 import InputField from "../components/InputField"
-import { appleAuth, AppleButton } from "@invertase/react-native-apple-authentication"
-import { useFocusEffect } from "@react-navigation/native"
+import {appleAuth, AppleButton} from "@invertase/react-native-apple-authentication"
+import {useFocusEffect} from "@react-navigation/native"
 import {apiRequest, signinApi, signinWithAppleApi, signupApi} from "../apis/api"
 import * as Keychain from "react-native-keychain"
-import { useDispatch, useSelector } from "react-redux"
+import {useDispatch, useSelector} from "react-redux"
 import {
 	purgeAccount,
 	selectAccount,
@@ -33,13 +33,13 @@ import {
 } from "../globalstate/accountSlice"
 import ImagePicker from "react-native-image-crop-picker"
 import RNFS from "react-native-fs"
-import { profilePictureInit } from "../apis/fileManager"
-import { downloadProfilePicture, uploadProfilePicture } from "../apis/transferManager"
-import { dataControl } from "../globalstate/store"
-import {purgeAccountData, setTrips} from "../globalstate/dataSlice"
+import {profilePictureInit} from "../apis/fileManager"
+import {downloadProfilePicture, uploadProfilePicture} from "../apis/transferManager"
+import {dataControl} from "../globalstate/store"
+import {purgeAccountData, setSharedTrips, setTrips} from "../globalstate/dataSlice"
 import jwt_decode from 'jwt-decode';
 
-function SignModal({ modalVisible, setModalVisible }) {
+function SignModal({modalVisible, setModalVisible}) {
 
 	const theme = useTheme().colors
 
@@ -112,7 +112,7 @@ function SignModal({ modalVisible, setModalVisible }) {
 				id: "warningInfo",
 				render: () => {
 					return (
-						<ToastInfo />
+						<ToastInfo/>
 					)
 				},
 			})
@@ -138,8 +138,8 @@ function SignModal({ modalVisible, setModalVisible }) {
 			requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
 		})
 
-      // other fields are available, but full name is not
-		const { email, email_verified, is_private_email, sub } = jwt_decode(appleAuthRequestResponse.identityToken)
+		// other fields are available, but full name is not
+		const {email, email_verified, is_private_email, sub} = jwt_decode(appleAuthRequestResponse.identityToken)
 
 		console.log(email + " / " + email_verified + " / " + is_private_email + " / " + sub)
 
@@ -162,6 +162,8 @@ function SignModal({ modalVisible, setModalVisible }) {
 					isLoggedIn: true,
 					id: res.data.user.id,
 					email: res.data.user.email,
+					password: res.data.user.password,
+
 					nickname: res.data.user.nickname,
 
 				}))
@@ -174,6 +176,7 @@ function SignModal({ modalVisible, setModalVisible }) {
 				}
 
 				dispatch(setTrips(res.data.userData.trips))
+				dispatch(setSharedTrips(res.data.userData.sharedTrips))
 
 				console.log("FETCHED DATA: " + res.data.userData)
 
@@ -188,7 +191,6 @@ function SignModal({ modalVisible, setModalVisible }) {
 				console.log("Signin Rejected: " + rej)
 			})
 
-
 		// /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
 		const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user)
 
@@ -200,21 +202,28 @@ function SignModal({ modalVisible, setModalVisible }) {
 
 	return <>
 
-		{isSignin?
+		{isSignin ?
 
-			<Modal isOpen={modalVisible} onClose={() => setModalVisible()} justifyContent="flex-end" bottom={HEIGHT * .35}
+			<Modal isOpen={modalVisible} onClose={() => {
+
+				setEmail("")
+				setPassword("")
+				setNickname("")
+				setWarningText("")
+				setModalVisible()
+			}} justifyContent="flex-end" bottom={HEIGHT * .35}
 			       shadowOpacity={.2}
 			       shadowRadius={24}
 			       shadowOffset={{
 				       height: 4,
 			       }}
-			       _backdrop={{ bg: "#000", opacity: .25 }}
+			       _backdrop={{bg: "#000", opacity: .25}}
 			>
 
 				<KeyboardAvoidingView
 					keyboardVerticalOffset={-200}
 					// flex={1}
-					behavior={Platform.OS === "ios"? "padding" : "height"}
+					behavior={Platform.OS === "ios" ? "padding" : "height"}
 				>
 					<Modal.Content borderRadius={24} w={WIDTH * .9} px={20} py={12}>
 
@@ -226,7 +235,7 @@ function SignModal({ modalVisible, setModalVisible }) {
 
 							<Pressable onPress={() => setModalVisible()} justifyContent={"center"} alignItems={"center"} w={28}
 							           h={28}>
-								<Feather name={"x"} size={20} color={theme.primary.text.indigo} />
+								<Feather name={"x"} size={20} color={theme.primary.text.indigo}/>
 							</Pressable>
 
 						</HStack>
@@ -242,8 +251,10 @@ function SignModal({ modalVisible, setModalVisible }) {
 									onChangeText={text => {
 										setEmail(text)
 									}}
-									borderWidth={0} color={theme.primary.text.indigo} placeholder={"電子郵件"} />
-								<HStack h={1} bg={"gray.300"} />
+									borderWidth={0} color={theme.primary.text.indigo} placeholder={"電子郵件"}/>
+								<HStack h={1} bg={"gray.300"}/>
+
+
 								<InputField
 									value={password}
 									onChangeText={text => {
@@ -254,21 +265,22 @@ function SignModal({ modalVisible, setModalVisible }) {
 									                              rounded="none"
 									                              w="1/6" h="full"
 									                              onPress={() => setShowPassword(prev => !prev)}>
-										{showPassword? <Feather name={"eye"} size={18} color={theme.primary.text.indigo} /> :
-											<Feather name={"eye-off"} size={18} color={theme.primary.text.indigo} />}
+										{showPassword ? <Feather name={"eye"} size={18} color={theme.primary.text.indigo}/> :
+											<Feather name={"eye-off"} size={18} color={theme.primary.text.indigo}/>}
 									</Pressable>}
-									borderWidth={0} color={theme.primary.text.indigo} placeholder={"密碼"} type={"password"} />
+									borderWidth={0} color={theme.primary.text.indigo} placeholder={"密碼"} type={"password"}/>
 							</VStack>
 
 
 							<HStack h={48} pr={4} alignItems={"center"} w={"100%"} justifyContent={"flex-end"}>
 
 								<Center h={32} w={148} bg={"black"} borderRadius={16} shadowColor={"indigo"} shadowOpacity={.2}
-								        shadowOffset={{ height: 1 }}
+								        shadowOffset={{height: 1}}
 								        shadowRadius={8}>
 									<AppleButton
 										buttonStyle={AppleButton.Style.BLACK}
 										buttonType={AppleButton.Type.SIGN_IN}
+
 										style={{
 											width: 128, // You must specify a width
 											height: 32, // You must specify a height
@@ -303,56 +315,58 @@ function SignModal({ modalVisible, setModalVisible }) {
 												email: email,
 												password: password,
 											})
-											         .then(async res => {
+												.then(async res => {
 
-												         await Keychain.setGenericPassword("token", res.data.token)
+													await Keychain.setGenericPassword("token", res.data.token)
 
-												         setAsync(false)
-												         setModalVisible(prev => !prev)
+													setAsync(false)
+													setModalVisible(prev => !prev)
 
-												         dispatch(setAccountInfo({
+													dispatch(setAccountInfo({
 
-													         ...account.info,
+														...account.info,
 
-													         isLoggedIn: true,
-													         id: res.data.user.id,
-													         email: res.data.user.email,
-													         nickname: res.data.user.nickname,
+														isLoggedIn: true,
+														id: res.data.user.id,
+														email: res.data.user.email,
+														password: res.data.user.password,
+														nickname: res.data.user.nickname,
 
-												         }))
+													}))
 
-												         dispatch(setFriends(res.data.user.friends))
+													dispatch(setFriends(res.data.user.friends))
 
-												         if (res.data.user.hasRemoteProfilePicture) {
-													         await downloadProfilePicture(res.data.user.id, res.data.user.id, RNFS.DocumentDirectoryPath + "/travelope/" + res.data.user.id)
-													         dispatch(setProfilePicture(RNFS.DocumentDirectoryPath + "/travelope/" + res.data.user.id))
-												         }
+													if (res.data.user.hasRemoteProfilePicture) {
+														await downloadProfilePicture(res.data.user.id, res.data.user.id, RNFS.DocumentDirectoryPath + "/travelope/" + res.data.user.id)
+														dispatch(setProfilePicture(RNFS.DocumentDirectoryPath + "/travelope/" + res.data.user.id))
+													}
 
-															dispatch(setTrips(res.data.userData.trips))
+													dispatch(setTrips(res.data.userData.trips))
+													dispatch(setSharedTrips(res.data.userData.sharedTrips))
 
-												         console.log("FETCHED DATA: " + res.data.userData)
+													console.log("shared trips" + res.data.userData.sharedTrips)
 
-												         setErrorText("")
-												         setWarningText("登入成功！")
+													setErrorText("")
+													setWarningText("登入成功！")
 
-											         }, rej => {
+												}, rej => {
 
-												         setAsync(false)
+													setAsync(false)
 
-												         setErrorText("帳戶資訊錯誤")
-												         console.log("Signin Rejected: " + rej)
-											         })
+													setErrorText("帳戶資訊錯誤")
+													console.log("Signin Rejected: " + rej)
+												})
 										}
 									}
 
-								}} />
+								}}/>
 
 							</HStack>
 
 							<HStack h={48} px={6} alignItems={"center"} w={"100%"} justifyContent={"space-between"}>
 
-								{async?
-									<Spinner size={"sm"} color={"dimgray"} /> :
+								{async ?
+									<Spinner size={"sm"} color={"dimgray"}/> :
 									<Text fontSize={15} fontWeight={"bold"}
 									      color={theme.primary.placeholder.purple}>
 										{errorText}
@@ -387,13 +401,13 @@ function SignModal({ modalVisible, setModalVisible }) {
 			       shadowOffset={{
 				       height: 4,
 			       }}
-			       _backdrop={{ bg: "#000", opacity: .25 }}
+			       _backdrop={{bg: "#000", opacity: .25}}
 			>
 
 				<KeyboardAvoidingView
 					keyboardVerticalOffset={-200}
 					// flex={1}
-					behavior={Platform.OS === "ios"? "padding" : "height"}
+					behavior={Platform.OS === "ios" ? "padding" : "height"}
 				>
 					<Modal.Content borderRadius={24} w={WIDTH * .9} px={20} py={12}>
 
@@ -405,7 +419,7 @@ function SignModal({ modalVisible, setModalVisible }) {
 
 							<Pressable onPress={() => setModalVisible()} justifyContent={"center"} alignItems={"center"} w={28}
 							           h={28}>
-								<Feather name={"x"} size={20} color={theme.primary.text.indigo} />
+								<Feather name={"x"} size={20} color={theme.primary.text.indigo}/>
 							</Pressable>
 
 						</HStack>
@@ -419,14 +433,14 @@ function SignModal({ modalVisible, setModalVisible }) {
 
 								<InputField
 									onChangeText={text => setNickname(text)}
-									value={nickname} borderWidth={0} color={theme.primary.text.indigo} placeholder={"用戶名稱"} />
+									value={nickname} borderWidth={0} color={theme.primary.text.indigo} placeholder={"用戶名稱"}/>
 
-								<HStack h={1} bg={"gray.300"} />
+								<HStack h={1} bg={"gray.300"}/>
 
 								<InputField
 									onChangeText={text => setEmail(text)}
-									value={email} borderWidth={0} color={theme.primary.text.indigo} placeholder={"電子郵件"} />
-								<HStack h={1} bg={"gray.300"} />
+									value={email} borderWidth={0} color={theme.primary.text.indigo} placeholder={"電子郵件"}/>
+								<HStack h={1} bg={"gray.300"}/>
 
 								<InputField
 									value={password}
@@ -438,10 +452,10 @@ function SignModal({ modalVisible, setModalVisible }) {
 									                              rounded="none"
 									                              w="1/6" h="full"
 									                              onPress={() => setShowPassword(prev => !prev)}>
-										{showPassword? <Feather name={"eye"} size={18} color={theme.primary.text.indigo} /> :
-											<Feather name={"eye-off"} size={18} color={theme.primary.text.indigo} />}
+										{showPassword ? <Feather name={"eye"} size={18} color={theme.primary.text.indigo}/> :
+											<Feather name={"eye-off"} size={18} color={theme.primary.text.indigo}/>}
 									</Pressable>}
-									borderWidth={0} color={theme.primary.text.indigo} placeholder={"密碼"} type={"password"} />
+									borderWidth={0} color={theme.primary.text.indigo} placeholder={"密碼"} type={"password"}/>
 							</VStack>
 
 
@@ -470,46 +484,46 @@ function SignModal({ modalVisible, setModalVisible }) {
 													...account.info,
 													nickname: nickname,
 													email: email,
-													id: "" + (new Date().getFullYear() - 2000) + (new Date().getMonth() + 1) + (new Date().getDate()) + (new Date().getMinutes()) + (new Date().getSeconds()) + (new Date().getMilliseconds()),
+													id: "" + new Date().getTime(),
 													password: password,
 
 												})
-												         .then(async res => {
+													.then(async res => {
 
-													         setErrorText("")
-													         setWarningText("註冊成功 !")
-													         setIsSignin(true)
+														setErrorText("")
+														setWarningText("註冊成功 !")
+														setIsSignin(true)
 
-													         await Keychain.setGenericPassword("token", res.data.token)
+														await Keychain.setGenericPassword("token", res.data.token)
 
-													         setAsync(false)
+														setAsync(false)
 
-												         })
-												         .catch(rej => {
+													})
+													.catch(rej => {
 
-													         setAsync(false)
+														setAsync(false)
 
-													         if (rej.response.data.includes("E11000")) {
-														         setErrorText("此電子信箱已經被註冊")
-													         } else {
-														         setErrorText("出現未知錯誤")
+														if (rej.response.data.includes("E11000")) {
+															setErrorText("此電子信箱已經被註冊")
+														} else {
+															setErrorText("出現未知錯誤")
 
-													         }
+														}
 
-													         console.log("Signup Rejected: " + JSON.stringify(rej.response.data))
-												         })
+														console.log("Signup Rejected: " + JSON.stringify(rej.response.data))
+													})
 											}
 										}
 									}
 
-								}} />
+								}}/>
 
 							</HStack>
 
 							<HStack h={48} px={6} alignItems={"center"} w={"100%"} justifyContent={"space-between"}>
 
-								{async?
-									<Spinner size={"sm"} color={"dimgray"} /> :
+								{async ?
+									<Spinner size={"sm"} color={"dimgray"}/> :
 									<Text fontSize={15} fontWeight={"bold"}
 									      color={theme.primary.placeholder.purple}>
 										{errorText}
@@ -541,13 +555,16 @@ function SignModal({ modalVisible, setModalVisible }) {
 	</>
 }
 
-const Settings = () => {
+const Settings = ({navigation}) => {
 
 	const theme = useTheme().colors
 	const [modalVisible, setModalVisible] = useState(false)
+	const [editNicknameModalVisible, setEditNicknameModalVisible] = useState(false)
 
 	const account = useSelector(selectAccount)
 	const dispatch = useDispatch()
+
+	const [editedNickname, setEditedNickname] = useState("")
 
 	const toastInfoRef = useRef()
 	const toast = useToast()
@@ -583,14 +600,14 @@ const Settings = () => {
 				id: "warningInfo",
 				render: () => {
 					return (
-						<ToastInfo warningText={warningText} />
+						<ToastInfo warningText={warningText}/>
 					)
 				},
 			})
 		}
 	}
 
-	const ToastInfo = ({ warningText }) => {
+	const ToastInfo = ({warningText}) => {
 		return (
 			<HStack
 				alignItems={"center"} justifyContent={"space-between"} bg={theme.primary.text.indigo} w={WIDTH * .9} h={64}
@@ -636,7 +653,124 @@ const Settings = () => {
 
 		<LayoutBase>
 
-			<SignModal modalVisible={modalVisible} setModalVisible={() => setModalVisible(prev => !prev)} />
+			<Modal isOpen={editNicknameModalVisible} onClose={() => setEditNicknameModalVisible()}
+			       justifyContent="flex-end" bottom={HEIGHT * .4}
+			       shadowOpacity={.2}
+			       shadowRadius={24}
+			       shadowOffset={{
+				       height: 4,
+			       }}
+			       _backdrop={{bg: "#000", opacity: .25}}
+			>
+
+				<Modal.Content borderRadius={24} w={WIDTH * .9} px={20} h={HEIGHT * .25} alignSelf={"center"} py={12}>
+
+					<HStack mt={4} h={30} mb={20} justifyContent={"space-between"} alignItems={"center"}>
+
+						<Text ml={8} fontSize={18} letterSpacing={1} fontWeight={"bold"} color={theme.primary.text.indigo}>
+							編輯暱稱
+						</Text>
+
+						<Pressable onPress={() => {
+
+							setEditNicknameModalVisible()
+
+						}} justifyContent={"center"} alignItems={"center"} w={28}
+						           h={28}>
+							<Feather name={"x"} size={20} color={theme.primary.text.indigo}/>
+						</Pressable>
+
+
+					</HStack>
+
+					<HStack
+
+
+						mb={48} bg={"#eeefff"} pl={20} pr={12} h={54} borderRadius={16} alignItems={"center"}
+						justifyContent={"space-between"}
+
+						borderWidth={1}
+						flexDirection={"row"}
+						bg={"transparent"}
+						borderColor={theme.primary.placeholder.indigo}
+					>
+						<Input
+
+							_focus={{
+								borderColor: "transparent",
+								color: theme.primary.text.indigo,
+								bg: "transparent",
+							}}
+
+							value={editedNickname}
+							onChangeText={id => setEditedNickname(prev => id)}
+							selectionColor={theme.primary.text.indigo}
+							placeholder={"輸入新暱稱"}
+							placeholderTextColor={theme.primary.placeholder.indigo}
+							borderColor={"transparent"}
+							color={theme.primary.text.indigo}
+							bg={"transparent"}
+							borderWidth={1}
+							borderRadius={16}
+							fontWeight={"bold"}
+							h={36}
+							flex={8}
+							fontSize={16}
+							textAlign={"left"}
+						/>
+					</HStack>
+
+					<HStack w={"100%"} justifyContent={"flex-end"}>
+						<GradientButton
+
+							onPress={() => {
+
+								apiRequest("put", `/api/travelope/update-user`, {
+
+									id: account.info.id,
+
+									data: {
+
+										email: account.info.email,
+										password: account.info.password,
+										nickname: editedNickname,
+
+										hasRemoteProfilePicture: true,
+
+										isAppleAccount: account.info.isAppleAccount
+
+									}
+								})
+
+								dispatch(setAccountInfo({
+
+									isLoggedIn: account.info.isLoggedIn,
+
+									id: account.info.id,
+									email: account.info.email,
+									password: account.info.password,
+									nickname: editedNickname,
+
+									profilePictureLocalPath: account.info.profilePictureLocalPath,
+									hasRemoteProfilePicture: true,
+
+									isAppleAccount: account.info.isAppleAccount
+
+								}))
+
+								setEditNicknameModalVisible(false)
+
+							}}
+
+							w={108} title={"修改暱稱"} icon={"edit-3"} iconSize={18} iconColor={"white"}/>
+					</HStack>
+
+
+				</Modal.Content>
+
+			</Modal>
+
+			<SignModal modalVisible={modalVisible} setModalVisible={() => setModalVisible(prev => !prev)}/>
 
 			<VStack mb={36}>
 
@@ -661,7 +795,7 @@ const Settings = () => {
 						alignItems={"center"}
 					>
 						{
-							account.info.profilePictureLocalPath !== ""?
+							account.info.profilePictureLocalPath !== "" ?
 
 								<Image
 									style={{
@@ -669,10 +803,10 @@ const Settings = () => {
 										height: 88,
 										width: 88,
 									}}
-									source={{ uri: account.info.profilePictureLocalPath }}
+									source={{uri: account.info.profilePictureLocalPath}}
 									alt={"userImage"}
 								/>
-								: <Feather name={"user"} color={theme.primary.text.purple} size={32} />
+								: <Feather name={"user"} color={theme.primary.text.purple} size={32}/>
 						}
 
 					</Pressable>
@@ -681,11 +815,28 @@ const Settings = () => {
 				<HStack mb={4} h={24} justifyContent={"center"} alignItems={"center"}>
 
 					{
-						account.info.isLoggedIn?
+						account.info.isLoggedIn ?
 
-							<Text fontSize={18} fontWeight={"bold"} color={theme.primary.text.purple}>
-								{account.info.nickname}
-							</Text> :
+							<HStack alignItems={"center"} ml={26}>
+								<Text mr={6} fontSize={18} fontWeight={"bold"} color={theme.primary.text.purple}>
+									{account.info.nickname}
+								</Text>
+
+								<Pressable
+
+									mt={3}
+									w={24}
+									h={24}
+									justifyContent={"center"}
+									alignItems={"center"}
+									onPress={() => {
+										setEditNicknameModalVisible(true)
+									}}>
+									<Feather name={"edit-3"} color={theme.primary.text.purple} size={18}/>
+								</Pressable>
+							</HStack>
+
+							:
 
 							<Text fontSize={18} fontWeight={"bold"} color={theme.primary.text.purple}>
 								未登入
@@ -697,7 +848,7 @@ const Settings = () => {
 				<HStack h={24} justifyContent={"center"} alignItems={"center"}>
 
 					{
-						account.info.isLoggedIn?
+						account.info.isLoggedIn ?
 
 							<Text fontSize={16} fontWeight={"normal"} color={theme.primary.text.indigo}>
 								{"用戶ID: " + account.info.id}
@@ -710,7 +861,7 @@ const Settings = () => {
 
 			{
 
-				account.info.isLoggedIn?
+				account.info.isLoggedIn ?
 
 					<Block pl={24} pr={18} mb={36} borderRadius={32} fd={"row"} h={64} sc={"#9e66ff"} bdc={"#af81ff"}
 					       ai={"center"}
@@ -740,7 +891,7 @@ const Settings = () => {
 							// 	appleAccountLink: {},
 							// }))
 
-						}} />
+						}}/>
 
 					</Block> :
 
@@ -748,12 +899,12 @@ const Settings = () => {
 					       ai={"center"}
 					       jc={"space-between"}>
 
-						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={16}>
 							啟用同步與朋友功能。
 						</Text>
 						<GradientButton w={100} h={34} title={"登入"} onPress={() => {
 							setModalVisible(prev => !prev)
-						}} />
+						}}/>
 
 					</Block>
 			}
@@ -764,52 +915,58 @@ const Settings = () => {
 				<Block px={12} py={16} borderRadius={32} fd={"column"} h={112} sc={"#9e66ff"} bdc={"#af81ff"}
 				       jc={"space-between"}>
 
-					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
-						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+					<Pressable onPress={() => {
+						navigation.navigate("MyZone")
+
+					}} flexDirection={"row"} px={10} alignItems={"center"}>
+
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={16}>
 							我的圈子
 						</Text>
-						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
+
 					</Pressable>
 
-					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.purple} />
+					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.purple}/>
 
-					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
-						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
-							分享Travelope
+					<Pressable
+
+						onPress={() => {
+							navigation.navigate("SharedWithMe")
+						}}
+
+						flexDirection={"row"} px={10} alignItems={"center"}>
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={16}>
+							與我分享的旅程
 						</Text>
-						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
+
 					</Pressable>
 
 				</Block>
-
-
 
 				<Block px={12} py={16} borderRadius={32} fd={"column"} h={164} sc={"#9e66ff"} bdc={"#af81ff"}
 				       jc={"space-between"}>
 
 					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
-						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={16}>
 							評分
 						</Text>
-						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
 					</Pressable>
 
-					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.purple} />
+					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.purple}/>
 
 					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
-						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={16}>
 							意見回饋
 						</Text>
-						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
 					</Pressable>
 
-					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.purple} />
+					<HStack h={2} w={"100%"} opacity={.5} bg={theme.primary.text.purple}/>
 
 					<Pressable flexDirection={"row"} px={10} alignItems={"center"}>
-						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={17}>
+						<Text mr={8} numberOfLines={1} flex={1} color={"#7f54ff"} fontWeight={"bold"} fontSize={16}>
 							隱私政策
 						</Text>
-						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo} />
+						<Feather name={"arrow-right"} size={22} color={theme.primary.text.indigo}/>
 					</Pressable>
 
 				</Block>

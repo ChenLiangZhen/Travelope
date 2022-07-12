@@ -106,6 +106,7 @@ router_user.post("/api/travelope/sign-with-apple", async (req, res) => {
 	if (!email || !password) {
 		return res.status(422).send({ error: "must provide email and password." })
 	}
+
 	//尋找該 email 的使用者是否存在。 若不在則回傳錯誤。
 	const user = await User.findOne({ email })
 
@@ -113,7 +114,8 @@ router_user.post("/api/travelope/sign-with-apple", async (req, res) => {
 		try {
 
 			let nickname = email
-			let id = "" + (new Date().getFullYear() - 2000) + (new Date().getMonth() + 1) + (new Date().getDate()) + (new Date().getMinutes()) + (new Date().getSeconds()) + (new Date().getMilliseconds())
+			let id = "" + new Date().getTime()
+
 
 			if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
 				return res.status(400).send("Signup Failed: Email Invalid.")
@@ -172,11 +174,13 @@ router_user.put("/api/travelope/update-user", async (req, res) => {
 	try {
 		User.updateOne({ id: id },
 			{
+
 				email: data.email,
 				password: data.password,
 				nickname: data.nickname,
 				hasRemoteProfilePicture: data.hasRemoteProfilePicture,
-				appleAccountLink: data.appleAccountLink
+
+				isAppleAccount: data.isAppleAccount
 			},
 			{},
 			(e, res) => {
@@ -219,7 +223,7 @@ router_user.put("/api/travelope/update-user-has-picture", async (req, res) => {
 
 router_user.post("/api/travelope/add-friend/:accountID", async (req, res) => {
 
-	const { key, name, tag } = req.body
+	const { key, name, pictureURL, tag } = req.body
 	const { accountID } = req.params
 
 	try {
@@ -237,8 +241,10 @@ router_user.post("/api/travelope/add-friend/:accountID", async (req, res) => {
 			}
 
 			user.friends.push({
+
 				key : key,
 				name: name,
+				pictureURL: pictureURL,
 				tag: tag
 			})
 
