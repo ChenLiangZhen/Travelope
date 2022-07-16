@@ -11,7 +11,6 @@ import {useAnimatedStyle} from "react-native-reanimated";
 import {apiRequest} from "../apis/api";
 import {useNavigation} from "@react-navigation/native";
 import LayoutBase from "../components/LayoutBase";
-import {WIDTH} from "../Util";
 
 const styles = StyleSheet.create({
 	container: {

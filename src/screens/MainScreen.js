@@ -1,10 +1,9 @@
-import {HStack, Pressable, ScrollView, Text, useTheme, VStack} from "native-base"
+import {HStack, Pressable, Text, useTheme, VStack} from "native-base"
 import React, {useCallback, useEffect, useRef, useState} from "react"
 import Block from "../components/Block"
 import BlockTitle from "../components/BlockTitle"
 import LayoutBase from "../components/LayoutBase"
 
-import CameraRoll from "@react-native-community/cameraroll"
 import {Alert, Animated, FlatList, StyleSheet} from "react-native"
 import {delTrip, selectData} from "../globalstate/dataSlice"
 import {useDispatch, useSelector} from "react-redux"
@@ -308,14 +307,6 @@ const MainScreen = ({navigation}) => {
 		setRandomMsg(Math.ceil(Math.random() * 6) - 1)
 		setRandomEmoji(Math.ceil(Math.random() * 6) - 1)
 	}, [isFocused])
-
-	useEffect(() => {
-
-	}, [location])
-
-	useEffect(() => {
-		CameraRoll.getPhotos()
-	}, [])
 
 	return (
 
