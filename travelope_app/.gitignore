@@ -24,7 +24,7 @@ DerivedData
 # Android/IntelliJ
 #
 build/
-.idea
+../.idea
 .gradle
 local.properties
 *.iml
@@ -57,5 +57,5 @@ buck-out/
 *.jsbundle
 
 # Ruby / CocoaPods
-/ios/Pods/
+/travelope_app/ios/Pods/
 /vendor/bundle/
