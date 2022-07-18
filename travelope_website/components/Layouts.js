@@ -10,7 +10,7 @@ export const BaseGrid = styled.div`
   display: grid;
   grid-template-columns: [Left] 15% [vLeft] 26px [vBodyLeft]  1fr [vBodyRight] 26px [vRight] 15% [Right];
   grid-template-rows: [Top] 72px [hBottom] 32px [hContentDivider] auto [hCopyrightDivider] 60px  [Bottom];
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
 
   @media (max-width: 480px) {

@@ -16,6 +16,7 @@ const Home = () => {
 
          <Script type='text/javascript'
                  src='//font.arphic.com/FontSubsetOutput/1642523883319/B2DF88D8BA84F2076780EDBB70B310FB/1642523883319.JS?9458856266'/>
+
          <BaseWeb>
 
             <BaseGrid>
@@ -32,6 +33,7 @@ const Home = () => {
                <SiteFooter/>
 
             </BaseGrid>
+
          </BaseWeb>
       </>
    )
