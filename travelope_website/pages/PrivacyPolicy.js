@@ -28,7 +28,7 @@ const PrivacyPolicy = () => {
 
 	return (<>
 		<Head>
-			<title>Taiwan Weather 台灣天氣</title>
+			<title>Travelope 隱私權政策</title>
 		</Head>
 
 		<BaseWeb>

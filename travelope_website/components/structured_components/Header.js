@@ -1,5 +1,4 @@
 import {HStack} from "../Layouts";
-import {SunIcon} from "../Icons";
 import styled from "styled-components";
 import {motion} from "framer-motion";
 import {CLinkButton} from "../Buttons";
@@ -33,12 +32,24 @@ export function SiteHeader(props) {
 	return (
 		<Header initial={{y: -100, opacity: 0}} animate={{y: 0, opacity: 1}}
 		        transition={{type: "spring", bounce: 0.4, duration: 1.5}}>
-			<HStack>
-				<SunIcon size={24}/>
-				<CLinkButton href="/" $color="black" $fontSize="20px" $fontFamily="Noto Sans TC" $fontWeight={300}
-				             $letterSpacing="2px" $margin="0px 0 3px 4px"
+			<HStack $alignItems={"center"}>
+
+				{/*<SunIcon size={24}/>*/}
+
+				<CLinkButton href="/"
+				             $height={40}
+				             $alignItems={"center"}
+				             $justifyContent={"center"}
 				             {...props}>
-					<Image src={require("../../res/travelope_logo_eng_svg.svg")}/>
+
+					<Image src={require("../../res/travelope_logo_eng_svg.svg")}
+					       height={40}
+					       width={180}
+					       style={{
+						       padding: 0,
+						       margin: 0
+					       }}
+					/>
 				</CLinkButton>
 			</HStack>
 

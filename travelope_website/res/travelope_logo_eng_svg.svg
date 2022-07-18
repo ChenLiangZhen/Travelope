@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 1146 234" version="1.1" xmlns="http://www.w3.org/2000/svg"
+<svg width="100%" height="100%" viewBox="0 0 888 94" version="1.1" xmlns="http://www.w3.org/2000/svg"
      xml:space="preserve"
      style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-5313.86,-311.1)">
-        <g id="travelope_logo" transform="matrix(0.762983,0,0,0.569343,3945.84,311.1)">
-            <rect x="1793" y="0" width="1502" height="411" style="fill:none;"/>
+    <g transform="matrix(1,0,0,1,-5443.12,-382.041)">
+        <g transform="matrix(0.762983,0,0,0.569343,3945.84,311.1)">
             <g transform="matrix(1.21097,0,0,1.41985,-335.382,-37.84)">
                 <path d="M1939.77,144.766L1939.77,220.785C1939.77,223.385 1942.04,225.785 1944.49,225.785C1947.14,225.785 1950.3,223.585 1950.3,220.785L1950.3,144.766C1950.3,140.829 1951.66,137.054 1954.1,134.27C1956.54,131.486 1959.84,129.922 1963.29,129.922C1973.24,129.922 1985.28,129.922 1985.29,129.922C1985.29,129.922 1985.29,129.922 1985.29,129.922C1987.93,129.922 1990.01,126.385 1990.01,123.785C1990.01,120.985 1987.93,118.785 1985.29,118.785L1904.45,118.785C1902,118.785 1899.73,120.985 1899.73,123.785C1899.73,126.385 1902,129.922 1904.45,129.922C1904.45,129.922 1904.45,129.922 1904.45,129.922C1904.47,129.922 1916.72,129.922 1926.78,129.922C1933.96,129.922 1939.77,136.568 1939.77,144.766Z"
                       style="fill:url(#_Linear1);fill-rule:nonzero;stroke:url(#_Linear2);stroke-width:4.8px;"/>
