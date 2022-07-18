@@ -9,13 +9,15 @@ const MobileMenuButton = ({
 	                          width = 24,
 	                          height = 24,
 	                          strokeWidth = 3,
-	                          color = "#000",
+	                          color = "#b13cff",
 	                          transition = null,
 	                          lineProps = null,
 	                          ...props
                           }) => {
 	const variant = isOpen ? "opened" : "closed";
+
 	const top = {
+
 		closed: {
 			rotate: 0,
 			translateY: 0
@@ -45,7 +47,7 @@ const MobileMenuButton = ({
 	};
 	lineProps = {
 		stroke: color,
-		strokeWidth: strokeWidth,
+		strokeWidth: 2,
 		vectorEffect: "non-scaling-stroke",
 		initial: "closed",
 		animate: variant,
@@ -94,7 +96,9 @@ const MobileMenuButton = ({
 
 const MobileMenu_ = styled(motion.button)`
   display: none;
+
   @media (max-width: 480px) {
+
     display: flex;
     position: fixed;
     justify-content: center;
@@ -106,7 +110,7 @@ const MobileMenu_ = styled(motion.button)`
     outline: none;
     border: none;
 
-    right: 8px;
+    right: 12px;
     top: 8px
   }
 `
@@ -148,6 +152,7 @@ const MobileMenuItem_ = styled(motion.a)`
   display: none;
 
   @media (max-width: 480px) {
+
     padding: 8px 32px 8px 0;
     display: flex;
     justify-content: flex-end;

@@ -5,7 +5,7 @@ import {SiteBody} from "../components/structured_components/Body";
 import {SiteHeader} from "../components/structured_components/Header";
 import SiteFooter from "../components/structured_components/Footer";
 
-const App = () => {
+const Home = () => {
 
    return (
       <>
@@ -24,6 +24,7 @@ const App = () => {
 
                }}/>
 
+
                <SiteBody>
 
                </SiteBody>
@@ -36,4 +37,4 @@ const App = () => {
    )
 }
 
-export default App
+export default Home

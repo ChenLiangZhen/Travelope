@@ -5,8 +5,11 @@ export function SiteBody({children}) {
 
 	return (
 		<Body>
+
 			<MobileMenu/>
+
 			{children}
+
 		</Body>
 	)
 }
