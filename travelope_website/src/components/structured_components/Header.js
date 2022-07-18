@@ -3,8 +3,10 @@ import {SunIcon} from "../Icons";
 import styled from "styled-components";
 import {motion} from "framer-motion";
 import {CLinkButton} from "../Buttons";
+import Image from "next/image";
 
 const Header = styled(motion.div)`
+  
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -36,7 +38,7 @@ export function SiteHeader(props) {
 				<CLinkButton href="/" $color="black" $fontSize="20px" $fontFamily="Noto Sans TC" $fontWeight={300}
 				             $letterSpacing="2px" $margin="0px 0 3px 4px"
 				             {...props}>
-
+					<Image src={require("../../res/travelope_logo_eng_svg.svg")}/>
 				</CLinkButton>
 			</HStack>
 

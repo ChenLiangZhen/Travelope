@@ -6,6 +6,7 @@ import {SiteHeader} from "../components/structured_components/Header";
 import SiteFooter from "../components/structured_components/Footer";
 
 const App = () => {
+
    return (
       <>
          <Head>
@@ -28,6 +29,7 @@ const App = () => {
                </SiteBody>
 
                <SiteFooter/>
+
             </BaseGrid>
          </BaseWeb>
       </>
