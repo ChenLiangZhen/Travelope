@@ -1,9 +1,9 @@
-import { apiRequest } from "./api"
+import {apiRequest} from "./api"
 import RNFS from "react-native-fs"
 
 export const uploadImage = (accountID, key) => {
 
-	apiRequest("get", `/api/travelope/get-upload-link/${accountID}/${key}`)
+	apiRequest("get", `/travelope/get-upload-link/${accountID}/${key}`)
 		.then(res => { // 取得授權後的檔案上傳連結
 
 			uploadToURL(res.url, res.name)
@@ -55,7 +55,7 @@ export const uploadImage = (accountID, key) => {
 
 export const uploadProfilePicture = (accountID, key, localPath) => {
 
-	apiRequest("get", `/api/travelope/get-upload-link/${accountID}/${key}`)
+	apiRequest("get", `/travelope/get-upload-link/${accountID}/${key}`)
 		.then(res => { // 取得授權後的檔案上傳連結
 
 			uploadToURL(res.url, res.name)
@@ -108,7 +108,7 @@ export const downloadProfilePicture = (accountID, key, localPath) => {
 
 	return new Promise(async (resolve, reject) => {
 
-		apiRequest("get", `/api/travelope/get-download-link/${accountID}/${key}`)
+		apiRequest("get", `/travelope/get-download-link/${accountID}/${key}`)
 			.then(res => { // 取得授權後的檔案上傳連結
 
 				downloadFromURL(res.url, res.name)

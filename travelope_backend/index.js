@@ -30,11 +30,11 @@ const doSecretKey = process.env.MONGODB_LOCAL_URI
 mongoose.connect(testURI)
    .then(() => { console.log("successfully connected: " + testURI) }, rej => {console.log("failed to connect: " + rej)})
 
-// app.get("/api", userAuth, (req, res)=>{
-//   res.send(`your email is: ${req.user.email} and your data is: ${req.data}`)
-// })
+app.get("/travelope", (req, res) => {
+  res.send(`testing!`)
+})
 
-const PORT= 3000;
+const PORT = 3001;
 app.listen(PORT, ()=>{
   console.log(`App is running on port ${PORT}`)
 })

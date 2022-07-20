@@ -25,9 +25,9 @@ const doClient = new aws.S3({
 	},
 })
 
-router_transfer.get("/api/travelope/get-upload-link/:accountID/:key", userAuth, async (req, res) => {
+router_transfer.get("/travelope/get-upload-link/:accountID/:key", userAuth, async (req, res) => {
 
-	const { accountID, key } = req.params
+	const {accountID, key} = req.params
 
 	const doParams = {
 		Bucket: bucketName,
@@ -48,9 +48,9 @@ router_transfer.get("/api/travelope/get-upload-link/:accountID/:key", userAuth, 
 
 })
 
-router_transfer.get("/api/travelope/get-download-link/:accountID/:key", userAuth, async (req, res) => {
+router_transfer.get("/travelope/get-download-link/:accountID/:key", userAuth, async (req, res) => {
 
-	const { accountID, key } = req.params
+	const {accountID, key} = req.params
 
 	const doParams = {
 		Bucket: bucketName,

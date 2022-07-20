@@ -1,19 +1,7 @@
 import React, {useEffect, useRef, useState} from "react"
 import LayoutBase from "../../components/LayoutBase"
 import FlatBlock from "../../components/FlatBlock"
-import {
-	HStack,
-	Input,
-	KeyboardAvoidingView,
-	Modal,
-	Pressable,
-	Text,
-	TextArea,
-	useTheme,
-	useToast,
-	View,
-	VStack,
-} from "native-base"
+import {HStack, Input, Modal, Pressable, Text, TextArea, useTheme, useToast, View, VStack,} from "native-base"
 import Block from "../../components/Block"
 import DatePicker from "react-native-date-picker"
 import Feather from "react-native-vector-icons/Feather"
@@ -22,11 +10,10 @@ import {selectAccount} from "../../globalstate/accountSlice"
 import {FlatList, Keyboard} from "react-native"
 import {HEIGHT, WIDTH} from "../../Util"
 import {useDispatch, useSelector} from "react-redux"
-import {appleAuth} from "@invertase/react-native-apple-authentication"
-import {pushTrip, selectData, setCurrentTrip} from "../../globalstate/dataSlice"
+import {pushTrip, selectData} from "../../globalstate/dataSlice"
 import {apiRequest} from "../../apis/api"
 import {useFocusEffect, useIsFocused} from "@react-navigation/native"
-import {config, useSpring, animated} from "@react-spring/native";
+import {animated, config, useSpring} from "@react-spring/native";
 
 const NewTrip = ({navigation}) => {
 
@@ -565,7 +552,7 @@ const NewTrip = ({navigation}) => {
 
 							dispatch(pushTrip(tripObject))
 
-							apiRequest("post", `/api/travelope/new-trip/${account.info.id}`, tripObject)
+							apiRequest("post", `/travelope/new-trip/${account.info.id}`, tripObject)
 
 							navigation.navigate("CurrentTrip")
 

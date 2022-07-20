@@ -1,19 +1,17 @@
 import React, {useCallback, useEffect, useRef, useState} from "react"
 import LayoutBase from "../../components/LayoutBase"
-import FlatBlock from "../../components/FlatBlock"
-import {HStack, Modal, Pressable, Text, useTheme, View, VStack} from "native-base"
+import {HStack, Modal, Pressable, Text, useTheme, VStack} from "native-base"
 import Feather from "react-native-vector-icons/Feather"
 import {GradientBorderButton, GradientButton} from "../../components/GradientButton"
 import Block from "../../components/Block"
 import {useDispatch, useSelector} from "react-redux"
 import {selectAccount} from "../../globalstate/accountSlice"
-import {FlatList} from "react-native"
+import {FlatList, StyleSheet} from "react-native"
 import SwipeableItem, {useSwipeableItemParams} from "react-native-swipeable-item"
-import {StyleSheet, TouchableOpacity} from "react-native"
 import Animated, {useAnimatedStyle} from "react-native-reanimated"
 import {delTripNote, selectData, setInactive} from "../../globalstate/dataSlice"
 import {useFocusEffect, useIsFocused, useNavigation} from "@react-navigation/native"
-import {config, useSpring, animated} from "@react-spring/native"
+import {animated, config, useSpring} from "@react-spring/native"
 import {HEIGHT, WIDTH} from "../../Util";
 import {apiRequest} from "../../apis/api";
 
@@ -69,7 +67,7 @@ const UnderlayLeft = ({drag}: { drag: () => void }) => {
 
 				<Pressable flex={1} w={52} justifyContent={"center"} alignItems={"center"} onPress={() => {
 					dispatch(delTripNote(item.recordTime))
-					apiRequest("post", `/api/travelope/del-trip-note/${account.info.id}/${item.noteID}`, {})
+					apiRequest("post", `/travelope/del-trip-note/${account.info.id}/${item.noteID}`, {})
 
 				}}>
 
@@ -363,7 +361,7 @@ const CurrentTrip = () => {
 									console.log("setInactive")
 									dispatch(setInactive())
 
-									apiRequest("put", `/api/travelope/set-trip-inactive/${account.info.id}/${activeTrip.tripID}`, {})
+									apiRequest("put", `/travelope/set-trip-inactive/${account.info.id}/${activeTrip.tripID}`, {})
 
 									setActiveTrip(null)
 

@@ -2,7 +2,8 @@ import React, {useCallback, useEffect, useRef, useState} from "react"
 import LayoutBase from "../components/LayoutBase"
 import {
 	Center,
-	HStack, Input,
+	HStack,
+	Input,
 	KeyboardAvoidingView,
 	Modal,
 	Pressable,
@@ -16,7 +17,7 @@ import {
 import Feather from "react-native-vector-icons/Feather"
 import Block from "../components/Block"
 import {GradientButton} from "../components/GradientButton"
-import {FlatList, Image, Keyboard, Platform} from "react-native"
+import {Image, Keyboard, Platform} from "react-native"
 import {HEIGHT, WIDTH} from "../Util"
 import InputField from "../components/InputField"
 import {appleAuth, AppleButton} from "@invertase/react-native-apple-authentication"
@@ -27,7 +28,8 @@ import {useDispatch, useSelector} from "react-redux"
 import {
 	purgeAccount,
 	selectAccount,
-	setAccountInfo, setFriends,
+	setAccountInfo,
+	setFriends,
 	setHasRemoteProfilePicture,
 	setProfilePicture,
 } from "../globalstate/accountSlice"
@@ -35,7 +37,6 @@ import ImagePicker from "react-native-image-crop-picker"
 import RNFS from "react-native-fs"
 import {profilePictureInit} from "../apis/fileManager"
 import {downloadProfilePicture, uploadProfilePicture} from "../apis/transferManager"
-import {dataControl} from "../globalstate/store"
 import {purgeAccountData, setSharedTrips, setTrips} from "../globalstate/dataSlice"
 import jwt_decode from 'jwt-decode';
 
@@ -143,7 +144,7 @@ function SignModal({modalVisible, setModalVisible}) {
 
 		console.log(email + " / " + email_verified + " / " + is_private_email + " / " + sub)
 
-		signinWithAppleApi.post("/api/travelope/sign-with-apple", {
+		signinWithAppleApi.post("/travelope/sign-with-apple", {
 
 			email: email,
 			password: sub
@@ -309,7 +310,7 @@ function SignModal({modalVisible, setModalVisible}) {
 
 											setAsync(true)
 
-											signinApi.post("/api/travelope/signin", {
+											signinApi.post("/travelope/signin", {
 
 												isAppleAccount: false,
 												email: email,
@@ -479,7 +480,7 @@ function SignModal({modalVisible, setModalVisible}) {
 
 												setAsync(true)
 
-												signupApi.post("/api/travelope/signup", {
+												signupApi.post("/travelope/signup", {
 
 													...account.info,
 													nickname: nickname,
@@ -642,7 +643,7 @@ const Settings = ({navigation}) => {
 
 			uploadProfilePicture(account.info.id, account.info.id, URI)
 
-			apiRequest("put", "/api/travelope/update-user-has-picture", {
+			apiRequest("put", "/travelope/update-user-has-picture", {
 				id: accountID
 			})
 		})
@@ -725,7 +726,7 @@ const Settings = ({navigation}) => {
 
 							onPress={() => {
 
-								apiRequest("put", `/api/travelope/update-user`, {
+								apiRequest("put", `/travelope/update-user`, {
 
 									id: account.info.id,
 

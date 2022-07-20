@@ -8,7 +8,7 @@ const userAuth = require("../middleware/userAuth")
 
 const router_data = express.Router()
 
-router_data.get("/api/travelope/get-trips/:accountID", userAuth, async (req, res) => {
+router_data.get("/travelope/get-trips/:accountID", userAuth, async (req, res) => {
 
 	const {accountID} = req.params
 
@@ -29,7 +29,7 @@ router_data.get("/api/travelope/get-trips/:accountID", userAuth, async (req, res
 
 })
 
-router_data.post("/api/travelope/new-trip/:accountID", userAuth, async (req, res) => {
+router_data.post("/travelope/new-trip/:accountID", userAuth, async (req, res) => {
 
 	const {accountID} = req.params
 	const tripData = req.body
@@ -67,7 +67,7 @@ router_data.post("/api/travelope/new-trip/:accountID", userAuth, async (req, res
 
 })
 
-router_data.post("/api/travelope/new-shared-trip/:sharedAccountID/:fromAccountID/:fromAccountNickname", userAuth, async (req, res) => {
+router_data.post("/travelope/new-shared-trip/:sharedAccountID/:fromAccountID/:fromAccountNickname", userAuth, async (req, res) => {
 
 	const {sharedAccountID, fromAccountID, fromAccountNickname} = req.params
 	const tripData = req.body
@@ -112,7 +112,7 @@ router_data.post("/api/travelope/new-shared-trip/:sharedAccountID/:fromAccountID
 
 })
 
-router_data.post("/api/travelope/del-trip/:accountID/:tripID", userAuth, async (req, res) => {
+router_data.post("/travelope/del-trip/:accountID/:tripID", userAuth, async (req, res) => {
 
 	const {accountID, tripID} = req.params
 
@@ -144,7 +144,7 @@ router_data.post("/api/travelope/del-trip/:accountID/:tripID", userAuth, async (
 
 })
 
-router_data.post("/api/travelope/new-trip-note/:accountID", userAuth, async (req, res) => {
+router_data.post("/travelope/new-trip-note/:accountID", userAuth, async (req, res) => {
 
 	const {accountID} = req.params
 	const tripNoteData = req.body
@@ -176,7 +176,7 @@ router_data.post("/api/travelope/new-trip-note/:accountID", userAuth, async (req
 
 })
 
-router_data.put("/api/travelope/update-trip-note/:accountID/:noteID", userAuth, async (req, res) => {
+router_data.put("/travelope/update-trip-note/:accountID/:noteID", userAuth, async (req, res) => {
 
 	const {accountID, noteID} = req.params
 	const tripNoteData = req.body
@@ -209,7 +209,7 @@ router_data.put("/api/travelope/update-trip-note/:accountID/:noteID", userAuth, 
 
 })
 
-router_data.put("/api/travelope/set-trip-inactive/:accountID/:tripID", userAuth, async (req, res) => {
+router_data.put("/travelope/set-trip-inactive/:accountID/:tripID", userAuth, async (req, res) => {
 
 	const {accountID, tripID} = req.params
 
@@ -241,7 +241,7 @@ router_data.put("/api/travelope/set-trip-inactive/:accountID/:tripID", userAuth,
 
 })
 
-router_data.post("/api/travelope/del-trip-note/:accountID/:noteID", userAuth, async (req, res) => {
+router_data.post("/travelope/del-trip-note/:accountID/:noteID", userAuth, async (req, res) => {
 
 	const {accountID, noteID} = req.params
 
@@ -271,7 +271,7 @@ router_data.post("/api/travelope/del-trip-note/:accountID/:noteID", userAuth, as
 
 })
 
-router_data.put(`/api/travelope/update-data`, userAuth, async (req, res) => {
+router_data.put(`/travelope/update-data`, userAuth, async (req, res) => {
 
 	const {data, userLink} = req.body
 

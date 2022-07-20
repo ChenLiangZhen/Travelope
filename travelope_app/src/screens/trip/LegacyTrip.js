@@ -1,19 +1,17 @@
 import React, {useCallback, useEffect, useRef, useState} from "react"
 import LayoutBase from "../../components/LayoutBase"
-import FlatBlock from "../../components/FlatBlock"
-import {HStack, Modal, Pressable, Spinner, Text, useTheme, useToast, View, VStack} from "native-base"
+import {HStack, Modal, Pressable, Spinner, Text, useTheme, useToast, VStack} from "native-base"
 import Feather from "react-native-vector-icons/Feather"
 import {GradientBorderButton, GradientButton} from "../../components/GradientButton"
 import Block from "../../components/Block"
 import {useDispatch, useSelector} from "react-redux"
 import {selectAccount} from "../../globalstate/accountSlice"
-import {FlatList} from "react-native"
+import {FlatList, StyleSheet} from "react-native"
 import SwipeableItem, {useSwipeableItemParams} from "react-native-swipeable-item"
-import {StyleSheet, TouchableOpacity} from "react-native"
 import Animated, {useAnimatedStyle} from "react-native-reanimated"
-import {delTripNote, selectData, setInactive} from "../../globalstate/dataSlice"
-import {useFocusEffect, useIsFocused, useNavigation} from "@react-navigation/native"
-import {config, useSpring, animated} from "@react-spring/native"
+import {delTripNote, selectData} from "../../globalstate/dataSlice"
+import {useIsFocused, useNavigation} from "@react-navigation/native"
+import {animated, config, useSpring} from "@react-spring/native"
 import {HEIGHT, WIDTH} from "../../Util";
 import {apiRequest} from "../../apis/api";
 
@@ -69,7 +67,7 @@ const UnderlayLeft = ({drag}: { drag: () => void }) => {
 
 				<Pressable flex={1} w={52} justifyContent={"center"} alignItems={"center"} onPress={() => {
 					dispatch(delTripNote(item.recordTime))
-					apiRequest("post", `/api/travelope/del-trip-note/${account.info.id}/${item.noteID}`, {})
+					apiRequest("post", `/travelope/del-trip-note/${account.info.id}/${item.noteID}`, {})
 
 				}}>
 
@@ -431,7 +429,7 @@ const LegacyTrip = ({navigation, route}) => {
 								console.log(selectedFriend.key + '  ' + account.info.id + '  ' + account.info.nickname)
 								setAsync(true)
 
-								apiRequest("post", `/api/travelope/new-shared-trip/${selectedFriend.key}/${account.info.id}/${account.info.nickname}`, item)
+								apiRequest("post", `/travelope/new-shared-trip/${selectedFriend.key}/${account.info.id}/${account.info.nickname}`, item)
 								.then( async res => {
 
 									console.log("成功分享旅程")

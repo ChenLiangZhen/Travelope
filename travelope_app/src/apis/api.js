@@ -2,22 +2,22 @@ import axios from "axios"
 import * as Keychain from "react-native-keychain"
 
 export const signupApi = axios.create({
-	baseURL: "https://lightii.ap.ngrok.io",
+	baseURL: "https://api.lightii.dev/",
 	timeout: 10000,
 })
 
 export const signinApi = axios.create({
-	baseURL: "https://lightii.ap.ngrok.io",
+	baseURL: "https://api.lightii.dev/",
 	timeout: 10000,
 })
 
 export const signinWithAppleApi = axios.create({
-	baseURL: "https://lightii.ap.ngrok.io",
+	baseURL: "https://api.lightii.dev/",
 	timeout: 10000,
 })
 
 export const request = axios.create({
-	baseURL: "https://lightii.ap.ngrok.io",
+	baseURL: "https://api.lightii.dev/",
 	timeout: 10000,
 })
 

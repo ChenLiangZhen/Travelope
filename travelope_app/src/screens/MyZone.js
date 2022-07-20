@@ -121,7 +121,7 @@ const UnderlayLeft = ({drag}: { drag: () => void }) => {
 						{
 							text: "刪除", onPress: () => {
 								dispatch(delFriend(item.key))
-								apiRequest("post", `/api/travelope/del-friend/${account.info.id}/${item.key}`)
+								apiRequest("post", `/travelope/del-friend/${account.info.id}/${item.key}`)
 									.then(async res => {
 										addToast("成功移除朋友： " + item.name)
 										await new Promise(resolve => setTimeout(resolve, 1500))
@@ -495,14 +495,14 @@ const MyZone = () => {
 										setAsyncImg(true)
 										setAsyncData(true)
 
-										apiRequest("get", `/api/travelope/get-download-link/${searchID}/${searchID}`, {})
+										apiRequest("get", `/travelope/get-download-link/${searchID}/${searchID}`, {})
 											.then(res => {
 												setTargetImageURL(res.url), setAsyncImg(false)
 											}, rej => {
 												setAsyncImg(false)
 											})
 
-										apiRequest("get", `/api/travelope/find-user/${searchID}`, {})
+										apiRequest("get", `/travelope/find-user/${searchID}`, {})
 											.then(res => {
 
 												setWarningMessage("OK"), setTargetData(res), setAsyncData(false)
@@ -614,7 +614,7 @@ const MyZone = () => {
 																	                tag: "friend",
 																                }))
 
-																                apiRequest("post", `/api/travelope/add-friend/${account.info.id}`, {
+																                apiRequest("post", `/travelope/add-friend/${account.info.id}`, {
 
 																	                key: targetData.id,
 																	                name: targetData.nickname,

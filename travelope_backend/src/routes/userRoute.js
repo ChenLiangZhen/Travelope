@@ -7,9 +7,9 @@ const UserData = mongoose.model("user_data")
 
 const router_user = express.Router()
 
-router_user.get("/api/travelope/find-user/:accountID",userAuth ,async (req, res) => {
+router_user.get("/travelope/find-user/:accountID", userAuth, async (req, res) => {
 
-	const { accountID } = req.params
+	const {accountID} = req.params
 
 	try {
 		console.log(accountID)
@@ -31,9 +31,9 @@ router_user.get("/api/travelope/find-user/:accountID",userAuth ,async (req, res)
 
 })
 
-router_user.post("/api/travelope/signup", async (req, res) => {
+router_user.post("/travelope/signup", async (req, res) => {
 
-	const { nickname, email, id, password } = req.body
+	const {nickname, email, id, password} = req.body
 	let linkId, userData
 
 	try {
@@ -71,17 +71,17 @@ router_user.post("/api/travelope/signup", async (req, res) => {
 
 })
 
-router_user.post("/api/travelope/signin", async (req, res) => {
+router_user.post("/travelope/signin", async (req, res) => {
 
-	const { email, password } = req.body
+	const {email, password} = req.body
 
 	if (!email || !password) {
-		return res.status(422).send({ error: "must provide email and password." })
+		return res.status(422).send({error: "must provide email and password."})
 	}
 	//尋找該 email 的使用者是否存在。 若不在則回傳錯誤。
-	const user = await User.findOne({ email })
+	const user = await User.findOne({email})
 	if (!user) {
-		return res.status(422).send({ error: "invalid password of email" })
+		return res.status(422).send({error: "invalid password of email"})
 	}
 
 	try {
@@ -99,16 +99,16 @@ router_user.post("/api/travelope/signin", async (req, res) => {
 	}
 })
 
-router_user.post("/api/travelope/sign-with-apple", async (req, res) => {
+router_user.post("/travelope/sign-with-apple", async (req, res) => {
 
-	const { email, password } = req.body
+	const {email, password} = req.body
 
 	if (!email || !password) {
-		return res.status(422).send({ error: "must provide email and password." })
+		return res.status(422).send({error: "must provide email and password."})
 	}
 
 	//尋找該 email 的使用者是否存在。 若不在則回傳錯誤。
-	const user = await User.findOne({ email })
+	const user = await User.findOne({email})
 
 	if (!user) {
 		try {
@@ -167,12 +167,12 @@ router_user.post("/api/travelope/sign-with-apple", async (req, res) => {
 	}
 })
 
-router_user.put("/api/travelope/update-user", async (req, res) => {
+router_user.put("/travelope/update-user", async (req, res) => {
 
-	const { id, data } = req.body
+	const {id, data} = req.body
 
 	try {
-		User.updateOne({ id: id },
+		User.updateOne({id: id},
 			{
 
 				email: data.email,
@@ -197,12 +197,12 @@ router_user.put("/api/travelope/update-user", async (req, res) => {
 
 })
 
-router_user.put("/api/travelope/update-user-has-picture", async (req, res) => {
+router_user.put("/travelope/update-user-has-picture", async (req, res) => {
 
-	const { id } = req.body
+	const {id} = req.body
 
 	try {
-		User.updateOne({ id: id },
+		User.updateOne({id: id},
 			{
 				hasRemoteProfilePicture: true,
 			},
@@ -221,14 +221,14 @@ router_user.put("/api/travelope/update-user-has-picture", async (req, res) => {
 
 })
 
-router_user.post("/api/travelope/add-friend/:accountID", async (req, res) => {
+router_user.post("/travelope/add-friend/:accountID", async (req, res) => {
 
-	const { key, name, pictureURL, tag } = req.body
-	const { accountID } = req.params
+	const {key, name, pictureURL, tag} = req.body
+	const {accountID} = req.params
 
 	try {
 
-		User.findOne({id: accountID}, async (e, user)=> {
+		User.findOne({id: accountID}, async (e, user) => {
 
 			if (e || !user) {
 				console.log("ERROR FINDING USER:" + e)
@@ -262,13 +262,13 @@ router_user.post("/api/travelope/add-friend/:accountID", async (req, res) => {
 
 })
 
-router_user.post("/api/travelope/del-friend/:accountID/:key", async (req, res) => {
+router_user.post("/travelope/del-friend/:accountID/:key", async (req, res) => {
 
-	const { key, accountID } = req.params
+	const {key, accountID} = req.params
 
 	try {
 
-		User.findOne({id: accountID}, async (e, user)=> {
+		User.findOne({id: accountID}, async (e, user) => {
 
 			if (e || !user) {
 				console.log("ERROR FINDING USER:" + e)

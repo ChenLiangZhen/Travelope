@@ -10,6 +10,7 @@
     "lint": "eslint .."
   },
   "dependencies": {
+    "@google-cloud/secret-manager": "^4.0.0",
     "@invertase/react-native-apple-authentication": "^2.2.1",
     "@react-native-async-storage/async-storage": "^1.17.6",
     "@react-native-clipboard/clipboard": "react-native-clipboard/clipboard",

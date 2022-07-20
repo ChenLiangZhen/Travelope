@@ -1,23 +1,21 @@
 import React, {useEffect, useRef, useState} from "react"
 import LayoutBase from "../../components/LayoutBase"
 import FlatBlock from "../../components/FlatBlock"
-import {HStack, Input, Modal, Pressable, ScrollView, Text, useTheme, useToast} from "native-base"
-import Block from "../../components/Block"
+import {HStack, Input, Pressable, ScrollView, Text, useTheme, useToast} from "native-base"
 import DatePicker from "react-native-date-picker"
 import Feather from "react-native-vector-icons/Feather"
-import {GradientBorderButton, GradientButton} from "../../components/GradientButton"
+import {GradientButton} from "../../components/GradientButton"
 import {selectAccount} from "../../globalstate/accountSlice"
 import {FlatList, Image, Keyboard} from "react-native"
-import {HEIGHT, WIDTH} from "../../Util"
+import {WIDTH} from "../../Util"
 import {useDispatch, useSelector} from "react-redux"
-import {pushTripNote, selectData, updateTripNote} from "../../globalstate/dataSlice"
-import {apiRequest, geocodingRequest} from "../../apis/api"
+import {selectData} from "../../globalstate/dataSlice"
+import {geocodingRequest} from "../../apis/api"
 import Geolocation from "react-native-geolocation-service"
 import ImagePicker from "react-native-image-crop-picker"
 import {uploadImageInit} from "../../apis/fileManager"
-import RNFS from "react-native-fs"
-import {useFocusEffect, useIsFocused} from "@react-navigation/native";
-import {config, useSpring, animated} from "@react-spring/native";
+import {useIsFocused} from "@react-navigation/native";
+import {animated, config, useSpring} from "@react-spring/native";
 
 const ImageItem = (props) => {
 
@@ -273,7 +271,7 @@ const LegacyNote = ({navigation, route}) => {
 
 			// uploadProfilePicture(account.info.id, account.info.id, URI)
 
-			// apiRequest("put", "/api/travelope/update-user-has-picture", {
+			// apiRequest("put", "/travelope/update-user-has-picture", {
 			// 	id: accountID,
 			// })
 		})

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" serverName="DigitalOcean" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="DigitalOcean">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/travelope-backend" local="$PROJECT_DIR$/travelope_backend" web="/" />
+            <mapping local="" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/travelope_backend/node_modules" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>

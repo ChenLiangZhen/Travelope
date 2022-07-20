@@ -82,7 +82,7 @@ const UnderlayLeft = ({drag}: { drag: () => void }) => {
 							{
 								text: "刪除", onPress: () => {
 									dispatch(delTrip(item.tripID))
-									apiRequest("post", `/api/travelope/del-trip/${account.info.id}/${item.tripID}`, {})
+									apiRequest("post", `/travelope/del-trip/${account.info.id}/${item.tripID}`, {})
 
 								},
 							},
